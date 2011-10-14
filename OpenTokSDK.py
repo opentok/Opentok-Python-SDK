@@ -2,12 +2,10 @@
 
 
 """
- OpenTok Python Library v0.90.0
+ OpenTok Python Library v0.91.0
  http://www.tokbox.com/
 
- Copyright 2010, TokBox, Inc.
-
- Last modified: @opentok.sdk.python.mod_time@
+ Copyright 2011, TokBox, Inc.
 
 """
 
@@ -15,6 +13,7 @@ import urllib
 import urllib2
 import datetime
 import calendar
+import time
 import hmac
 import hashlib
 import base64
@@ -66,11 +65,10 @@ class OpenTokSDK(object):
     Use this SDK to create tokens and interface with the server-side portion of the Opentok API.
     """
     TOKEN_SENTINEL = "T1=="
-    SDK_VERSION = "tbpy-@sdk_version@.@opentok.sdk.python.mod_time@"
 
-    API_URL = "@staging.api.url@"
+    API_URL = "http://staging.tokbox.com/hl"
     # Uncomment this line when you launch your app
-    # API_URL = "@production.api.url@";
+    # API_URL = "https://api.opentok.com/hl";
 
     def __init__(self, api_key, api_secret):
         self.api_key = api_key
@@ -89,6 +87,11 @@ class OpenTokSDK(object):
         if not role:
             role = RoleConstants.PUBLISHER
 
+        if role != RoleConstants.SUBSCRIBER and \
+        	role != RoleConstants.PUBLISHER and \
+            role != RoleConstants.MODERATOR:
+                raise OpenTokException("%s is not a valid role" % role)
+
         data_params = dict(session_id=session_id,
                            create_time=calendar.timegm(create_time.timetuple()),
                            role=role,
@@ -97,16 +100,28 @@ class OpenTokSDK(object):
             if isinstance(expire_time, datetime.datetime):
                 data_params['expire_time'] = calendar.timegm(expire_time.timetuple())
             else:
-                data_params['expire_time'] = expire_time
+                try:
+                    data_params['expire_time'] = int(expire_time)
+
+                except ValueError, TypeError:
+                    raise OpenTokException("Expire time must be a number")
+
+            if data_params['expire_time'] < time.time():
+                raise OpenTokException("Expire time must be in the future")
+
+            if data_params['expire_time'] > time.time() + 604800:
+                raise OpenTokException("Expire time must be in the next 7 days")
         
         if connection_data is not None:
+            if len(connection_data) > 1000:
+                raise OpenTokException("Connection data must be less than 1000 characters")
             data_params['connection_data'] = connection_data
 
         data_params['nonce'] = random.randint(0,999999)
         data_string = urllib.urlencode(data_params, True)
 
         sig = self._sign_string(data_string, self.api_secret)
-        token_string = "%s%s" % (self.TOKEN_SENTINEL, base64.b64encode("partner_id=%s&sdk_version=%s&sig=%s:%s" % (self.api_key, self.SDK_VERSION, sig, data_string)))
+        token_string = "%s%s" % (self.TOKEN_SENTINEL, base64.b64encode("partner_id=%s&sig=%s:%s" % (self.api_key, sig, data_string)))
         return token_string
 
     def create_session(self, location='', properties={}, **kwargs):
