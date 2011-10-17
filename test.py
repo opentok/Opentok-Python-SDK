@@ -86,14 +86,14 @@ class TestPythonSDK(unittest.TestCase):
             'Python SDK tests: multiplexer.switchType not properly set (should be 100000)')
 
     def test_p2p_preference(self):
-        s = self.o.create_session(properties = {"p2p.preference": 'enable'})
+        s = self.o.create_session(properties = {"p2p.preference": 'enabled'})
         xml = self.get_session_info(s.session_id)
-        self.assertEqual('enable', xml.getElementsByTagName('preference')[0].childNodes[0].data, \
+        self.assertEqual('enabled', xml.getElementsByTagName('preference')[0].childNodes[0].data, \
             'Python SDK tests: multiplexer.p2p_preference not enabled')
 
-        s = self.o.create_session(properties = {"p2p.preference": 'disable'})
+        s = self.o.create_session(properties = {"p2p.preference": 'disabled'})
         xml = self.get_session_info(s.session_id)
-        self.assertEqual('disable', xml.getElementsByTagName('preference')[0].childNodes[0].data, \
+        self.assertEqual('disabled', xml.getElementsByTagName('preference')[0].childNodes[0].data, \
             'Python SDK tests: multiplexer.p2p_preference not disabled')
     
     def test_echo_suppression(self):
