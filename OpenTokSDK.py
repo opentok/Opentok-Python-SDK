@@ -1,13 +1,10 @@
-
-
-
 """
- OpenTok Python Library v0.91.0
- http://www.tokbox.com/
+OpenTok Python Library v0.91.0
+http://www.tokbox.com/
 
- Copyright 2011, TokBox, Inc.
-
+Copyright 2011, TokBox, Inc.
 """
+
 
 import urllib
 import urllib2
