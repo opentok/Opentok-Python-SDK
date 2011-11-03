@@ -59,9 +59,9 @@ class SessionProperties(object):
 
 class RoleConstants:
     """List of valid roles for a token."""
-    SUBSCRIBER = "subscriber" #Can only subscribe
-    PUBLISHER = "publisher"   #Can publish, subscribe, and signal
-    MODERATOR = "moderator"   #Can do the above along with  forceDisconnect and forceUnpublish
+    SUBSCRIBER = 'subscriber' #Can only subscribe
+    PUBLISHER = 'publisher'   #Can publish, subscribe, and signal
+    MODERATOR = 'moderator'   #Can do the above along with  forceDisconnect and forceUnpublish
 
 
 class OpenTokSession(object):
@@ -73,9 +73,9 @@ class OpenTokSDK(object):
     """Use this SDK to create tokens and interface with the server-side portion
     of the Opentok API.
     """
-    TOKEN_SENTINEL = "T1=="
+    TOKEN_SENTINEL = 'T1=='
 
-    API_URL = "http://staging.tokbox.com/hl"
+    API_URL = 'http://staging.tokbox.com/hl'
     # Uncomment this line when you launch your app
     # API_URL = "https://api.opentok.com/hl";
 
@@ -99,7 +99,7 @@ class OpenTokSDK(object):
         if role != RoleConstants.SUBSCRIBER and \
                 role != RoleConstants.PUBLISHER and \
                 role != RoleConstants.MODERATOR:
-            raise OpenTokException("%s is not a valid role" % role)
+            raise OpenTokException('%s is not a valid role' % role)
 
         data_params = dict(
             session_id=session_id,
@@ -113,24 +113,24 @@ class OpenTokSDK(object):
                 try:
                     data_params['expire_time'] = int(expire_time)
                 except ValueError, TypeError:
-                    raise OpenTokException("Expire time must be a number")
+                    raise OpenTokException('Expire time must be a number')
 
             if data_params['expire_time'] < time.time():
-                raise OpenTokException("Expire time must be in the future")
+                raise OpenTokException('Expire time must be in the future')
 
             if data_params['expire_time'] > time.time() + 604800:
-                raise OpenTokException("Expire time must be in the next 7 days")
+                raise OpenTokException('Expire time must be in the next 7 days')
 
         if connection_data is not None:
             if len(connection_data) > 1000:
-                raise OpenTokException("Connection data must be less than 1000 characters")
+                raise OpenTokException('Connection data must be less than 1000 characters')
             data_params['connection_data'] = connection_data
 
         data_params['nonce'] = random.randint(0,999999)
         data_string = urllib.urlencode(data_params, True)
 
         sig = self._sign_string(data_string, self.api_secret)
-        token_string = "%s%s" % (self.TOKEN_SENTINEL, base64.b64encode("partner_id=%s&sig=%s:%s" % (self.api_key, sig, data_string)))
+        token_string = '%s%s' % (self.TOKEN_SENTINEL, base64.b64encode('partner_id=%s&sig=%s:%s' % (self.api_key, sig, data_string)))
         return token_string
 
     def create_session(self, location='', properties={}, **kwargs):
@@ -150,26 +150,26 @@ class OpenTokSDK(object):
         params.update(properties)
         dom = ''
         try:
-            dom = self._do_request("/session/create", params)
+            dom = self._do_request('/session/create', params)
         except RequestError:
             raise
         except Exception, e:
-            raise RequestError("Failed to create session: %s" % str(e)  )
+            raise RequestError('Failed to create session: %s' % str(e)  )
 
         try:
             error = dom.getElementsByTagName('error')
             if error:
                 error = error[0]
-                raise AuthError("Failed to create session (code=%s): %s" % (error.attributes['code'].value, error.firstChild.attributes['message'].value))
+                raise AuthError('Failed to create session (code=%s): %s' % (error.attributes['code'].value, error.firstChild.attributes['message'].value))
 
             session_id = dom.getElementsByTagName('session_id')[0].childNodes[0].nodeValue
             return OpenTokSession(session_id)
         except Exception, e:
-            raise OpenTokException("Failed to generate session: %s" % str(e))
+            raise OpenTokException('Failed to generate session: %s' % str(e))
 
 
     def _sign_string(self, string, secret):
-        return hmac.new(secret, string.encode("utf-8"), hashlib.sha1).hexdigest()
+        return hmac.new(secret, string.encode('utf-8'), hashlib.sha1).hexdigest()
 
     def _do_request(self, url, params):
         import xml.dom.minidom as xmldom
@@ -178,9 +178,9 @@ class OpenTokSDK(object):
             auth_header = ('X-TB-TOKEN-AUTH', params['_token'])
             del params['_token']
         else:
-            auth_header = ('X-TB-PARTNER-AUTH', "%s:%s" % (self.api_key, self.api_secret))
+            auth_header = ('X-TB-PARTNER-AUTH', '%s:%s' % (self.api_key, self.api_secret))
 
-        method = "POST" if params else "GET"
+        method = 'POST' if params else 'GET'
         data_string = urllib.urlencode(params, True)
 
         context_source = [
@@ -206,6 +206,6 @@ class OpenTokSDK(object):
             dom = xmldom.parseString(response.read())
             response.close()
         except urllib2.HTTPError, e:
-            raise RequestError("Failed to send request: %s" % str(e))
+            raise RequestError('Failed to send request: %s' % str(e))
 
         return dom
