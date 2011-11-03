@@ -21,17 +21,21 @@ TIMEOUT = 10
 
 
 class OpenTokException(BaseException):
-    "Generic OpenTok Error. All other errors extend this."
+    """Generic OpenTok Error. All other errors extend this."""
     pass
 
 
 class RequestError(OpenTokException):
-    "Indicates an error during the request. Most likely an error connecting to the OpenTok API servers. (HTTP 500 error)"
+    """Indicates an error during the request. Most likely an error connecting to
+    the OpenTok API servers. (HTTP 500 error).
+    """
     pass
 
 
 class AuthError(OpenTokException):
-    "Indicates that the problem was likely with credentials. Check your API key and API secret and try again"
+    """Indicates that the problem was likely with credentials. Check your API
+    key and API secret and try again.
+    """
     pass
 
 
@@ -53,7 +57,7 @@ class SessionProperties(object):
 
 
 class RoleConstants:
-    "List of valid roles for a token"
+    """List of valid roles for a token."""
     SUBSCRIBER = "subscriber" #Can only subscribe
     PUBLISHER = "publisher"   #Can publish, subscribe, and signal
     MODERATOR = "moderator"   #Can do the above along with  forceDisconnect and forceUnpublish
@@ -65,8 +69,8 @@ class OpenTokSession(object):
         self.session_id = session_id
 
 class OpenTokSDK(object):
-    """
-    Use this SDK to create tokens and interface with the server-side portion of the Opentok API.
+    """Use this SDK to create tokens and interface with the server-side portion
+    of the Opentok API.
     """
     TOKEN_SENTINEL = "T1=="
 
@@ -129,10 +133,13 @@ class OpenTokSDK(object):
         return token_string
 
     def create_session(self, location='', properties={}, **kwargs):
-        """
-        Create a new session in the OpenTok API. Returns an OpenTokSession object with a session_id property.
-        location: IP address of the user requesting the session. This is used for geolocation to choose which datacenter the session will live on.
-        properties: An instance of the SessionProperties object. Fill in the fields that you are interested in to use features of the groups API. Look in the documentation for more details. Also accepts any dict-like object.
+        """Create a new session in the OpenTok API. Returns an OpenTokSession
+        object with a session_id property. location: IP address of the user
+        requesting the session. This is used for geolocation to choose which
+        datacenter the session will live on. properties: An instance of the
+        SessionProperties object. Fill in the fields that you are interested in
+        to use features of the groups API. Look in the documentation for more
+        details. Also accepts any dict-like object.
         """
         #ip_passthru is a deprecated argument and has been replaced with location
         if 'ip_passthru' in kwargs:
