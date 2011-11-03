@@ -96,7 +96,7 @@ class OpenTokSDK(object):
             role = RoleConstants.PUBLISHER
 
         if role != RoleConstants.SUBSCRIBER and \
-        	role != RoleConstants.PUBLISHER and \
+            role != RoleConstants.PUBLISHER and \
             role != RoleConstants.MODERATOR:
                 raise OpenTokException("%s is not a valid role" % role)
 
