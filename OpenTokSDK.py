@@ -16,7 +16,9 @@ import hashlib
 import base64
 import random
 
+
 TIMEOUT = 10
+
 
 class OpenTokException(BaseException):
     "Generic OpenTok Error. All other errors extend this."
