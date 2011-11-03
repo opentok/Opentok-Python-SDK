@@ -1,8 +1,10 @@
-from OpenTokSDK import OpenTokSDK, OpenTokException
 import time
-import unittest
 import urllib2
+import unittest
 from xml.dom.minidom import parseString
+
+from OpenTokSDK import OpenTokSDK, OpenTokException
+
 
 class TestPythonSDK(unittest.TestCase):
 
@@ -95,7 +97,7 @@ class TestPythonSDK(unittest.TestCase):
         xml = self.get_session_info(s.session_id)
         self.assertEqual('disabled', xml.getElementsByTagName('preference')[0].childNodes[0].data, \
             'Python SDK tests: multiplexer.p2p_preference not disabled')
-    
+
     def test_echo_suppression(self):
         s = self.o.create_session(properties = {"echoSuppression.enabled": 'true'})
         xml = self.get_session_info(s.session_id)
@@ -197,7 +199,7 @@ class TestPythonSDK(unittest.TestCase):
         # garbage data
         try:
             t = self.o.generate_token(s.session_id, 'ads')
-            raise AssertionError('Python SDK tests: invalid role should be rejected') 
+            raise AssertionError('Python SDK tests: invalid role should be rejected')
 
         except OpenTokException:
             pass # expected
@@ -300,11 +302,11 @@ class TestPythonSDK(unittest.TestCase):
 
     def assertIsNotNone(self, obj, msg):
         if obj is None:
-        	raise AssertionError(msg)
+            raise AssertionError(msg)
 
     def assertIsNone(self, obj, msg):
         if obj is not None:
-        	raise AssertionError(msg)
+            raise AssertionError(msg)
 
 if __name__ == '__main__':
         unittest.main()
