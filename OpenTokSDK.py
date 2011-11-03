@@ -47,12 +47,13 @@ class SessionProperties(object):
     p2p_preference = None
 
     def __iter__(self):
-        d= {'echoSuppression.enabled' : self.echoSuppression_enabled,
-            'multiplexer.numOutputStreams' : self.multiplexer_numOutputStreams,
-            'multiplexer.switchType' : self.multiplexer_switchType,
-            'multiplexer.switchTimeout' : self.multiplexer_switchTimeout,
-            'p2p.preference' : self.p2p_preference,
-            }
+        d = {
+            'echoSuppression.enabled': self.echoSuppression_enabled,
+            'multiplexer.numOutputStreams': self.multiplexer_numOutputStreams,
+            'multiplexer.switchType': self.multiplexer_switchType,
+            'multiplexer.switchTimeout': self.multiplexer_switchTimeout,
+            'p2p.preference': self.p2p_preference,
+        }
         return d.iteritems()
 
 
@@ -96,21 +97,21 @@ class OpenTokSDK(object):
             role = RoleConstants.PUBLISHER
 
         if role != RoleConstants.SUBSCRIBER and \
-            role != RoleConstants.PUBLISHER and \
-            role != RoleConstants.MODERATOR:
-                raise OpenTokException("%s is not a valid role" % role)
+                role != RoleConstants.PUBLISHER and \
+                role != RoleConstants.MODERATOR:
+            raise OpenTokException("%s is not a valid role" % role)
 
-        data_params = dict(session_id=session_id,
-                           create_time=calendar.timegm(create_time.timetuple()),
-                           role=role,
-                           )
+        data_params = dict(
+            session_id=session_id,
+            create_time=calendar.timegm(create_time.timetuple()),
+            role=role,
+        )
         if expire_time is not None:
             if isinstance(expire_time, datetime.datetime):
                 data_params['expire_time'] = calendar.timegm(expire_time.timetuple())
             else:
                 try:
                     data_params['expire_time'] = int(expire_time)
-
                 except ValueError, TypeError:
                     raise OpenTokException("Expire time must be a number")
 
@@ -183,12 +184,11 @@ class OpenTokSDK(object):
         data_string = urllib.urlencode(params, True)
 
         context_source = [
-                ('method', method),
-                ('Content-Type', 'application-xml'),
-                ('Content-Length', len(data_string)),
-                auth_header
-                ]
-
+            ('method', method),
+            ('Content-Type', 'application-xml'),
+            ('Content-Length', len(data_string)),
+            auth_header
+        ]
 
         req_string = self.API_URL + url
         try:
