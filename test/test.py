@@ -1,8 +1,10 @@
-from OpenTokSDK import OpenTokSDK, OpenTokException
 import time
-import unittest
 import urllib2
+import unittest
 from xml.dom.minidom import parseString
+
+from OpenTokSDK import OpenTokSDK, OpenTokException
+
 
 class TestPythonSDK(unittest.TestCase):
 
