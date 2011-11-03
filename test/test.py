@@ -302,11 +302,11 @@ class TestPythonSDK(unittest.TestCase):
 
     def assertIsNotNone(self, obj, msg):
         if obj is None:
-        	raise AssertionError(msg)
+            raise AssertionError(msg)
 
     def assertIsNone(self, obj, msg):
         if obj is not None:
-        	raise AssertionError(msg)
+            raise AssertionError(msg)
 
 if __name__ == '__main__':
         unittest.main()
