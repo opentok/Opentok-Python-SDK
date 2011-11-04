@@ -16,7 +16,7 @@ setup(
 
     # Metadata for PyPI:
     author = 'TokBox, Inc.',
-    author_email = 'mkascel@gmail.com',
+    author_email = 'support@tokbox.com',
     #license = '?',
     url = 'https://github.com/opentok/Opentok-Python-SDK',
     keywords = 'video chat tokbox tok opentok python media',
