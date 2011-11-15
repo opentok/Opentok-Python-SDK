@@ -10,7 +10,7 @@ class TestPythonSDK(unittest.TestCase):
 
     api_key = -1
     api_secret = ""
-    api_url = OpenTokSDK.API_URL
+    api_url = OpenTokSDK.STAGING_URL
     o = None
 
     def setUp(self):
