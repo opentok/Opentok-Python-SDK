@@ -74,14 +74,13 @@ class OpenTokSDK(object):
     of the Opentok API.
     """
     TOKEN_SENTINEL = 'T1=='
+    STAGING_URL = 'http://staging.tokbox.com/hl'
+    PRODUCTION_URL = 'https://api.opentok.com/hl'
 
-    API_URL = 'http://staging.tokbox.com/hl'
-    # Uncomment this line when you launch your app
-    # API_URL = "https://api.opentok.com/hl";
-
-    def __init__(self, api_key, api_secret):
+    def __init__(self, api_key, api_secret, staging=False):
         self.api_key = api_key
         self.api_secret = api_secret.strip()
+        self.API_URL = self.STAGING_URL if staging else self.PRODUCTION_URL
 
     def generate_token(self, session_id=None, role=None, expire_time=None, connection_data=None, **kwargs):
         """
