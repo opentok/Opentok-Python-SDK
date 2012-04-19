@@ -44,7 +44,7 @@ class SessionProperties(object):
     multiplexer_numOutputStreams = None
     multiplexer_switchType = None
     multiplexer_switchTimeout = None
-    p2p_preference = None
+    p2p_preference = "p2p.preference" 
 
     def __iter__(self):
         d = {
@@ -184,7 +184,7 @@ class OpenTokSDK(object):
 
         context_source = [
             ('method', method),
-            ('Content-Type', 'application-xml'),
+            ('Content-Type', 'application/x-www-form-urlencoded'),
             ('Content-Length', len(data_string)),
             auth_header
         ]
