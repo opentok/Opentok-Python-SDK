@@ -10,7 +10,6 @@ class TestPythonSDK(unittest.TestCase):
 
     api_key = -1
     api_secret = ""
-    api_url = OpenTokSDK.STAGING_URL
     o = None
 
     def setUp(self):
@@ -18,94 +17,111 @@ class TestPythonSDK(unittest.TestCase):
 
     def test_create_session(self):
         s = self.o.create_session()
+        t = self.o.generate_token(s.session_id)
         self.assertIsNotNone(s.session_id, "Python SDK tests: create session (no params): did not return a session id")
-        xml = self.get_session_info(s.session_id)
+        xml = self.get_session_info(s.session_id, t)
         self.assertEqual(s.session_id, xml.getElementsByTagName('session_id')[0].childNodes[0].data, \
             "Python SDK tests: Session id not found")
 
         s = self.o.create_session('216.38.134.114')
+        t = self.o.generate_token(s.session_id)
         self.assertIsNotNone(s.session_id, "Python SDK tests: create session (no params): did not return a session id")
-        xml = self.get_session_info(s.session_id)
+        xml = self.get_session_info(s.session_id, t)
         self.assertEqual(s.session_id, xml.getElementsByTagName('session_id')[0].childNodes[0].data, \
             "Python SDK tests: Session id not found")
 
     def test_num_output_streams(self):
         s = self.o.create_session('127.0.0.1', properties={"multiplexer.numOutputStreams": 0})
-        xml = self.get_session_info(s.session_id)
+        t = self.o.generate_token(s.session_id)
+        xml = self.get_session_info(s.session_id, t)
         self.assertEqual('0', xml.getElementsByTagName('numOutputStreams')[0].childNodes[0].data, \
             'Python SDK tests: multiplexer.numOutputStreams not set to 0')
 
         s = self.o.create_session('127.0.0.1', properties = {"multiplexer.numOutputStreams": 1})
-        xml = self.get_session_info(s.session_id)
+        t = self.o.generate_token(s.session_id)
+        xml = self.get_session_info(s.session_id, t)
         self.assertEqual('1', xml.getElementsByTagName('numOutputStreams')[0].childNodes[0].data, \
             'Python SDK tests: multiplexer.numOutputStreams not set to 1')
 
         s = self.o.create_session('127.0.0.1', properties = {"multiplexer.numOutputStreams": 5})
-        xml = self.get_session_info(s.session_id)
+        t = self.o.generate_token(s.session_id)
+        xml = self.get_session_info(s.session_id, t)
         self.assertEqual('5', xml.getElementsByTagName('numOutputStreams')[0].childNodes[0].data, \
             'Python SDK tests: multiplexer.numOutputStreams not set to 5')
 
         s = self.o.create_session('127.0.0.1', properties = {"multiplexer.numOutputStreams": 100})
-        xml = self.get_session_info(s.session_id)
+        t = self.o.generate_token(s.session_id)
+        xml = self.get_session_info(s.session_id, t)
         self.assertEqual('100', xml.getElementsByTagName('numOutputStreams')[0].childNodes[0].data, \
             'Python SDK tests: multiplexer.numOutputStreams not set to 100')
 
         s = self.o.create_session('127.0.0.1')
-        xml = self.get_session_info(s.session_id)
+        t = self.o.generate_token(s.session_id)
+        xml = self.get_session_info(s.session_id, t)
         self.assertEqual([], xml.getElementsByTagName('numOutputStreams'),
             'Python SDK tests: multiplexer.numOutputStreams should not be set')
 
     def test_switch_type(self):
         s = self.o.create_session(properties = {"multiplexer.switchType":  0})
-        xml = self.get_session_info(s.session_id)
+        t = self.o.generate_token(s.session_id)
+        xml = self.get_session_info(s.session_id, t)
         self.assertEqual('0', xml.getElementsByTagName('switchType')[0].childNodes[0].data, \
             'Python SDK tests: multiplexer.switchType not 0')
 
         s = self.o.create_session(properties = {"multiplexer.switchType":  1})
-        xml = self.get_session_info(s.session_id)
+        t = self.o.generate_token(s.session_id)
+        xml = self.get_session_info(s.session_id, t)
         self.assertEqual('1', xml.getElementsByTagName('switchType')[0].childNodes[0].data, \
             'Python SDK tests: multiplexer.switchType not 1')
 
         s = self.o.create_session()
-        xml = self.get_session_info(s.session_id)
+        t = self.o.generate_token(s.session_id)
+        xml = self.get_session_info(s.session_id, t)
         self.assertEqual([], xml.getElementsByTagName('switchType'),
             'Python SDK tests: multiplexer.switchType should not be set')
 
     def test_switch_timeout(self):
         s = self.o.create_session(properties = {"multiplexer.switchTimeout": 1200})
-        xml = self.get_session_info(s.session_id)
+        t = self.o.generate_token(s.session_id)
+        xml = self.get_session_info(s.session_id, t)
         self.assertEqual('1200', xml.getElementsByTagName('switchTimeout')[0].childNodes[0].data, \
             'Python SDK tests: multiplexer.switchTimeout not properly set (should be 1200)')
 
         s = self.o.create_session(properties = {"multiplexer.switchTimeout": 2000})
-        xml = self.get_session_info(s.session_id)
+        t = self.o.generate_token(s.session_id)
+        xml = self.get_session_info(s.session_id, t)
         self.assertEqual('2000', xml.getElementsByTagName('switchTimeout')[0].childNodes[0].data, \
             'Python SDK tests: multiplexer.switchTimeout not properly set (should be 2000)')
 
         s = self.o.create_session(properties = {"multiplexer.switchTimeout": 100000})
-        xml = self.get_session_info(s.session_id)
+        t = self.o.generate_token(s.session_id)
+        xml = self.get_session_info(s.session_id, t)
         self.assertEqual('100000', xml.getElementsByTagName('switchTimeout')[0].childNodes[0].data, \
             'Python SDK tests: multiplexer.switchType not properly set (should be 100000)')
 
     def test_p2p_preference(self):
         s = self.o.create_session(properties = {"p2p.preference": 'enabled'})
-        xml = self.get_session_info(s.session_id)
+        t = self.o.generate_token(s.session_id)
+        xml = self.get_session_info(s.session_id, t)
         self.assertEqual('enabled', xml.getElementsByTagName('preference')[0].childNodes[0].data, \
             'Python SDK tests: multiplexer.p2p_preference not enabled')
 
         s = self.o.create_session(properties = {"p2p.preference": 'disabled'})
-        xml = self.get_session_info(s.session_id)
+        t = self.o.generate_token(s.session_id)
+        xml = self.get_session_info(s.session_id, t)
         self.assertEqual('disabled', xml.getElementsByTagName('preference')[0].childNodes[0].data, \
             'Python SDK tests: multiplexer.p2p_preference not disabled')
 
     def test_echo_suppression(self):
         s = self.o.create_session(properties = {"echoSuppression.enabled": 'true'})
-        xml = self.get_session_info(s.session_id)
+        t = self.o.generate_token(s.session_id)
+        xml = self.get_session_info(s.session_id, t)
         self.assertEqual('True', xml.getElementsByTagName('enabled')[0].childNodes[0].data, \
             'Python SDK tests: echo suppression not showing enabled')
 
         s = self.o.create_session(properties = {"echoSuppression.enabled": 'false'})
-        xml = self.get_session_info(s.session_id)
+        t = self.o.generate_token(s.session_id)
+        xml = self.get_session_info(s.session_id, t)
         self.assertEqual('False', xml.getElementsByTagName('enabled')[0].childNodes[0].data, \
             'Python SDK tests: echo suppression not showing disabled')
 
@@ -276,28 +292,28 @@ class TestPythonSDK(unittest.TestCase):
         except OpenTokException:
             pass # expected
 
-    def get_session_info(self, session_id, token = 'devtoken'):
+    def get_session_info(self, session_id, token):
         try:
-            url = self.api_url + '/session/' + session_id + '?extended=true'
+            url = self.o.API_URL + '/session/' + session_id + '?extended=true'
             req = urllib2.Request(url, '', { 'X-TB-TOKEN-AUTH': token })
             response = urllib2.urlopen(req)
             dom = parseString(response.read())
             response.close()
 
             return dom
-        except urllib2.HTTPError, e:
+        except urllib2.HTTPError:
             print "HTTP Error: failed to send request"
 
     def get_token_info(self, token):
         try:
-            url = self.api_url + '/token/validate'
+            url = self.o.API_URL + '/token/validate'
             req = urllib2.Request(url, '', { 'X-TB-TOKEN-AUTH': token })
             response = urllib2.urlopen(req)
             dom = parseString(response.read())
             response.close()
 
             return dom
-        except urllib2.HTTPError, e:
+        except urllib2.HTTPError:
             print "HTTP Error: failed to send request"
 
     def assertIsNotNone(self, obj, msg):

@@ -74,13 +74,11 @@ class OpenTokSDK(object):
     of the Opentok API.
     """
     TOKEN_SENTINEL = 'T1=='
-    STAGING_URL = 'http://staging.tokbox.com/hl'
-    PRODUCTION_URL = 'https://api.opentok.com/hl'
+    API_URL = 'https://api.opentok.com'
 
-    def __init__(self, api_key, api_secret, staging=False):
+    def __init__(self, api_key, api_secret):
         self.api_key = api_key
         self.api_secret = api_secret.strip()
-        self.API_URL = self.STAGING_URL if staging else self.PRODUCTION_URL
 
     def generate_token(self, session_id=None, role=None, expire_time=None, connection_data=None, **kwargs):
         """
@@ -111,7 +109,7 @@ class OpenTokSDK(object):
             else:
                 try:
                     data_params['expire_time'] = int(expire_time)
-                except ValueError, TypeError:
+                except (ValueError, TypeError):
                     raise OpenTokException('Expire time must be a number')
 
             if data_params['expire_time'] < time.time():
