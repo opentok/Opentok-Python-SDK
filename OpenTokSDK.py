@@ -115,8 +115,8 @@ class OpenTokSDK(object):
             if data_params['expire_time'] < time.time():
                 raise OpenTokException('Expire time must be in the future')
 
-            if data_params['expire_time'] > time.time() + 604800:
-                raise OpenTokException('Expire time must be in the next 7 days')
+            if data_params['expire_time'] > time.time() + 2592000:
+                raise OpenTokException('Expire time must be in the next 30 days')
 
         if connection_data is not None:
             if len(connection_data) > 1000:
