@@ -10,6 +10,6 @@ session = opentok_sdk.create_session(session_address)
 print session.session_id
 
 connectionMetadata = 'username=Bob, userLevel=4'
-token = opentok_sdk.generate_token(session.session_id, 'PUBLISHER', None, connectionMetadata)
+token = opentok_sdk.generate_token(session.session_id, OpenTokSDK.RoleConstants.PUBLISHER, None, connectionMetadata)
 
 print token
