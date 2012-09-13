@@ -7,7 +7,7 @@ setup(
 
     # Basic package information:
     name = 'opentok-python-sdk',
-    version = '0.91.0',
+    version = '0.91.1',
     py_modules = ['OpenTokSDK'],
 
     # Packaging options:
