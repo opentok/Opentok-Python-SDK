@@ -74,7 +74,7 @@ class OpenTokSDK(object):
     of the Opentok API.
     """
     TOKEN_SENTINEL = 'T1=='
-    API_URL = 'https://api.opentok.com'
+    API_URL = 'http://api.opentok.com'
 
     def __init__(self, api_key, api_secret):
         self.api_key = api_key
