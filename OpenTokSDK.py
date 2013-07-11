@@ -88,8 +88,8 @@ class OpenTokSDK(object):
         expire_time: Integer timestamp. You can override the default token expire time of 24h by choosing an explicit expire time. Can be up to 7d after create_time.
         """
         create_time = datetime.datetime.utcnow()
-        if session_id is None:
-            session_id = ''
+        if session_id is None or len(session_id)<5: #Session ids are at least 5 characters long.
+            raise OpenTokException('No Session ID given')
         if not role:
             role = RoleConstants.PUBLISHER
 
