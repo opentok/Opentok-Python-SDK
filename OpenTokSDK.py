@@ -89,7 +89,7 @@ class OpenTokSDK(object):
         """
         create_time = datetime.datetime.utcnow()
         if session_id is None or len(session_id)<5: #Session ids are at least 5 characters long.
-            raise OpenTokException('No Session ID given')
+            raise OpenTokException('Please pass in a valid session id')
         if not role:
             role = RoleConstants.PUBLISHER
 
