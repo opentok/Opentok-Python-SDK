@@ -80,7 +80,7 @@ class OpenTokSDK(object):
         self.api_key = api_key
         self.api_secret = api_secret.strip()
 
-    def generate_token(self, session_id=None, role=None, expire_time=None, connection_data=None, **kwargs):
+    def generate_token(self, session_id, role=None, expire_time=None, connection_data=None, **kwargs):
         """
         Generate a token which is passed to the JS API to enable widgets to connect to the Opentok api.
         session_id: Specify a session_id to make this token only valid for that session_id.
@@ -88,8 +88,25 @@ class OpenTokSDK(object):
         expire_time: Integer timestamp. You can override the default token expire time of 24h by choosing an explicit expire time. Can be up to 7d after create_time.
         """
         create_time = datetime.datetime.utcnow()
-        if session_id is None or len(session_id)<5: #Session ids are at least 5 characters long.
-            raise OpenTokException('Please pass in a valid session id')
+        if not session_id:
+            raise OpenTokException('Null or empty session ID are not valid')
+        sub_session_id = session_id[2:]
+        decoded_session_id=""
+        for i in range(0,3):
+            new_session_id = sub_session_id+("="*i)
+            new_session_id = new_session_id.replace("-","+").replace("_","/")
+            try:
+                decoded_session_id = base64.b64decode(new_session_id)
+                if "~" in decoded_session_id:
+                    break
+            except TypeError:
+                pass
+        try:
+            if decoded_session_id.split('~')[1]!=str(self.api_key):
+                raise OpenTokException("An invalid session ID was passed")
+        except Exception as e:
+            raise OpenTokException("An invalid session ID was passed")
+
         if not role:
             role = RoleConstants.PUBLISHER
 

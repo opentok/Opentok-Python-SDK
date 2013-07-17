@@ -15,6 +15,16 @@ class TestPythonSDK(unittest.TestCase):
     def setUp(self):
         self.o = OpenTokSDK(self.api_key, self.api_secret)
 
+    def test_token_incorrect_key(self):
+        different_session_id = "1_MX4yMDc1MjM4MX5-V2VkIEp1bCAxNyAxMDozMjoyMCBQRFQgMjAxM34wLjUyNTU2Mzd-" 
+        try:
+            t = self.o.generate_token(different_session_id)
+            raise AssertionError('Python SDK tests: Token with incorrect API key should be rejected')
+        except OpenTokException as e:
+            pass #expected
+
+       
+
     def test_create_session(self):
         s = self.o.create_session()
         t = self.o.generate_token(s.session_id)
