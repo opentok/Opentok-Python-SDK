@@ -42,14 +42,14 @@ Use your `OpenTokSDK` object to create `session_id`
 > location (string) -  OPTIONAL. a location so OpenTok can stream through the closest server  
 > properties (object) - OPTIONAL. Set peer to peer as `enabled` or `disabled`. Disabled by default  
 
-<pre>
+```python
 # creating a simple session: closest streaming server will be automatically determined when user connects to session
 session_id = OTSDK.create_session().session_id
 
 # Creating Session object with p2p enabled
 session_properties = {OTSDK.SessionProperties.p2p_preference: "enabled"}    # or disabled
 session_id = OTSDK.create_session(None, sessionProperties ).session_id
-</pre>
+```
 
 ## Generating Tokens
 With the generated sessionId, you can start generating tokens for each user.
@@ -59,10 +59,10 @@ With the generated sessionId, you can start generating tokens for each user.
 > expire_time (int) - OPTIONAL. Time when token will expire in unix timestamp  
 > connection_data (string) - OPTIONAL. Metadata to store data (names, user id, etc)
 
-<pre>
+```python
 # Generating a token
 token = OTSDK.generate_token(session_id, OTSDK.RoleConstants.PUBLISHER, "username=Bob,level=4")
-</pre>
+```
 
 Possible Errors:
 > "Null or empty session ID are not valid"  
