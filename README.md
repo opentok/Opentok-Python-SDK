@@ -10,7 +10,7 @@ To install from PyPi using [pip](http://www.pip-installer.org/en/latest/), a pac
 pip install opentok
 </pre>
 
-If you get "Permission Denied" errorsm try running it with `sudo` in front:
+If you get "Permission Denied" errors try running it with `sudo` in front:
 <pre>
 sudo pip install opentok
 </pre>
