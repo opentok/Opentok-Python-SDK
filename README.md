@@ -1,7 +1,7 @@
 # Opentok
 
 OpenTok is an API from TokBox that enables websites to weave live group video communication into their online experience. Check out <http://www.tokbox.com/> for more information.  
-This is the official OpenTok Ruby Server SDK for generating Sessions, Tokens, and retriving Archives. Please visit our [getting started page](http://www.tokbox.com/opentok/tools/js/gettingstarted) if you are unfamiliar with these concepts.  
+Please visit our [getting started page](http://www.tokbox.com/opentok/tools/js/gettingstarted) if you are unfamiliar with these concepts.  
 
 ## Installation
 
@@ -53,7 +53,7 @@ session_id = OTSDK.create_session(None, sessionProperties ).session_id
 
 ## Generating Tokens
 With the generated sessionId, you can start generating tokens for each user.
-`generate_token` takes in hash with 1-4 properties:
+`generate_token` takes in 1-4 properties:
 > session_id (string) - REQUIRED  
 > role (string) - OPTIONAL. subscriber, publisher, or moderator  
 > expire_time (int) - OPTIONAL. Time when token will expire in unix timestamp  
