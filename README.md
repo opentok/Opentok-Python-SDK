@@ -26,14 +26,14 @@ In order to use any of the server side functions, you must first create an `Open
 > api_key (string) - Given to you when you register  
 > api_secret (string) - Given to you when you register  
 
-<pre>
+```python
 import OpenTokSDK
 
 # Creating an OpenTok Object
 API_KEY = ''                # should be a string
 API_SECRET = ''            # should be a string
 OTSDK = OpenTokSDK.OpenTokSDK(API_KEY,API_SECRET)
-</pre>
+```
 
 
 ## Creating Sessions
@@ -61,7 +61,7 @@ With the generated sessionId, you can start generating tokens for each user.
 
 <pre>
 # Generating a token
-token = OTSDK.generate_token(session_id, role = OTSDK.RoleConstants.PUBLISHER, connection_data = "username=Bob,level=4")
+token = OTSDK.generate_token(session_id, OTSDK.RoleConstants.PUBLISHER, "username=Bob,level=4")
 </pre>
 
 Possible Errors:
