@@ -1,7 +1,8 @@
-# Opentok
+# OpenTok Server SDK for Python
 
-OpenTok is an API from TokBox that enables websites to weave live group video communication into their online experience. Check out <http://www.tokbox.com/> for more information.  
-Please visit our [getting started page](http://www.tokbox.com/opentok/tools/js/gettingstarted) if you are unfamiliar with these concepts.  
+The OpenTok server SDK for Python lets you generate [sessions](http://tokbox.com/opentok/tutorials/create-session/) and
+[tokens](http://tokbox.com/opentok/tutorials/create-token/) for [OpenTok](http://www.tokbox.com/) applications.
+
 
 ## Installation
 
@@ -15,55 +16,67 @@ If you get "Permission Denied" errors try running it with `sudo` in front:
 sudo pip install opentok
 </pre>
 
+You can download the OpenTok Python SDK from GitHub:
+
+<https://github.com/opentok/Opentok-Python-SDK/archive/master.zip>
+
+
 ## Requirements
 
-You need an api-key and secret. Sign up at <http://www.tokbox.com/opentok/tools/js/apikey>.
+The OpenTok Python SDK requires Python 2.2 or greater.
+
+You need an OpenTok API key and API secret, which you can obtain at <https://dashboard.tokbox.com>.
 
 # OpenTokSDK
 
-In order to use any of the server side functions, you must first create an `OpenTokSDK` object with your developer credentials.  
-`OpenTokSDK` takes 2 parameters:
-> api_key (string) - Given to you when you register  
-> api_secret (string) - Given to you when you register  
+In order to use any of the functions of the SDK, you must first create an `OpenTokSDK` object with your developer credentials.  
+The `OpenTokSDK` constructor takes two parameters:
+
+* api_key (string) - Your OpenTok [API key](https://dashboard.tokbox.com)
+* api_secret (string) - Your OpenTok [API secret](https://dashboard.tokbox.com)
 
 ```python
 import OpenTokSDK
 
 # Creating an OpenTok Object
-API_KEY = ''                # should be a string
-API_SECRET = ''            # should be a string
+API_KEY = ''     # Replace with your API key.
+API_SECRET = ''  # Replace with your API secret.
 OTSDK = OpenTokSDK.OpenTokSDK(API_KEY,API_SECRET)
 ```
 
 
 ## Creating Sessions
-Use your `OpenTokSDK` object to create `session_id`  
-`create_session` takes 1-2 parameters:
-> location (string) -  OPTIONAL. a location so OpenTok can stream through the closest server  
-> properties (object) - OPTIONAL. Set peer to peer as `enabled` or `disabled`. Disabled by default  
+
+Use the `createSession()` method of the OpenTokSDK object to create a session and a session ID:
 
 ```python
-# creating a simple session: closest streaming server will be automatically determined when user connects to session
+# creating an OpenTok server-enabled session:
 session_id = OTSDK.create_session().session_id
 
-# Creating Session object with p2p enabled
-session_properties = {OTSDK.SessionProperties.p2p_preference: "enabled"}    # or disabled
+# Creating a peer-to-peer session
+session_properties = {OTSDK.SessionProperties.p2p_preference: "enabled"}
 session_id = OTSDK.create_session(None, sessionProperties ).session_id
 ```
 
 ## Generating Tokens
-With the generated sessionId, you can start generating tokens for each user.
-`generate_token` takes in 1-4 properties:
-> session_id (string) - REQUIRED  
-> role (string) - OPTIONAL. subscriber, publisher, or moderator  
-> expire_time (int) - OPTIONAL. Time when token will expire in unix timestamp  
-> connection_data (string) - OPTIONAL. Metadata to store data (names, user id, etc)
+With the generated sessionId, you generate tokens for each user.
 
 ```python
-# Generating a token
-token = OTSDK.generate_token(session_id, OTSDK.RoleConstants.PUBLISHER, "username=Bob,level=4")
+# Generate a publisher token that will expire in 24 hours:
+token = OTSDK.generate_token(session_id)
+
+# Generate a subscriber token that has connection data
+role = OTSDK.RoleConstants.SUBSCRIBER
+connect_data = "username=Bob,level=4"
+token = OTSDK.generate_token(session_id, role, None, connect_data)
 ```
 
 Possible Errors:
-> "Null or empty session ID are not valid"  
-> "An invalid session ID was passed"
+* "Null or empty session ID are not valid"  
+* "An invalid session ID was passed"
+
+# More information
+
+See the [reference documentation](docs/reference.md).
+
+For more information on OpenTok, go to <http://www.tokbox.com/>.
