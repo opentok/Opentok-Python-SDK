@@ -54,8 +54,8 @@ Use the `createSession()` method of the OpenTokSDK object to create a session an
 session_id = OTSDK.create_session().session_id
 
 # Creating a peer-to-peer session
-session_properties = {OTSDK.SessionProperties.p2p_preference: "enabled"}
-session_id = OTSDK.create_session(None, sessionProperties ).session_id
+session_properties = {OpenTokSDK.SessionProperties.p2p_preference: "enabled"}
+session_id = OTSDK.create_session(properties=session_properties).session_id
 ```
 
 ## Generating Tokens
@@ -66,7 +66,7 @@ With the generated sessionId, you generate tokens for each user.
 token = OTSDK.generate_token(session_id)
 
 # Generate a subscriber token that has connection data
-role = OTSDK.RoleConstants.SUBSCRIBER
+role = OpenTokSDK.RoleConstants.SUBSCRIBER
 connect_data = "username=Bob,level=4"
 token = OTSDK.generate_token(session_id, role, None, connect_data)
 ```
