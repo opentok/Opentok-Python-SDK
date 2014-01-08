@@ -9,6 +9,7 @@ setup(
     name = 'opentok-python-sdk',
     version = '0.91.1',
     py_modules = ['OpenTokSDK'],
+    install_requires=['requests == 1.2.3'],
 
     # Packaging options:
     zip_safe = False,
@@ -22,7 +23,7 @@ setup(
     keywords = 'video chat tokbox tok opentok python media',
     description = 'A python wrapper for the OpenTok video chat APIs.',
     long_description = open(normpath(join(dirname(abspath(__file__)),
-        'README'))).read(),
+        'README.md'))).read(),
     classifiers = [
         'Intended Audience :: Developers',
         'Topic :: Communications',
