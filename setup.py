@@ -1,13 +1,14 @@
 from os.path import abspath, dirname, join, normpath
 
 from setuptools import setup
+import OpenTokSDK
 
 
 setup(
 
     # Basic package information:
     name = 'opentok-python-sdk',
-    version = '0.91.1',
+    version = OpenTokSDK.__version__,
     py_modules = ['OpenTokSDK'],
     install_requires=['requests == 1.2.3'],
 

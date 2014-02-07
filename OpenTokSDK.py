@@ -5,9 +5,10 @@ http://www.tokbox.com/
 Copyright 2011, TokBox, Inc.
 """
 
+__version__ = '2.0.0-beta'
+
 
 import urllib
-import urllib2
 import datetime
 import calendar
 import time
@@ -18,8 +19,6 @@ import random
 import requests
 import json
 
-TIMEOUT = 10
-
 
 class OpenTokException(BaseException):
     """Generic OpenTok Error. All other errors extend this."""
@@ -27,8 +26,8 @@ class OpenTokException(BaseException):
 
 
 class RequestError(OpenTokException):
-    """Indicates an error during the request. Most likely an error connecting to
-    the OpenTok API servers. (HTTP 500 error).
+    """Indicates an error during the request. Most likely an error connecting
+    to the OpenTok API servers. (HTTP 500 error).
     """
     pass
 
@@ -39,15 +38,17 @@ class AuthError(OpenTokException):
     """
     pass
 
+
 class NotFoundError(OpenTokException):
-    """Indicates that the element requested was not found.  Check the parameters of
-    the request.
+    """Indicates that the element requested was not found.  Check the parameters
+    of the request.
     """
     pass
 
+
 class ArchiveError(OpenTokException):
-    """Indicates that there was a archive specific problem, probably the status of
-    the requested archive is invalid.
+    """Indicates that there was a archive specific problem, probably the status
+    of the requested archive is invalid.
     """
     pass
 
@@ -57,7 +58,7 @@ class SessionProperties(object):
     multiplexer_numOutputStreams = None
     multiplexer_switchType = None
     multiplexer_switchTimeout = None
-    p2p_preference = "p2p.preference" 
+    p2p_preference = "p2p.preference"
 
     def __iter__(self):
         d = {
@@ -72,9 +73,9 @@ class SessionProperties(object):
 
 class RoleConstants:
     """List of valid roles for a token."""
-    SUBSCRIBER = 'subscriber' #Can only subscribe
-    PUBLISHER = 'publisher'   #Can publish, subscribe, and signal
-    MODERATOR = 'moderator'   #Can do the above along with  forceDisconnect and forceUnpublish
+    SUBSCRIBER = 'subscriber'  # Can only subscribe
+    PUBLISHER = 'publisher'    # Can publish, subscribe, and signal
+    MODERATOR = 'moderator'    # Can do the above along with forceDisconnect and forceUnpublish
 
 
 class OpenTokSession(object):
@@ -129,7 +130,7 @@ class OpenTokSDK(object):
     of the Opentok API.
     """
     TOKEN_SENTINEL = 'T1=='
-    API_URL = 'http://api.opentok.com'
+    API_URL = 'https://api.opentok.com'
 
     def __init__(self, api_key, api_secret):
         self.api_key = api_key
@@ -147,9 +148,9 @@ class OpenTokSDK(object):
             raise OpenTokException('Null or empty session ID are not valid')
         sub_session_id = session_id[2:]
         decoded_session_id = ""
-        for i in range(0,3):
+        for i in range(0, 3):
             new_session_id = sub_session_id+("="*i)
-            new_session_id = new_session_id.replace("-","+").replace("_","/")
+            new_session_id = new_session_id.replace("-", "+").replace("_", "/")
             try:
                 decoded_session_id = base64.b64decode(new_session_id)
                 if "~" in decoded_session_id:
@@ -157,9 +158,9 @@ class OpenTokSDK(object):
             except TypeError:
                 pass
         try:
-            if decoded_session_id.split('~')[1]!=str(self.api_key):
+            if decoded_session_id.split('~')[1] != str(self.api_key):
                 raise OpenTokException("An invalid session ID was passed")
-        except Exception as e:
+        except Exception:
             raise OpenTokException("An invalid session ID was passed")
 
         if not role:
@@ -217,13 +218,18 @@ class OpenTokSDK(object):
         params = dict(api_key=self.api_key)
         params['location'] = location
         params.update(properties)
-        dom = ''
+
         try:
-            dom = self._do_request('/session/create', params)
-        except RequestError:
-            raise
+            response = requests.post(self.session_url(), data=params, headers=self.headers())
+
+            if response.status_code == 403:
+                raise AuthError('Failed to create session, invalid credentials')
+            if not response.content:
+                raise RequestError()
+            import xml.dom.minidom as xmldom
+            dom = xmldom.parseString(response.content)
         except Exception, e:
-            raise RequestError('Failed to create session: %s' % str(e)  )
+            raise RequestError('Failed to create session: %s' % str(e))
 
         try:
             error = dom.getElementsByTagName('error')
@@ -238,9 +244,18 @@ class OpenTokSDK(object):
 
     def headers(self):
         return {
-            'Content-Type': 'application/json',
+            'User-Agent': 'OpenTok-Python-SDK/' + __version__,
             'X-TB-PARTNER-AUTH': self.api_key + ':' + self.api_secret
         }
+
+    def archive_headers(self):
+        result = self.headers()
+        result['Content-Type'] = 'application/json'
+        return result
+
+    def session_url(self):
+        url = OpenTokSDK.API_URL + '/session/create'
+        return url
 
     def archive_url(self, archive_id=None):
         url = OpenTokSDK.API_URL + '/v2/partner/' + self.api_key + '/archive'
@@ -249,9 +264,9 @@ class OpenTokSDK(object):
         return url
 
     def start_archive(self, session_id, **kwargs):
-        payload = {'action': 'start', 'name': kwargs.get('name'), 'sessionId': session_id}
+        payload = {'name': kwargs.get('name'), 'sessionId': session_id}
 
-        response = requests.post(self.archive_url(), data=json.dumps(payload), headers=self.headers())
+        response = requests.post(self.archive_url(), data=json.dumps(payload), headers=self.archive_headers())
 
         if response.status_code < 300:
             return OpenTokArchive(self, response.json())
@@ -264,11 +279,10 @@ class OpenTokSDK(object):
         elif response.status_code == 409:
             raise ArchiveError(response.json().get("message"))
         else:
-            raise RequestError("An unexpected error occurred", response.status_code)     
+            raise RequestError("An unexpected error occurred", response.status_code)    
 
     def stop_archive(self, archive_id):
-        payload = {'action': 'stop'}
-        response = requests.post(self.archive_url(archive_id), data=json.dumps(payload), headers=self.headers())
+        response = requests.post(self.archive_url(archive_id) + '/stop', headers=self.archive_headers())
 
         if response.status_code < 300:
             return OpenTokArchive(self, response.json())
@@ -282,7 +296,7 @@ class OpenTokSDK(object):
             raise RequestError("An unexpected error occurred", response.status_code)
 
     def delete_archive(self, archive_id):
-        response = requests.delete(self.archive_url(archive_id), headers=self.headers())
+        response = requests.delete(self.archive_url(archive_id), headers=self.archive_headers())
 
         if response.status_code < 300:
             pass
@@ -294,7 +308,7 @@ class OpenTokSDK(object):
             raise RequestError("An unexpected error occurred", response.status_code)
 
     def get_archive(self, archive_id):
-        response = requests.get(self.archive_url(archive_id), headers=self.headers())
+        response = requests.get(self.archive_url(archive_id), headers=self.archive_headers())
 
         if response.status_code < 300:
             return OpenTokArchive(self, response.json())
@@ -307,10 +321,12 @@ class OpenTokSDK(object):
 
     def get_archives(self, offset=None, count=None):
         params = {}
-        if offset is not None: params['offset'] = offset
-        if count is not None: params['count'] = count
+        if offset is not None:
+            params['offset'] = offset
+        if count is not None:
+            params['count'] = count
 
-        response = requests.get(self.archive_url() + "?" + urllib.urlencode(params), headers=self.headers())
+        response = requests.get(self.archive_url() + "?" + urllib.urlencode(params), headers=self.archive_headers())
 
         if response.status_code < 300:
             return OpenTokArchiveList(response.json())
@@ -323,42 +339,3 @@ class OpenTokSDK(object):
 
     def _sign_string(self, string, secret):
         return hmac.new(secret, string.encode('utf-8'), hashlib.sha1).hexdigest()
-
-    def _do_request(self, url, params):
-        import xml.dom.minidom as xmldom
-
-        if '_token' in params: #Do token auth if _token is present, partner auth normally
-            auth_header = ('X-TB-TOKEN-AUTH', params['_token'])
-            del params['_token']
-        else:
-            auth_header = ('X-TB-PARTNER-AUTH', '%s:%s' % (self.api_key, self.api_secret))
-
-        method = 'POST' if params else 'GET'
-        data_string = urllib.urlencode(params, True)
-
-        context_source = [
-            ('method', method),
-            ('Content-Type', 'application/x-www-form-urlencoded'),
-            ('Content-Length', len(data_string)),
-            auth_header
-        ]
-
-        req_string = self.API_URL + url
-        try:
-            opener = urllib2.build_opener()
-            opener.addheaders = context_source
-            if data_string:
-                request = urllib2.Request(url=req_string, data=data_string)
-            else: #GET if no data_string
-                request = urllib2.Request(url=req_string)
-            try:
-                response = opener.open(request, timeout=TIMEOUT)
-            except TypeError: #Python2.6 added the timeout keyword, if it doesn't get accepted, try without it
-                response = opener.open(request)
-
-            dom = xmldom.parseString(response.read())
-            response.close()
-        except urllib2.HTTPError, e:
-            raise RequestError('Failed to send request: %s' % str(e))
-
-        return dom
