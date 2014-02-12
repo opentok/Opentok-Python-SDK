@@ -20,6 +20,9 @@ import requests
 import json
 
 
+dthandler = lambda obj: obj.isoformat() if isinstance(obj, datetime.datetime)  or isinstance(obj, datetime.date) else None
+
+
 class OpenTokException(BaseException):
     """Generic OpenTok Error. All other errors extend this."""
     pass
@@ -104,8 +107,11 @@ class OpenTokArchive(object):
     def delete(self):
         self.sdk.delete_archive(self.id)
 
-    def json(self):
+    def attrs(self):
         return dict((k, v) for k, v in self.__dict__.iteritems() if k is not "sdk")
+
+    def json(self):
+        return json.dumps(self.attrs(), default=dthandler, indent=4)
 
 
 class OpenTokArchiveList(object):
@@ -118,11 +124,14 @@ class OpenTokArchiveList(object):
         for x in self.items:
             yield x
 
-    def json(self):
+    def attrs(self):
         return {
             'count': self.count,
-            'items': map(OpenTokArchive.json, self.items)
+            'items': map(OpenTokArchive.attrs, self.items)
         }
+
+    def json(self):
+        return json.dumps(self.attrs(), default=dthandler, indent=4)
 
 
 class OpenTokSDK(object):
@@ -279,7 +288,7 @@ class OpenTokSDK(object):
         elif response.status_code == 409:
             raise ArchiveError(response.json().get("message"))
         else:
-            raise RequestError("An unexpected error occurred", response.status_code)    
+            raise RequestError("An unexpected error occurred", response.status_code)
 
     def stop_archive(self, archive_id):
         response = requests.post(self.archive_url(archive_id) + '/stop', headers=self.archive_headers())
