@@ -347,4 +347,4 @@ class OpenTokSDK(object):
             raise RequestError("An unexpected error occurred", response.status_code)
 
     def _sign_string(self, string, secret):
-        return hmac.new(secret, string.encode('utf-8'), hashlib.sha1).hexdigest()
+        return hmac.new(secret.encode('utf-8'), string.encode('utf-8'), hashlib.sha1).hexdigest()
