@@ -5,9 +5,6 @@ http://www.tokbox.com/
 Copyright 2011, TokBox, Inc.
 """
 
-__version__ = '2.0.0-beta'
-
-
 import urllib
 import datetime
 import calendar
