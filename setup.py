@@ -69,7 +69,9 @@ setup(
 
     packages=find_packages(exclude=["contrib", "docs", "tests*"]),
 
-    install_requires=['requests>=1,<2'],
+    install_requires=[
+        'requests>=1,<2'
+    ],
 
     # TODO: these aren't in the sample package, but might again become imp
     #       if JSON schema files are needed
@@ -78,6 +80,5 @@ setup(
 
     # NOTE: this isn't included in the sample packaging recommendation, but it seems to be the 
     #       de-facto standard for testing tools, Travis uses nose
-    test_suite='nose.collector',
-    tests_require=['nose'],
+    test_suite='tests',
 )
