@@ -136,11 +136,11 @@ class OpenTokSDK(object):
     of the Opentok API.
     """
     TOKEN_SENTINEL = 'T1=='
-    API_URL = 'https://api.opentok.com'
 
-    def __init__(self, api_key, api_secret):
-        self.api_key = api_key
-        self.api_secret = api_secret.strip()
+    def __init__(self, api_key, api_secret, api_url='https://api.opentok.com'):
+        self.api_key = str(api_key)
+        self.api_secret = api_secret
+        self.api_url = api_url
 
     def generate_token(self, session_id, role=None, expire_time=None, connection_data=None, **kwargs):
         """

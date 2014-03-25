@@ -1,338 +1,355 @@
-import time
-import urllib2
+# import time
+# import urllib2
 import unittest
-from xml.dom.minidom import parseString
+from nose.tools import raises
+# from xml.dom.minidom import parseString
 
-from OpenTokSDK import OpenTokSDK, OpenTokException
+from opentok import OpenTokSDK #, OpenTokException
 
 
-class TestPythonSDK(unittest.TestCase):
-
-    api_key = -1
-    api_secret = ""
-    o = None
-
+class OpenTokTest(unittest.TestCase):
     def setUp(self):
-        self.o = OpenTokSDK(self.api_key, self.api_secret)
+        self.api_key = '123456'
+        self.api_secret = '1234567890abcdef1234567890abcdef1234567890'
+        self.api_url = 'http://environment.example.com'
 
-    def test_token_incorrect_key(self):
-        different_session_id = "1_MX4yMDc1MjM4MX5-V2VkIEp1bCAxNyAxMDozMjoyMCBQRFQgMjAxM34wLjUyNTU2Mzd-" 
-        try:
-            t = self.o.generate_token(different_session_id)
-            raise AssertionError('Python SDK tests: Token with incorrect API key should be rejected')
-        except OpenTokException as e:
-            pass #expected
+    def test_intialization(self):
+        opentok = OpenTokSDK(self.api_key, self.api_secret)
+        self.assertIsInstance(opentok, OpenTokSDK)
 
-       
+    @raises(TypeError)
+    def test_initialization_without_required_params(self):
+        opentok = OpenTokSDK()
 
-    def test_create_session(self):
-        s = self.o.create_session()
-        t = self.o.generate_token(s.session_id)
-        self.assertIsNotNone(s.session_id, "Python SDK tests: create session (no params): did not return a session id")
-        xml = self.get_session_info(s.session_id, t)
-        self.assertEqual(s.session_id, xml.getElementsByTagName('session_id')[0].childNodes[0].data, \
-            "Python SDK tests: Session id not found")
+    def test_initialization_with_api_url(self):
+        opentok = OpenTokSDK(self.api_key, self.api_secret, self.api_url)
+        self.assertIsInstance(opentok, OpenTokSDK)
 
-        s = self.o.create_session('216.38.134.114')
-        t = self.o.generate_token(s.session_id)
-        self.assertIsNotNone(s.session_id, "Python SDK tests: create session (no params): did not return a session id")
-        xml = self.get_session_info(s.session_id, t)
-        self.assertEqual(s.session_id, xml.getElementsByTagName('session_id')[0].childNodes[0].data, \
-            "Python SDK tests: Session id not found")
+    # api_key = -1
+    # api_secret = ""
+    # o = None
 
-    def test_num_output_streams(self):
-        s = self.o.create_session('127.0.0.1', properties={"multiplexer.numOutputStreams": 0})
-        t = self.o.generate_token(s.session_id)
-        xml = self.get_session_info(s.session_id, t)
-        self.assertEqual('0', xml.getElementsByTagName('numOutputStreams')[0].childNodes[0].data, \
-            'Python SDK tests: multiplexer.numOutputStreams not set to 0')
+    # def setUp(self):
+    #     self.o = OpenTokSDK(self.api_key, self.api_secret)
 
-        s = self.o.create_session('127.0.0.1', properties = {"multiplexer.numOutputStreams": 1})
-        t = self.o.generate_token(s.session_id)
-        xml = self.get_session_info(s.session_id, t)
-        self.assertEqual('1', xml.getElementsByTagName('numOutputStreams')[0].childNodes[0].data, \
-            'Python SDK tests: multiplexer.numOutputStreams not set to 1')
+    # def test_token_incorrect_key(self):
+    #     different_session_id = "1_MX4yMDc1MjM4MX5-V2VkIEp1bCAxNyAxMDozMjoyMCBQRFQgMjAxM34wLjUyNTU2Mzd-" 
+    #     try:
+    #         t = self.o.generate_token(different_session_id)
+    #         raise AssertionError('Python SDK tests: Token with incorrect API key should be rejected')
+    #     except OpenTokException as e:
+    #         pass #expected
 
-        s = self.o.create_session('127.0.0.1', properties = {"multiplexer.numOutputStreams": 5})
-        t = self.o.generate_token(s.session_id)
-        xml = self.get_session_info(s.session_id, t)
-        self.assertEqual('5', xml.getElementsByTagName('numOutputStreams')[0].childNodes[0].data, \
-            'Python SDK tests: multiplexer.numOutputStreams not set to 5')
+    #    
 
-        s = self.o.create_session('127.0.0.1', properties = {"multiplexer.numOutputStreams": 100})
-        t = self.o.generate_token(s.session_id)
-        xml = self.get_session_info(s.session_id, t)
-        self.assertEqual('100', xml.getElementsByTagName('numOutputStreams')[0].childNodes[0].data, \
-            'Python SDK tests: multiplexer.numOutputStreams not set to 100')
+    # def test_create_session(self):
+    #     s = self.o.create_session()
+    #     t = self.o.generate_token(s.session_id)
+    #     self.assertIsNotNone(s.session_id, "Python SDK tests: create session (no params): did not return a session id")
+    #     xml = self.get_session_info(s.session_id, t)
+    #     self.assertEqual(s.session_id, xml.getElementsByTagName('session_id')[0].childNodes[0].data, \
+    #         "Python SDK tests: Session id not found")
 
-        s = self.o.create_session('127.0.0.1')
-        t = self.o.generate_token(s.session_id)
-        xml = self.get_session_info(s.session_id, t)
-        self.assertEqual([], xml.getElementsByTagName('numOutputStreams'),
-            'Python SDK tests: multiplexer.numOutputStreams should not be set')
+    #     s = self.o.create_session('216.38.134.114')
+    #     t = self.o.generate_token(s.session_id)
+    #     self.assertIsNotNone(s.session_id, "Python SDK tests: create session (no params): did not return a session id")
+    #     xml = self.get_session_info(s.session_id, t)
+    #     self.assertEqual(s.session_id, xml.getElementsByTagName('session_id')[0].childNodes[0].data, \
+    #         "Python SDK tests: Session id not found")
 
-    def test_switch_type(self):
-        s = self.o.create_session(properties = {"multiplexer.switchType":  0})
-        t = self.o.generate_token(s.session_id)
-        xml = self.get_session_info(s.session_id, t)
-        self.assertEqual('0', xml.getElementsByTagName('switchType')[0].childNodes[0].data, \
-            'Python SDK tests: multiplexer.switchType not 0')
+    # def test_num_output_streams(self):
+    #     s = self.o.create_session('127.0.0.1', properties={"multiplexer.numOutputStreams": 0})
+    #     t = self.o.generate_token(s.session_id)
+    #     xml = self.get_session_info(s.session_id, t)
+    #     self.assertEqual('0', xml.getElementsByTagName('numOutputStreams')[0].childNodes[0].data, \
+    #         'Python SDK tests: multiplexer.numOutputStreams not set to 0')
 
-        s = self.o.create_session(properties = {"multiplexer.switchType":  1})
-        t = self.o.generate_token(s.session_id)
-        xml = self.get_session_info(s.session_id, t)
-        self.assertEqual('1', xml.getElementsByTagName('switchType')[0].childNodes[0].data, \
-            'Python SDK tests: multiplexer.switchType not 1')
+    #     s = self.o.create_session('127.0.0.1', properties = {"multiplexer.numOutputStreams": 1})
+    #     t = self.o.generate_token(s.session_id)
+    #     xml = self.get_session_info(s.session_id, t)
+    #     self.assertEqual('1', xml.getElementsByTagName('numOutputStreams')[0].childNodes[0].data, \
+    #         'Python SDK tests: multiplexer.numOutputStreams not set to 1')
 
-        s = self.o.create_session()
-        t = self.o.generate_token(s.session_id)
-        xml = self.get_session_info(s.session_id, t)
-        self.assertEqual([], xml.getElementsByTagName('switchType'),
-            'Python SDK tests: multiplexer.switchType should not be set')
+    #     s = self.o.create_session('127.0.0.1', properties = {"multiplexer.numOutputStreams": 5})
+    #     t = self.o.generate_token(s.session_id)
+    #     xml = self.get_session_info(s.session_id, t)
+    #     self.assertEqual('5', xml.getElementsByTagName('numOutputStreams')[0].childNodes[0].data, \
+    #         'Python SDK tests: multiplexer.numOutputStreams not set to 5')
 
-    def test_switch_timeout(self):
-        s = self.o.create_session(properties = {"multiplexer.switchTimeout": 1200})
-        t = self.o.generate_token(s.session_id)
-        xml = self.get_session_info(s.session_id, t)
-        self.assertEqual('1200', xml.getElementsByTagName('switchTimeout')[0].childNodes[0].data, \
-            'Python SDK tests: multiplexer.switchTimeout not properly set (should be 1200)')
+    #     s = self.o.create_session('127.0.0.1', properties = {"multiplexer.numOutputStreams": 100})
+    #     t = self.o.generate_token(s.session_id)
+    #     xml = self.get_session_info(s.session_id, t)
+    #     self.assertEqual('100', xml.getElementsByTagName('numOutputStreams')[0].childNodes[0].data, \
+    #         'Python SDK tests: multiplexer.numOutputStreams not set to 100')
 
-        s = self.o.create_session(properties = {"multiplexer.switchTimeout": 2000})
-        t = self.o.generate_token(s.session_id)
-        xml = self.get_session_info(s.session_id, t)
-        self.assertEqual('2000', xml.getElementsByTagName('switchTimeout')[0].childNodes[0].data, \
-            'Python SDK tests: multiplexer.switchTimeout not properly set (should be 2000)')
+    #     s = self.o.create_session('127.0.0.1')
+    #     t = self.o.generate_token(s.session_id)
+    #     xml = self.get_session_info(s.session_id, t)
+    #     self.assertEqual([], xml.getElementsByTagName('numOutputStreams'),
+    #         'Python SDK tests: multiplexer.numOutputStreams should not be set')
 
-        s = self.o.create_session(properties = {"multiplexer.switchTimeout": 100000})
-        t = self.o.generate_token(s.session_id)
-        xml = self.get_session_info(s.session_id, t)
-        self.assertEqual('100000', xml.getElementsByTagName('switchTimeout')[0].childNodes[0].data, \
-            'Python SDK tests: multiplexer.switchType not properly set (should be 100000)')
+    # def test_switch_type(self):
+    #     s = self.o.create_session(properties = {"multiplexer.switchType":  0})
+    #     t = self.o.generate_token(s.session_id)
+    #     xml = self.get_session_info(s.session_id, t)
+    #     self.assertEqual('0', xml.getElementsByTagName('switchType')[0].childNodes[0].data, \
+    #         'Python SDK tests: multiplexer.switchType not 0')
 
-    def test_p2p_preference(self):
-        s = self.o.create_session(properties = {"p2p.preference": 'enabled'})
-        t = self.o.generate_token(s.session_id)
-        xml = self.get_session_info(s.session_id, t)
-        self.assertEqual('enabled', xml.getElementsByTagName('preference')[0].childNodes[0].data, \
-            'Python SDK tests: multiplexer.p2p_preference not enabled')
+    #     s = self.o.create_session(properties = {"multiplexer.switchType":  1})
+    #     t = self.o.generate_token(s.session_id)
+    #     xml = self.get_session_info(s.session_id, t)
+    #     self.assertEqual('1', xml.getElementsByTagName('switchType')[0].childNodes[0].data, \
+    #         'Python SDK tests: multiplexer.switchType not 1')
 
-        s = self.o.create_session(properties = {"p2p.preference": 'disabled'})
-        t = self.o.generate_token(s.session_id)
-        xml = self.get_session_info(s.session_id, t)
-        self.assertEqual('disabled', xml.getElementsByTagName('preference')[0].childNodes[0].data, \
-            'Python SDK tests: multiplexer.p2p_preference not disabled')
+    #     s = self.o.create_session()
+    #     t = self.o.generate_token(s.session_id)
+    #     xml = self.get_session_info(s.session_id, t)
+    #     self.assertEqual([], xml.getElementsByTagName('switchType'),
+    #         'Python SDK tests: multiplexer.switchType should not be set')
 
-    def test_echo_suppression(self):
-        s = self.o.create_session(properties = {"echoSuppression.enabled": 'true'})
-        t = self.o.generate_token(s.session_id)
-        xml = self.get_session_info(s.session_id, t)
-        self.assertEqual('True', xml.getElementsByTagName('enabled')[0].childNodes[0].data, \
-            'Python SDK tests: echo suppression not showing enabled')
+    # def test_switch_timeout(self):
+    #     s = self.o.create_session(properties = {"multiplexer.switchTimeout": 1200})
+    #     t = self.o.generate_token(s.session_id)
+    #     xml = self.get_session_info(s.session_id, t)
+    #     self.assertEqual('1200', xml.getElementsByTagName('switchTimeout')[0].childNodes[0].data, \
+    #         'Python SDK tests: multiplexer.switchTimeout not properly set (should be 1200)')
 
-        s = self.o.create_session(properties = {"echoSuppression.enabled": 'false'})
-        t = self.o.generate_token(s.session_id)
-        xml = self.get_session_info(s.session_id, t)
-        self.assertEqual('False', xml.getElementsByTagName('enabled')[0].childNodes[0].data, \
-            'Python SDK tests: echo suppression not showing disabled')
+    #     s = self.o.create_session(properties = {"multiplexer.switchTimeout": 2000})
+    #     t = self.o.generate_token(s.session_id)
+    #     xml = self.get_session_info(s.session_id, t)
+    #     self.assertEqual('2000', xml.getElementsByTagName('switchTimeout')[0].childNodes[0].data, \
+    #         'Python SDK tests: multiplexer.switchTimeout not properly set (should be 2000)')
 
-    def test_roles(self):
-        s = self.o.create_session()
+    #     s = self.o.create_session(properties = {"multiplexer.switchTimeout": 100000})
+    #     t = self.o.generate_token(s.session_id)
+    #     xml = self.get_session_info(s.session_id, t)
+    #     self.assertEqual('100000', xml.getElementsByTagName('switchTimeout')[0].childNodes[0].data, \
+    #         'Python SDK tests: multiplexer.switchType not properly set (should be 100000)')
 
-        # default: publisher
-        t = self.o.generate_token(s.session_id)
-        xml = self.get_token_info(t)
-        role = xml.getElementsByTagName('role')[0].childNodes[0].data
-        role = role.strip()
-        self.assertEqual('publisher', role, 'Python SDK tests: default role not publisher')
-        self.assertNotEqual([], xml.getElementsByTagName('subscribe'), \
-            'Python SDK tests: token default permissions should include subscribe')
-        self.assertNotEqual([], xml.getElementsByTagName('publish'), \
-            'Python SDK tests: token default permissions should include publish')
-        self.assertNotEqual([], xml.getElementsByTagName('signal'), \
-            'Python SDK tests: token default permissions should include signal')
-        self.assertEqual([], xml.getElementsByTagName('forceunpublish'), \
-            'Python SDK tests: token default permissions should include forceunpublish')
-        self.assertEqual([], xml.getElementsByTagName('forcedisconnect'), \
-            'Python SDK tests: token default permissions should include forcedisconnect')
-        self.assertEqual([], xml.getElementsByTagName('record'), \
-            'Python SDK tests: token default permissions should include record')
-        self.assertEqual([], xml.getElementsByTagName('playback'), \
-            'Python SDK tests: token default permissions should include playback')
+    # def test_p2p_preference(self):
+    #     s = self.o.create_session(properties = {"p2p.preference": 'enabled'})
+    #     t = self.o.generate_token(s.session_id)
+    #     xml = self.get_session_info(s.session_id, t)
+    #     self.assertEqual('enabled', xml.getElementsByTagName('preference')[0].childNodes[0].data, \
+    #         'Python SDK tests: multiplexer.p2p_preference not enabled')
 
-        # publisher
-        t = self.o.generate_token(s.session_id, "publisher")
-        xml = self.get_token_info(t)
-        role = xml.getElementsByTagName('role')[0].childNodes[0].data
-        role = role.strip()
-        self.assertEqual('publisher', role, 'Python SDK tests: role not publisher')
-        self.assertNotEqual([], xml.getElementsByTagName('subscribe'), \
-            'Python SDK tests: token publisher permissions should include subscribe')
-        self.assertNotEqual([], xml.getElementsByTagName('publish'), \
-            'Python SDK tests: token publisher permissions should include publish')
-        self.assertNotEqual([], xml.getElementsByTagName('signal'), \
-            'Python SDK tests: token publisher permissions should include signal')
-        self.assertEqual([], xml.getElementsByTagName('forceunpublish'), \
-            'Python SDK tests: token publisher permissions should not include forceunpublish')
-        self.assertEqual([], xml.getElementsByTagName('forcedisconnect'), \
-            'Python SDK tests: token publisher permissions should not include forcedisconnect')
-        self.assertEqual([], xml.getElementsByTagName('record'), \
-            'Python SDK tests: token publisher permissions should not include record')
-        self.assertEqual([], xml.getElementsByTagName('playback'), \
-            'Python SDK tests: token publisher permissions should not include playback')
+    #     s = self.o.create_session(properties = {"p2p.preference": 'disabled'})
+    #     t = self.o.generate_token(s.session_id)
+    #     xml = self.get_session_info(s.session_id, t)
+    #     self.assertEqual('disabled', xml.getElementsByTagName('preference')[0].childNodes[0].data, \
+    #         'Python SDK tests: multiplexer.p2p_preference not disabled')
 
-        # moderator
-        t = self.o.generate_token(s.session_id, "moderator")
-        xml = self.get_token_info(t)
-        role = xml.getElementsByTagName('role')[0].childNodes[0].data
-        role = role.strip()
-        self.assertEqual('moderator', role, 'Python SDK tests: role not moderator')
-        self.assertNotEqual([], xml.getElementsByTagName('subscribe'), \
-            'Python SDK tests: token moderator permissions should include subscribe')
-        self.assertNotEqual([], xml.getElementsByTagName('publish'), \
-            'Python SDK tests: token moderator permissions should include publish')
-        self.assertNotEqual([], xml.getElementsByTagName('signal'), \
-            'Python SDK tests: token moderator permissions should include signal')
-        self.assertNotEqual([], xml.getElementsByTagName('forceunpublish'), \
-            'Python SDK tests: token moderator permissions should include forceunpublish')
-        self.assertNotEqual([], xml.getElementsByTagName('forcedisconnect'), \
-            'Python SDK tests: token moderator permissions should include forcedisconnect')
-        self.assertNotEqual([], xml.getElementsByTagName('record'), \
-            'Python SDK tests: token moderator permissions should include record')
-        self.assertNotEqual([], xml.getElementsByTagName('playback'), \
-            'Python SDK tests: token moderator permissions should include playback')
+    # def test_echo_suppression(self):
+    #     s = self.o.create_session(properties = {"echoSuppression.enabled": 'true'})
+    #     t = self.o.generate_token(s.session_id)
+    #     xml = self.get_session_info(s.session_id, t)
+    #     self.assertEqual('True', xml.getElementsByTagName('enabled')[0].childNodes[0].data, \
+    #         'Python SDK tests: echo suppression not showing enabled')
 
-        # subscriber
-        t = self.o.generate_token(s.session_id, "subscriber")
-        xml = self.get_token_info(t)
-        role = xml.getElementsByTagName('role')[0].childNodes[0].data
-        role = role.strip()
-        self.assertEqual('subscriber', role, 'Python SDK tests: role not subscriber')
-        self.assertNotEqual([], xml.getElementsByTagName('subscribe'), \
-            'Python SDK tests: token subscriber permissions should include subscribe')
-        self.assertEqual([], xml.getElementsByTagName('publish'), \
-            'Python SDK tests: token subscriber permissions should not include publish')
-        self.assertEqual([], xml.getElementsByTagName('signal'), \
-            'Python SDK tests: token subscriber permissions should not include signal')
-        self.assertEqual([], xml.getElementsByTagName('forceunpublish'), \
-            'Python SDK tests: token subscriber permissions should not include forceunpublish')
-        self.assertEqual([], xml.getElementsByTagName('forcedisconnect'), \
-            'Python SDK tests: token subscriber permissions should not include forcedisconnect')
-        self.assertEqual([], xml.getElementsByTagName('record'), \
-            'Python SDK tests: token subscriber permissions should not include record')
-        self.assertEqual([], xml.getElementsByTagName('playback'), \
-            'Python SDK tests: token subscriber permissions should not include playback')
+    #     s = self.o.create_session(properties = {"echoSuppression.enabled": 'false'})
+    #     t = self.o.generate_token(s.session_id)
+    #     xml = self.get_session_info(s.session_id, t)
+    #     self.assertEqual('False', xml.getElementsByTagName('enabled')[0].childNodes[0].data, \
+    #         'Python SDK tests: echo suppression not showing disabled')
 
-        # garbage data
-        try:
-            t = self.o.generate_token(s.session_id, 'ads')
-            raise AssertionError('Python SDK tests: invalid role should be rejected')
+    # def test_roles(self):
+    #     s = self.o.create_session()
 
-        except OpenTokException:
-            pass # expected
+    #     # default: publisher
+    #     t = self.o.generate_token(s.session_id)
+    #     xml = self.get_token_info(t)
+    #     role = xml.getElementsByTagName('role')[0].childNodes[0].data
+    #     role = role.strip()
+    #     self.assertEqual('publisher', role, 'Python SDK tests: default role not publisher')
+    #     self.assertNotEqual([], xml.getElementsByTagName('subscribe'), \
+    #         'Python SDK tests: token default permissions should include subscribe')
+    #     self.assertNotEqual([], xml.getElementsByTagName('publish'), \
+    #         'Python SDK tests: token default permissions should include publish')
+    #     self.assertNotEqual([], xml.getElementsByTagName('signal'), \
+    #         'Python SDK tests: token default permissions should include signal')
+    #     self.assertEqual([], xml.getElementsByTagName('forceunpublish'), \
+    #         'Python SDK tests: token default permissions should include forceunpublish')
+    #     self.assertEqual([], xml.getElementsByTagName('forcedisconnect'), \
+    #         'Python SDK tests: token default permissions should include forcedisconnect')
+    #     self.assertEqual([], xml.getElementsByTagName('record'), \
+    #         'Python SDK tests: token default permissions should include record')
+    #     self.assertEqual([], xml.getElementsByTagName('playback'), \
+    #         'Python SDK tests: token default permissions should include playback')
 
-    def test_old_session(self):
-        s_id = '1abc70a34d069d2e6a1e565f3958b5250b435e32'
-        t = self.o.generate_token(s_id)
-        xml = self.get_token_info(t)
-        self.assertEqual(s_id, xml.getElementsByTagName('session_id')[0].childNodes[0].data, \
-            'Python SDK test: creating token with old session id failed')
+    #     # publisher
+    #     t = self.o.generate_token(s.session_id, "publisher")
+    #     xml = self.get_token_info(t)
+    #     role = xml.getElementsByTagName('role')[0].childNodes[0].data
+    #     role = role.strip()
+    #     self.assertEqual('publisher', role, 'Python SDK tests: role not publisher')
+    #     self.assertNotEqual([], xml.getElementsByTagName('subscribe'), \
+    #         'Python SDK tests: token publisher permissions should include subscribe')
+    #     self.assertNotEqual([], xml.getElementsByTagName('publish'), \
+    #         'Python SDK tests: token publisher permissions should include publish')
+    #     self.assertNotEqual([], xml.getElementsByTagName('signal'), \
+    #         'Python SDK tests: token publisher permissions should include signal')
+    #     self.assertEqual([], xml.getElementsByTagName('forceunpublish'), \
+    #         'Python SDK tests: token publisher permissions should not include forceunpublish')
+    #     self.assertEqual([], xml.getElementsByTagName('forcedisconnect'), \
+    #         'Python SDK tests: token publisher permissions should not include forcedisconnect')
+    #     self.assertEqual([], xml.getElementsByTagName('record'), \
+    #         'Python SDK tests: token publisher permissions should not include record')
+    #     self.assertEqual([], xml.getElementsByTagName('playback'), \
+    #         'Python SDK tests: token publisher permissions should not include playback')
 
-    def test_expire_time(self):
-        s = self.o.create_session()
+    #     # moderator
+    #     t = self.o.generate_token(s.session_id, "moderator")
+    #     xml = self.get_token_info(t)
+    #     role = xml.getElementsByTagName('role')[0].childNodes[0].data
+    #     role = role.strip()
+    #     self.assertEqual('moderator', role, 'Python SDK tests: role not moderator')
+    #     self.assertNotEqual([], xml.getElementsByTagName('subscribe'), \
+    #         'Python SDK tests: token moderator permissions should include subscribe')
+    #     self.assertNotEqual([], xml.getElementsByTagName('publish'), \
+    #         'Python SDK tests: token moderator permissions should include publish')
+    #     self.assertNotEqual([], xml.getElementsByTagName('signal'), \
+    #         'Python SDK tests: token moderator permissions should include signal')
+    #     self.assertNotEqual([], xml.getElementsByTagName('forceunpublish'), \
+    #         'Python SDK tests: token moderator permissions should include forceunpublish')
+    #     self.assertNotEqual([], xml.getElementsByTagName('forcedisconnect'), \
+    #         'Python SDK tests: token moderator permissions should include forcedisconnect')
+    #     self.assertNotEqual([], xml.getElementsByTagName('record'), \
+    #         'Python SDK tests: token moderator permissions should include record')
+    #     self.assertNotEqual([], xml.getElementsByTagName('playback'), \
+    #         'Python SDK tests: token moderator permissions should include playback')
 
-        # past
-        tm = time.time() - 1000
-        try:
-            t = self.o.generate_token(s.session_id, expire_time=tm)
-            raise AssertionError('Python SDK tests: expire time in past should be rejected')
-        except OpenTokException:
-            pass
+    #     # subscriber
+    #     t = self.o.generate_token(s.session_id, "subscriber")
+    #     xml = self.get_token_info(t)
+    #     role = xml.getElementsByTagName('role')[0].childNodes[0].data
+    #     role = role.strip()
+    #     self.assertEqual('subscriber', role, 'Python SDK tests: role not subscriber')
+    #     self.assertNotEqual([], xml.getElementsByTagName('subscribe'), \
+    #         'Python SDK tests: token subscriber permissions should include subscribe')
+    #     self.assertEqual([], xml.getElementsByTagName('publish'), \
+    #         'Python SDK tests: token subscriber permissions should not include publish')
+    #     self.assertEqual([], xml.getElementsByTagName('signal'), \
+    #         'Python SDK tests: token subscriber permissions should not include signal')
+    #     self.assertEqual([], xml.getElementsByTagName('forceunpublish'), \
+    #         'Python SDK tests: token subscriber permissions should not include forceunpublish')
+    #     self.assertEqual([], xml.getElementsByTagName('forcedisconnect'), \
+    #         'Python SDK tests: token subscriber permissions should not include forcedisconnect')
+    #     self.assertEqual([], xml.getElementsByTagName('record'), \
+    #         'Python SDK tests: token subscriber permissions should not include record')
+    #     self.assertEqual([], xml.getElementsByTagName('playback'), \
+    #         'Python SDK tests: token subscriber permissions should not include playback')
 
-        # near future
-        tm = time.time() + 6 * 24 * 60 * 60
-        t = self.o.generate_token(s.session_id, expire_time=tm)
-        xml = self.get_token_info(t)
-        self.assertEqual(str(int(tm)), xml.getElementsByTagName('expire_time')[0].childNodes[0].data,\
-            'Python SDK tests: expire time not set')
+    #     # garbage data
+    #     try:
+    #         t = self.o.generate_token(s.session_id, 'ads')
+    #         raise AssertionError('Python SDK tests: invalid role should be rejected')
 
-        # far future
-        tm = time.time() + 8 * 24 * 60 * 60
-        try:
-            t = self.o.generate_token(s.session_id, expire_time=tm)
-            raise AssertionError('Python SDK tests: expire time more than 7 days away should be rejected')
-        except OpenTokException:
-            pass
+    #     except OpenTokException:
+    #         pass # expected
 
-        # garbage data
-        try:
-            t = self.o.generate_token(s.session_id, expire_time="asdf")
-            raise AssertionError('Python SDK tests: non numberic expire time should be rejected')
-        except OpenTokException:
-            pass
+    # def test_old_session(self):
+    #     s_id = '1abc70a34d069d2e6a1e565f3958b5250b435e32'
+    #     t = self.o.generate_token(s_id)
+    #     xml = self.get_token_info(t)
+    #     self.assertEqual(s_id, xml.getElementsByTagName('session_id')[0].childNodes[0].data, \
+    #         'Python SDK test: creating token with old session id failed')
 
-    def test_connection_data(self):
-        s = self.o.create_session()
+    # def test_expire_time(self):
+    #     s = self.o.create_session()
 
-        test_string = 'test data'
-        t = self.o.generate_token(s.session_id, connection_data=test_string)
-        xml = self.get_token_info(t)
-        self.assertEqual(test_string, xml.getElementsByTagName('connection_data')[0].childNodes[0].data,\
-            'Python SDK tests: connection data not correct')
+    #     # past
+    #     tm = time.time() - 1000
+    #     try:
+    #         t = self.o.generate_token(s.session_id, expire_time=tm)
+    #         raise AssertionError('Python SDK tests: expire time in past should be rejected')
+    #     except OpenTokException:
+    #         pass
 
-        # Should reject over 1000 characters of connection data
-        test_string = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' + \
-            'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb' + \
-            'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc' + \
-            'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd' + \
-            'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' + \
-            'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' + \
-            'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' + \
-            'gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg' + \
-            'hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh' + \
-            'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii' + \
-            'jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj' + \
-            'kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk' + \
-            'llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll' + \
-            'mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm' + \
-            'nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn' + \
-            'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
-        try:
-            t = self.o.generate_token(s.session_id, connection_data=test_string)
-            raise AssertionError('Python SDK tests: long connection data should be rejected')
-        except OpenTokException:
-            pass # expected
+    #     # near future
+    #     tm = time.time() + 6 * 24 * 60 * 60
+    #     t = self.o.generate_token(s.session_id, expire_time=tm)
+    #     xml = self.get_token_info(t)
+    #     self.assertEqual(str(int(tm)), xml.getElementsByTagName('expire_time')[0].childNodes[0].data,\
+    #         'Python SDK tests: expire time not set')
 
-    def get_session_info(self, session_id, token):
-        try:
-            url = self.o.API_URL + '/session/' + session_id + '?extended=true'
-            req = urllib2.Request(url, '', { 'X-TB-TOKEN-AUTH': token })
-            response = urllib2.urlopen(req)
-            dom = parseString(response.read())
-            response.close()
+    #     # far future
+    #     tm = time.time() + 8 * 24 * 60 * 60
+    #     try:
+    #         t = self.o.generate_token(s.session_id, expire_time=tm)
+    #         raise AssertionError('Python SDK tests: expire time more than 7 days away should be rejected')
+    #     except OpenTokException:
+    #         pass
 
-            return dom
-        except urllib2.HTTPError:
-            print "HTTP Error: failed to send request"
+    #     # garbage data
+    #     try:
+    #         t = self.o.generate_token(s.session_id, expire_time="asdf")
+    #         raise AssertionError('Python SDK tests: non numberic expire time should be rejected')
+    #     except OpenTokException:
+    #         pass
 
-    def get_token_info(self, token):
-        try:
-            url = self.o.API_URL + '/token/validate'
-            req = urllib2.Request(url, '', { 'X-TB-TOKEN-AUTH': token })
-            response = urllib2.urlopen(req)
-            dom = parseString(response.read())
-            response.close()
+    # def test_connection_data(self):
+    #     s = self.o.create_session()
 
-            return dom
-        except urllib2.HTTPError:
-            print "HTTP Error: failed to send request"
+    #     test_string = 'test data'
+    #     t = self.o.generate_token(s.session_id, connection_data=test_string)
+    #     xml = self.get_token_info(t)
+    #     self.assertEqual(test_string, xml.getElementsByTagName('connection_data')[0].childNodes[0].data,\
+    #         'Python SDK tests: connection data not correct')
 
-    def assertIsNotNone(self, obj, msg):
-        if obj is None:
-            raise AssertionError(msg)
+    #     # Should reject over 1000 characters of connection data
+    #     test_string = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' + \
+    #         'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb' + \
+    #         'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc' + \
+    #         'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd' + \
+    #         'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' + \
+    #         'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' + \
+    #         'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' + \
+    #         'gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg' + \
+    #         'hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh' + \
+    #         'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii' + \
+    #         'jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj' + \
+    #         'kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk' + \
+    #         'llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll' + \
+    #         'mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm' + \
+    #         'nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn' + \
+    #         'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+    #     try:
+    #         t = self.o.generate_token(s.session_id, connection_data=test_string)
+    #         raise AssertionError('Python SDK tests: long connection data should be rejected')
+    #     except OpenTokException:
+    #         pass # expected
 
-    def assertIsNone(self, obj, msg):
-        if obj is not None:
-            raise AssertionError(msg)
+    # def get_session_info(self, session_id, token):
+    #     try:
+    #         url = self.o.API_URL + '/session/' + session_id + '?extended=true'
+    #         req = urllib2.Request(url, '', { 'X-TB-TOKEN-AUTH': token })
+    #         response = urllib2.urlopen(req)
+    #         dom = parseString(response.read())
+    #         response.close()
+
+    #         return dom
+    #     except urllib2.HTTPError:
+    #         print "HTTP Error: failed to send request"
+
+    # def get_token_info(self, token):
+    #     try:
+    #         url = self.o.API_URL + '/token/validate'
+    #         req = urllib2.Request(url, '', { 'X-TB-TOKEN-AUTH': token })
+    #         response = urllib2.urlopen(req)
+    #         dom = parseString(response.read())
+    #         response.close()
+
+    #         return dom
+    #     except urllib2.HTTPError:
+    #         print "HTTP Error: failed to send request"
+
+    # def assertIsNotNone(self, obj, msg):
+    #     if obj is None:
+    #         raise AssertionError(msg)
+
+    # def assertIsNone(self, obj, msg):
+    #    if obj is not None:
+    #        raise AssertionError(msg)
 
 if __name__ == '__main__':
         unittest.main()

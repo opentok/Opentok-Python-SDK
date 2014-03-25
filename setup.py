@@ -75,4 +75,9 @@ setup(
     #       if JSON schema files are needed
     # zip_safe = False,
     # include_package_data = True,
+
+    # NOTE: this isn't included in the sample packaging recommendation, but it seems to be the 
+    #       de-facto standard for testing tools, Travis uses nose
+    test_suite='nose.collector',
+    tests_require=['nose'],
 )
