@@ -245,7 +245,7 @@ class OpenTokSDK(object):
 
             session_id = dom.getElementsByTagName('session_id')[0].childNodes[0].nodeValue
             return OpenTokSession(session_id)
-        except Exception, e:
+        except Exception as e:
             raise OpenTokException('Failed to generate session: %s' % str(e))
 
     def headers(self):
