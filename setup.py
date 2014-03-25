@@ -80,5 +80,8 @@ setup(
 
     # NOTE: this isn't included in the sample packaging recommendation, but it seems to be the 
     #       de-facto standard for testing tools, Travis uses nose
-    test_suite='tests.get_tests',
+    test_suite='nose.collector',
+    tests_require=[
+        'nose'
+    ],
 )
