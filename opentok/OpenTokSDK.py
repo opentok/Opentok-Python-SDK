@@ -234,7 +234,7 @@ class OpenTokSDK(object):
                 raise RequestError()
             import xml.dom.minidom as xmldom
             dom = xmldom.parseString(response.content)
-        except Exception, e:
+        except Exception as e:
             raise RequestError('Failed to create session: %s' % str(e))
 
         try:
