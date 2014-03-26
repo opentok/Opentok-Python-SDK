@@ -1,10 +1,9 @@
 # import time
 # import urllib2
 import unittest
-# from sure import expect
 # from xml.dom.minidom import parseString
 
-from opentok import OpenTokSDK #, OpenTokException
+from opentok import OpenTok #, OpenTokException
 
 class OpenTokInitializationTest(unittest.TestCase):
     def setUp(self):
@@ -13,20 +12,16 @@ class OpenTokInitializationTest(unittest.TestCase):
         self.api_url = 'http://environment.example.com'
 
     def test_intialization(self):
-        opentok = OpenTokSDK(self.api_key, self.api_secret)
-        # self.assertIsInstance(opentok, OpenTokSDK)
-        # expect(opentok).to.be.a(OpenTokSDK)
-        assert isinstance(opentok, OpenTokSDK)
+        opentok = OpenTok(self.api_key, self.api_secret)
+        assert isinstance(opentok, OpenTok)
 
 #     @raises(TypeError)
 #     def test_initialization_without_required_params(self):
 #         opentok = OpenTokSDK()
 
     def test_initialization_with_api_url(self):
-        opentok = OpenTokSDK(self.api_key, self.api_secret, self.api_url)
-        # assert_is_instance(opentok, OpenTokSDK)
-        # expect(opentok).to.be.a(OpenTokSDK)
-        assert isinstance(opentok, OpenTokSDK)
+        opentok = OpenTok(self.api_key, self.api_secret, self.api_url)
+        assert isinstance(opentok, OpenTok)
 
 
     # api_key = -1

@@ -1,10 +1,3 @@
-"""
-OpenTok Python Library v0.91.0
-http://www.tokbox.com/
-
-Copyright 2011, TokBox, Inc.
-"""
-
 import urllib
 import datetime
 import calendar
@@ -16,42 +9,9 @@ import random
 import requests
 import json
 
+from .exceptions import OpenTokException, RequestError, AuthError, NotFoundError, ArchiveError
 
 dthandler = lambda obj: obj.isoformat() if isinstance(obj, datetime.datetime)  or isinstance(obj, datetime.date) else None
-
-
-class OpenTokException(BaseException):
-    """Generic OpenTok Error. All other errors extend this."""
-    pass
-
-
-class RequestError(OpenTokException):
-    """Indicates an error during the request. Most likely an error connecting
-    to the OpenTok API servers. (HTTP 500 error).
-    """
-    pass
-
-
-class AuthError(OpenTokException):
-    """Indicates that the problem was likely with credentials. Check your API
-    key and API secret and try again.
-    """
-    pass
-
-
-class NotFoundError(OpenTokException):
-    """Indicates that the element requested was not found.  Check the parameters
-    of the request.
-    """
-    pass
-
-
-class ArchiveError(OpenTokException):
-    """Indicates that there was a archive specific problem, probably the status
-    of the requested archive is invalid.
-    """
-    pass
-
 
 class SessionProperties(object):
     echoSuppression_enabled = None
@@ -131,7 +91,7 @@ class OpenTokArchiveList(object):
         return json.dumps(self.attrs(), default=dthandler, indent=4)
 
 
-class OpenTokSDK(object):
+class OpenTok(object):
     """Use this SDK to create tokens and interface with the server-side portion
     of the Opentok API.
     """
@@ -260,11 +220,11 @@ class OpenTokSDK(object):
         return result
 
     def session_url(self):
-        url = OpenTokSDK.API_URL + '/session/create'
+        url = OpenTok.API_URL + '/session/create'
         return url
 
     def archive_url(self, archive_id=None):
-        url = OpenTokSDK.API_URL + '/v2/partner/' + self.api_key + '/archive'
+        url = OpenTok.API_URL + '/v2/partner/' + self.api_key + '/archive'
         if archive_id:
             url = url + '/' + archive_id
         return url
