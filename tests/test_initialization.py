@@ -24,6 +24,10 @@ class OpenTokInitializationTest(unittest.TestCase):
         opentok = OpenTok(self.api_key, self.api_secret, self.api_url)
         assert isinstance(opentok, OpenTok)
 
+    def test_initialization_with_numeric_api_key(self):
+        opentok = OpenTok(123456, self.api_secret, self.api_url)
+        assert isinstance(opentok, OpenTok)
+
 
     # api_key = -1
     # api_secret = ""

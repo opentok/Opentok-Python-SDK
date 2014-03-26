@@ -14,7 +14,7 @@ from .exceptions import OpenTokException, RequestError, AuthError, NotFoundError
 
 dthandler = lambda obj: obj.isoformat() if isinstance(obj, datetime.datetime)  or isinstance(obj, datetime.date) else None
 
-class RoleConstants(Enum):
+class Roles(Enum):
     """List of valid roles for a token."""
     subscriber = 'subscriber'  # Can only subscribe
     publisher = 'publisher'    # Can publish, subscribe, and signal
@@ -113,17 +113,15 @@ class OpenTok(object):
             raise OpenTokException("An invalid session ID was passed")
 
         if not role:
-            role = RoleConstants.PUBLISHER
+            role = Roles.publisher
 
-        if role != RoleConstants.SUBSCRIBER and \
-                role != RoleConstants.PUBLISHER and \
-                role != RoleConstants.MODERATOR:
+        if not isinstance(role, Roles):
             raise OpenTokException('%s is not a valid role' % role)
 
         data_params = dict(
             session_id=session_id,
             create_time=calendar.timegm(create_time.timetuple()),
-            role=role,
+            role=role.value,
         )
         if expire_time is not None:
             if isinstance(expire_time, datetime.datetime):
