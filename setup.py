@@ -70,7 +70,8 @@ setup(
     packages=find_packages(exclude=["contrib", "docs", "tests*"]),
 
     install_requires=[
-        'requests>=1,<2'
+        'requests>=1,<2',
+        'enum34'
     ],
 
     # TODO: these aren't in the sample package, but might again become imp

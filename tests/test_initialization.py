@@ -1,6 +1,7 @@
 # import time
 # import urllib2
 import unittest
+from nose.tools import raises
 # from xml.dom.minidom import parseString
 
 from opentok import OpenTok #, OpenTokException
@@ -15,9 +16,9 @@ class OpenTokInitializationTest(unittest.TestCase):
         opentok = OpenTok(self.api_key, self.api_secret)
         assert isinstance(opentok, OpenTok)
 
-#     @raises(TypeError)
-#     def test_initialization_without_required_params(self):
-#         opentok = OpenTokSDK()
+    @raises(TypeError)
+    def test_initialization_without_required_params(self):
+        opentok = OpenTok()
 
     def test_initialization_with_api_url(self):
         opentok = OpenTok(self.api_key, self.api_secret, self.api_url)

@@ -1,4 +1,4 @@
-import urllib
+from urllib import urlencode
 import datetime
 import calendar
 import time
@@ -8,34 +8,17 @@ import base64
 import random
 import requests
 import json
+from enum import Enum
 
 from .exceptions import OpenTokException, RequestError, AuthError, NotFoundError, ArchiveError
 
 dthandler = lambda obj: obj.isoformat() if isinstance(obj, datetime.datetime)  or isinstance(obj, datetime.date) else None
 
-class SessionProperties(object):
-    echoSuppression_enabled = None
-    multiplexer_numOutputStreams = None
-    multiplexer_switchType = None
-    multiplexer_switchTimeout = None
-    p2p_preference = "p2p.preference"
-
-    def __iter__(self):
-        d = {
-            'echoSuppression.enabled': self.echoSuppression_enabled,
-            'multiplexer.numOutputStreams': self.multiplexer_numOutputStreams,
-            'multiplexer.switchType': self.multiplexer_switchType,
-            'multiplexer.switchTimeout': self.multiplexer_switchTimeout,
-            'p2p.preference': self.p2p_preference,
-        }
-        return d.iteritems()
-
-
-class RoleConstants:
+class RoleConstants(Enum):
     """List of valid roles for a token."""
-    SUBSCRIBER = 'subscriber'  # Can only subscribe
-    PUBLISHER = 'publisher'    # Can publish, subscribe, and signal
-    MODERATOR = 'moderator'    # Can do the above along with forceDisconnect and forceUnpublish
+    subscriber = 'subscriber'  # Can only subscribe
+    publisher = 'publisher'    # Can publish, subscribe, and signal
+    moderator = 'moderator'    # Can do the above along with forceDisconnect and forceUnpublish
 
 
 class OpenTokSession(object):
@@ -163,7 +146,7 @@ class OpenTok(object):
             data_params['connection_data'] = connection_data
 
         data_params['nonce'] = random.randint(0,999999)
-        data_string = urllib.urlencode(data_params, True)
+        data_string = urlencode(data_params, True)
 
         sig = self._sign_string(data_string, self.api_secret)
         token_string = '%s%s' % (self.TOKEN_SENTINEL, base64.b64encode('partner_id=%s&sig=%s:%s' % (self.api_key, sig, data_string)))
@@ -292,7 +275,7 @@ class OpenTok(object):
         if count is not None:
             params['count'] = count
 
-        response = requests.get(self.archive_url() + "?" + urllib.urlencode(params), headers=self.archive_headers())
+        response = requests.get(self.archive_url() + "?" + urlencode(params), headers=self.archive_headers())
 
         if response.status_code < 300:
             return OpenTokArchiveList(response.json())
