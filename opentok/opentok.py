@@ -1,16 +1,20 @@
-from six.moves.urllib.parse import urlencode
-import datetime
-import calendar
-import time
-import hmac
-import hashlib
-import base64
-import random
-import requests
-import json
-from enum import Enum
+from datetime import datetime  # generate_token
+import calendar                # generate_token
+import time                    # generate_token
+import hmac                    # _sign_string
+import hashlib                 # _sign_string
+import base64                  # generate_token
+import random                  # generate_token
+import requests                # create_session, archiving
+import json                    # archiving
 
 from .exceptions import OpenTokException, RequestError, AuthError, NotFoundError, ArchiveError
+
+# compat
+from six.moves import map
+from six.moves.urllib.parse import urlencode
+from six import text_type, u, b
+from enum import Enum
 
 dthandler = lambda obj: obj.isoformat() if isinstance(obj, datetime.datetime)  or isinstance(obj, datetime.date) else None
 
@@ -48,7 +52,7 @@ class OpenTokArchive(object):
         self.sdk.delete_archive(self.id)
 
     def attrs(self):
-        return dict((k, v) for k, v in self.__dict__.iteritems() if k is not "sdk")
+        return dict((k, v) for k, v in six.iteritems(self.__dict__) if k is not "sdk")
 
     def json(self):
         return json.dumps(self.attrs(), default=dthandler, indent=4)
@@ -85,70 +89,79 @@ class OpenTok(object):
         self.api_secret = api_secret
         self.api_url = api_url
 
-    def generate_token(self, session_id, role=None, expire_time=None, connection_data=None, **kwargs):
+    def generate_token(self, session_id, role=Roles.publisher, expire_time=None, connection_data=None, **kwargs):
         """
         Generate a token which is passed to the JS API to enable widgets to connect to the Opentok api.
         session_id: Specify a session_id to make this token only valid for that session_id.
         role: One of the constants defined in RoleConstants. Default is publisher, look in the documentation to learn more about roles.
         expire_time: Integer timestamp. You can override the default token expire time of 24h by choosing an explicit expire time. Can be up to 7d after create_time.
         """
-        create_time = datetime.datetime.utcnow()
-        if not session_id:
-            raise OpenTokException('Null or empty session ID are not valid')
-        sub_session_id = session_id[2:]
-        decoded_session_id = ""
-        for i in range(0, 3):
-            new_session_id = sub_session_id+("="*i)
-            new_session_id = new_session_id.replace("-", "+").replace("_", "/")
-            try:
-                decoded_session_id = base64.b64decode(new_session_id)
-                if "~" in decoded_session_id:
-                    break
-            except TypeError:
-                pass
-        try:
-            if decoded_session_id.split('~')[1] != str(self.api_key):
-                raise OpenTokException("An invalid session ID was passed")
-        except Exception:
-            raise OpenTokException("An invalid session ID was passed")
 
-        if not role:
-            role = Roles.publisher
-
-        if not isinstance(role, Roles):
-            raise OpenTokException('%s is not a valid role' % role)
-
-        data_params = dict(
-            session_id=session_id,
-            create_time=calendar.timegm(create_time.timetuple()),
-            role=role.value,
-        )
+        # normalize
+        # expire_time can be an integer, a datetime object, or anything else that can be coerced into an integer
+        # after this block it will only be an integer
         if expire_time is not None:
-            if isinstance(expire_time, datetime.datetime):
-                data_params['expire_time'] = calendar.timegm(expire_time.timetuple())
+            if isinstance(expire_time, datetime):
+                expire_time = calendar.timegm(expire_time.timetuple())
             else:
                 try:
-                    data_params['expire_time'] = int(expire_time)
+                    expire_time = int(expire_time)
                 except (ValueError, TypeError):
-                    raise OpenTokException('Expire time must be a number')
+                    raise OpenTokException(u('Cannot generate token, invalid expire time {0}').format(expire_time))
+        else:
+            expire_time = calendar.timegm(time.gmtime()) + (60*60*24) # 1 day
 
-            if data_params['expire_time'] < time.time():
-                raise OpenTokException('Expire time must be in the future')
+        # validations
+        if not text_type(session_id):
+            raise OpenTokException(u('Cannot generate token, session_id was not valid {0}').format(session_id))
+        if not isinstance(role, Roles):
+            raise OpenTokException(u('Cannot generate token, {0} is not a valid role').format(role))
+        now = calendar.timegm(time.gmtime())
+        if expire_time < now:
+            raise OpenTokException(u('Cannot generate token, expire_time is not in the future {0}').format(expire_time))
+        if expire_time > now + (60*60*24*30):  # 30 days
+            raise OpenTokException(u('Cannot generate token, expire_time is not in the next 30 days {0}').format(expire_time))
+        if (connection_data is not None) and len(connection_data) > 1000:
+            raise OpenTokException(u('Cannot generate token, connection_data must be less than 1000 characters').format(connection_data))
 
-            if data_params['expire_time'] > time.time() + 2592000:
-                raise OpenTokException('Expire time must be in the next 30 days')
+        # decode session id to verify api_key
+        # sub_session_id = session_id[2:]
+        # decoded_session_id = ""
+        # for i in range(0, 3):
+        #     new_session_id = sub_session_id+("="*i)
+        #     new_session_id = new_session_id.replace("-", "+").replace("_", "/")
+        #     try:
+        #         decoded_session_id = base64.b64decode(new_session_id)
+        #         if "~" in decoded_session_id:
+        #             break
+        #     except TypeError:
+        #         pass
+        # try:
+        #     if decoded_session_id.split('~')[1] != str(self.api_key):
+        #         raise OpenTokException("An invalid session ID was passed")
+        # except Exception:
+        #     raise OpenTokException("An invalid session ID was passed")
 
-        if connection_data is not None:
-            if len(connection_data) > 1000:
-                raise OpenTokException('Connection data must be less than 1000 characters')
-            data_params['connection_data'] = connection_data
-
-        data_params['nonce'] = random.randint(0,999999)
+        data_params = dict(
+            session_id      = session_id,
+            create_time     = now,
+            expire_time     = expire_time,
+            role            = role.value,
+            connection_data = (connection_data or None),
+            nonce           = random.randint(0,999999)
+        )
         data_string = urlencode(data_params, True)
 
         sig = self._sign_string(data_string, self.api_secret)
-        token_string = '%s%s' % (self.TOKEN_SENTINEL, base64.b64encode('partner_id=%s&sig=%s:%s' % (self.api_key, sig, data_string)))
-        return token_string
+        token = u('{sentinal}{base64_data}').format(
+            sentinal    = self.TOKEN_SENTINEL, 
+            base64_data = base64.b64encode(b(u('partner_id={api_key}&sig={sig}:{payload}').format(
+                api_key = self.api_key, 
+                sig     = sig,
+                payload = data_string
+            )))
+        )
+        return token
 
     def create_session(self, location='', properties={}, **kwargs):
         """Create a new session in the OpenTok API. Returns an OpenTokSession

@@ -1,4 +1,5 @@
 import unittest
+from six import text_type
 from nose.tools import raises
 
 from opentok import OpenTok
@@ -12,4 +13,4 @@ class OpenTokTokenGenerationTest(unittest.TestCase):
 
     def test_generate_plain_token(self):
         token = self.opentok.generate_token(self.session_id)
-        assert isinstance(token, str)
+        assert isinstance(token, text_type)

@@ -84,6 +84,7 @@ setup(
     #       de-facto standard for testing tools, Travis uses nose
     test_suite='nose.collector',
     tests_require=[
-        'nose'
+        'nose',
+        'six'
     ],
 )
