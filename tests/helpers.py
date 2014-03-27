@@ -9,7 +9,7 @@ def token_decoder(token):
     token_data = {}
     #remove sentinal
     encoded = token[4:]
-    decoded = base64.b64decode(encoded)
+    decoded = base64.b64decode(encoded.encode('utf-8'))
     # decode the bytes object back to unicode with utf-8 encoding
     if PY3:
         decoded = decoded.decode()
