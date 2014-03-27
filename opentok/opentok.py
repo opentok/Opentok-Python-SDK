@@ -124,23 +124,17 @@ class OpenTok(object):
         if (connection_data is not None) and len(connection_data) > 1000:
             raise OpenTokException(u('Cannot generate token, connection_data must be less than 1000 characters').format(connection_data))
 
-        # TODO: decode session id to verify api_key
-        # sub_session_id = session_id[2:]
-        # decoded_session_id = ""
-        # for i in range(0, 3):
-        #     new_session_id = sub_session_id+("="*i)
-        #     new_session_id = new_session_id.replace("-", "+").replace("_", "/")
-        #     try:
-        #         decoded_session_id = base64.b64decode(new_session_id)
-        #         if "~" in decoded_session_id:
-        #             break
-        #     except TypeError:
-        #         pass
-        # try:
-        #     if decoded_session_id.split('~')[1] != str(self.api_key):
-        #         raise OpenTokException("An invalid session ID was passed")
-        # except Exception:
-        #     raise OpenTokException("An invalid session ID was passed")
+        # decode session id to verify api_key
+        sub_session_id = session_id[2:]
+        sub_session_id_bytes = sub_session_id.encode('utf-8')
+        sub_session_id_bytes_padded = sub_session_id_bytes + (b('=') * (-len(sub_session_id_bytes) % 4))
+        try:
+            decoded_session_id = base64.b64decode(sub_session_id_bytes_padded, b('-_'))
+            parts = decoded_session_id.decode('utf-8').split(u('~'))
+        except Exception as e:
+            raise OpenTokException(u('Cannot generate token, the session_id {0} was not valid').format(session_id))
+        if self.api_key not in parts:
+            raise OpenTokException(u('Cannot generate token, the session_id {0} does not belong to the api_key {1}').format(session_id, self.api_key))
 
         data_params = dict(
             session_id      = session_id,

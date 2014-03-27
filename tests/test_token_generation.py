@@ -52,8 +52,14 @@ class OpenTokTokenGenerationTest(unittest.TestCase):
     def test_does_not_generate_token_without_session(self):
         token = self.opentok.generate_token(role=Roles.subscriber)
 
-    # TODO: this requires decoding session_id to check for api_key
+    @raises(OpenTokException)
     def test_does_not_generate_token_invalid_session(self):
-        pass
+        token = self.opentok.generate_token(u('NOT A REAL SESSIONID'))
+
+    @raises(OpenTokException)
+    def test_does_not_generate_token_without_api_key_match(self):
+        # this session_id has the wrong api_key
+        session_id = u('1_MX42NTQzMjF-flNhdCBNYXIgMTUgMTQ6NDI6MjMgUERUIDIwMTR-MC40OTAxMzAyNX4')
+        token = self.opentok.generate_token(session_id)
 
     # TODO: all the things that raise OpenTokException
