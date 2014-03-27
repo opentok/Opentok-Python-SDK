@@ -13,16 +13,16 @@ from .exceptions import OpenTokException, RequestError, AuthError, NotFoundError
 # compat
 from six.moves import map
 from six.moves.urllib.parse import urlencode
-from six import text_type, u, b
+from six import text_type, u, b, PY3
 from enum import Enum
 
 dthandler = lambda obj: obj.isoformat() if isinstance(obj, datetime.datetime)  or isinstance(obj, datetime.date) else None
 
 class Roles(Enum):
     """List of valid roles for a token."""
-    subscriber = 'subscriber'  # Can only subscribe
-    publisher = 'publisher'    # Can publish, subscribe, and signal
-    moderator = 'moderator'    # Can do the above along with forceDisconnect and forceUnpublish
+    subscriber = u('subscriber')   # Can only subscribe
+    publisher =  u('publisher')    # Can publish, subscribe, and signal
+    moderator =  u('moderator')    # Can do the above along with forceDisconnect and forceUnpublish
 
 
 class OpenTokSession(object):
@@ -124,7 +124,7 @@ class OpenTok(object):
         if (connection_data is not None) and len(connection_data) > 1000:
             raise OpenTokException(u('Cannot generate token, connection_data must be less than 1000 characters').format(connection_data))
 
-        # decode session id to verify api_key
+        # TODO: decode session id to verify api_key
         # sub_session_id = session_id[2:]
         # decoded_session_id = ""
         # for i in range(0, 3):
@@ -153,13 +153,16 @@ class OpenTok(object):
         data_string = urlencode(data_params, True)
 
         sig = self._sign_string(data_string, self.api_secret)
+        decoded_base64_bytes = u('partner_id={api_key}&sig={sig}:{payload}').format(
+            api_key = self.api_key, 
+            sig     = sig,
+            payload = data_string
+        )
+        if PY3:
+            decoded_base64_bytes = decoded_base64_bytes.encode('utf-8')
         token = u('{sentinal}{base64_data}').format(
-            sentinal    = self.TOKEN_SENTINEL, 
-            base64_data = base64.b64encode(b(u('partner_id={api_key}&sig={sig}:{payload}').format(
-                api_key = self.api_key, 
-                sig     = sig,
-                payload = data_string
-            )))
+            sentinal    = self.TOKEN_SENTINEL,
+            base64_data = base64.b64encode(decoded_base64_bytes).decode()
         )
         return token
 

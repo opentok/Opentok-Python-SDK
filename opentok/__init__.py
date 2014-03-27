@@ -1,4 +1,5 @@
-from .opentok import OpenTok
+from .opentok import OpenTok, Roles
+from .exceptions import OpenTokException
 
 # see: http://legacy.python.org/dev/peps/pep-0440/#public-version-identifiers
 __version__ = '2.2.0a0'
