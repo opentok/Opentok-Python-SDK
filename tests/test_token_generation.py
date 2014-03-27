@@ -1,7 +1,10 @@
 import unittest
-from six import text_type, u
+from six import text_type, u, PY2, PY3
 from nose.tools import raises
 import time
+import datetime
+import calendar
+import pytz
 
 from opentok import OpenTok, Roles, OpenTokException
 
@@ -31,11 +34,28 @@ class OpenTokTokenGenerationTest(unittest.TestCase):
         assert token_signature_validator(token, self.api_secret)
 
     def test_generate_expires_token(self):
-        expire_time = time.time()
+        # an integer is a valid argument
+        expire_time = int(time.time()) + 100
         token = self.opentok.generate_token(self.session_id, expire_time=expire_time)
         assert isinstance(token, text_type)
-        assert token_decoder(token)[u('expire_time')] == text_type(int(expire_time))
+        assert token_decoder(token)[u('expire_time')] == text_type(expire_time)
         assert token_signature_validator(token, self.api_secret)
+        # anything that can be coerced into an integer is also valid
+        expire_time = text_type(int(time.time()) + 100)
+        token = self.opentok.generate_token(self.session_id, expire_time=expire_time)
+        assert isinstance(token, text_type)
+        assert token_decoder(token)[u('expire_time')] == expire_time
+        assert token_signature_validator(token, self.api_secret)
+        # a datetime object is also valid
+        if PY2:
+            expire_time = datetime.datetime.fromtimestamp(time.time(), pytz.UTC) + datetime.timedelta(days=1)
+        if PY3:
+            expire_time = datetime.datetime.fromtimestamp(time.time(), datetime.timezone.utc) + datetime.timedelta(days=1)
+        token = self.opentok.generate_token(self.session_id, expire_time=expire_time)
+        assert isinstance(token, text_type)
+        assert token_decoder(token)[u('expire_time')] == text_type(calendar.timegm(expire_time.utctimetuple()))
+        assert token_signature_validator(token, self.api_secret)
+
 
     def test_generate_data_token(self):
         data = u('name=Johnny')

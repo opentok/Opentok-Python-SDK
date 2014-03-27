@@ -102,21 +102,21 @@ class OpenTok(object):
         # after this block it will only be an integer
         if expire_time is not None:
             if isinstance(expire_time, datetime):
-                expire_time = calendar.timegm(expire_time.timetuple())
+                expire_time = calendar.timegm(expire_time.utctimetuple())
             else:
                 try:
                     expire_time = int(expire_time)
                 except (ValueError, TypeError):
                     raise OpenTokException(u('Cannot generate token, invalid expire time {0}').format(expire_time))
         else:
-            expire_time = calendar.timegm(time.gmtime()) + (60*60*24) # 1 day
+            expire_time = int(time.time()) + (60*60*24) # 1 day
 
         # validations
         if not text_type(session_id):
             raise OpenTokException(u('Cannot generate token, session_id was not valid {0}').format(session_id))
         if not isinstance(role, Roles):
             raise OpenTokException(u('Cannot generate token, {0} is not a valid role').format(role))
-        now = calendar.timegm(time.gmtime())
+        now = int(time.time())
         if expire_time < now:
             raise OpenTokException(u('Cannot generate token, expire_time is not in the future {0}').format(expire_time))
         if expire_time > now + (60*60*24*30):  # 30 days

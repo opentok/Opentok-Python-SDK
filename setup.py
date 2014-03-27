@@ -72,7 +72,8 @@ setup(
     install_requires=[
         'requests>=1,<2',
         'enum34',
-        'six'
+        'six',
+        'pytz'
     ],
 
     # TODO: these aren't in the sample package, but might again become imp
