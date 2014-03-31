@@ -59,7 +59,7 @@ class OpenTokTokenGenerationTest(unittest.TestCase):
 
     def test_generate_data_token(self):
         data = u('name=Johnny')
-        token = self.opentok.generate_token(self.session_id, connection_data=data)
+        token = self.opentok.generate_token(self.session_id, data=data)
         assert isinstance(token, text_type)
         assert token_decoder(token)[u('connection_data')] == data
         assert token_signature_validator(token, self.api_secret)

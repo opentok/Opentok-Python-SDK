@@ -37,7 +37,7 @@ class OpenTok(object):
         self.api_secret = api_secret
         self.api_url = api_url
 
-    def generate_token(self, session_id, role=Roles.publisher, expire_time=None, connection_data=None, **kwargs):
+    def generate_token(self, session_id, role=Roles.publisher, expire_time=None, data=None):
         """
         Generate a token which is passed to the JS API to enable widgets to connect to the Opentok api.
         session_id: Specify a session_id to make this token only valid for that session_id.
@@ -69,8 +69,8 @@ class OpenTok(object):
             raise OpenTokException(u('Cannot generate token, expire_time is not in the future {0}').format(expire_time))
         if expire_time > now + (60*60*24*30):  # 30 days
             raise OpenTokException(u('Cannot generate token, expire_time is not in the next 30 days {0}').format(expire_time))
-        if (connection_data is not None) and len(connection_data) > 1000:
-            raise OpenTokException(u('Cannot generate token, connection_data must be less than 1000 characters').format(connection_data))
+        if (data is not None) and len(data) > 1000:
+            raise OpenTokException(u('Cannot generate token, data must be less than 1000 characters').format(data))
 
         # decode session id to verify api_key
         sub_session_id = session_id[2:]
@@ -89,7 +89,7 @@ class OpenTok(object):
             create_time     = now,
             expire_time     = expire_time,
             role            = role.value,
-            connection_data = (connection_data or None),
+            connection_data = (data or None),
             nonce           = random.randint(0,999999)
         )
         data_string = urlencode(data_params, True)
@@ -151,7 +151,7 @@ class OpenTok(object):
                 raise AuthError('Failed to create session (code=%s): %s' % (error.attributes['code'].value, error.firstChild.attributes['message'].value))
 
             session_id = dom.getElementsByTagName('session_id')[0].childNodes[0].nodeValue
-            return Session(session_id, location=location, p2p=p2p)
+            return Session(self, session_id, location=location, p2p=p2p)
         except Exception as e:
             raise OpenTokException('Failed to generate session: %s' % str(e))
 

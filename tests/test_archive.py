@@ -8,9 +8,9 @@ import json
 import datetime
 import pytz
 
-from opentok import OpenTok, Archive, ArchiveList, __version__
+from opentok import OpenTok, Archive, __version__
 
-class OpenTokArchiveApiTest(unittest.TestCase):
+class OpenTokArchiveTest(unittest.TestCase):
     def setUp(self):
         self.api_key = u('123456')
         self.api_secret = u('1234567890abcdef1234567890abcdef1234567890')
