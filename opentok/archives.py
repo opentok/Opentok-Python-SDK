@@ -5,6 +5,9 @@ import pytz
 if PY3:
     from datetime import timezone
 
+# compat
+from six.moves import map
+
 dthandler = lambda obj: obj.isoformat() if isinstance(obj, datetime)  or isinstance(obj, date) else None
 
 class Archive(object):
@@ -40,7 +43,7 @@ class ArchiveList(object):
 
     def __init__(self, values):
         self.count = values.get('count')
-        self.items = map(lambda x: OpenTokArchive(self, x), values.get('items', []))
+        self.items = map(lambda x: Archive(self, x), values.get('items', []))
 
     def __iter__(self):
         for x in self.items:
@@ -49,7 +52,7 @@ class ArchiveList(object):
     def attrs(self):
         return {
             'count': self.count,
-            'items': map(OpenTokArchive.attrs, self.items)
+            'items': map(Archive.attrs, self.items)
         }
 
     def json(self):

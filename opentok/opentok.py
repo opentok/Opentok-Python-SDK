@@ -11,7 +11,6 @@ from socket import inet_aton   # create_session
 import xml.dom.minidom as xmldom # create_session
 
 # compat
-from six.moves import map
 from six.moves.urllib.parse import urlencode
 from six import text_type, u, b, PY3
 from enum import Enum
