@@ -2,25 +2,35 @@
 OpenTok Python SDK
 ==================
 
+.. image:: https://travis-ci.org/aoberoi/Opentok-Python-SDK.svg?branch=modernization   :target: https://travis-ci.org/aoberoi/Opentok-Python-SDK
+
 The OpenTok Python SDK lets you generate `sessions <http://tokbox.com/opentok/tutorials/create-session/>`_ and
 `tokens <http://tokbox.com/opentok/tutorials/create-token/>`_ for `OpenTok <http://www.tokbox.com/>`_ applications. This version of the SDK also includes support for working with OpenTok 2.0 archives.
 
 
-## Installation
+Installation
+------------
 
-To install from PyPi using [pip](http://www.pip-installer.org/en/latest/), a package manager for Python. 
-<pre>
-pip install opentok
-</pre>
+Pip (recommended):
+~~~~~~~~~~~~~~~~~~
 
-If you get "Permission Denied" errors try running it with `sudo` in front:
-<pre>
-sudo pip install opentok
-</pre>
+Pip helps manage dependencies for Python projects using the PyPI index. Find more info here:
+http://www.pip-installer.org/en/latest/
 
-You can download the OpenTok Python SDK from GitHub:
+Add the opentok package as a dependency in your project. The most common way is to add it to your
+requirements.txt file::
 
-<https://github.com/opentok/Opentok-Python-SDK/archive/master.zip>
+  opentok>=2.2
+
+Next, install the dependencies::
+
+  $ pip install -r requirements.txt
+
+Manually:
+~~~~~~~~~
+
+Download the latest package zip from the `Releases page
+<https://github.com/opentok/Opentok-Python-SDK/releases>`_
 
 
 ## Requirements
