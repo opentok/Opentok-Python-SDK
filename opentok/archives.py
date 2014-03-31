@@ -1,6 +1,9 @@
 from datetime import datetime, date
-from six import iteritems
+from six import iteritems, PY2, PY3
 import json
+import pytz
+if PY3:
+    from datetime import timezone
 
 dthandler = lambda obj: obj.isoformat() if isinstance(obj, datetime)  or isinstance(obj, date) else None
 
@@ -13,7 +16,10 @@ class Archive(object):
         self.status = values.get('status')
         self.session_id = values.get('sessionId')
         self.partner_id = values.get('partnerId')
-        self.created_at = datetime.fromtimestamp(values.get('createdAt') / 1000)
+        if PY2:
+            self.created_at = datetime.fromtimestamp(values.get('createdAt') / 1000, pytz.UTC)
+        if PY3:
+            self.created_at = datetime.fromtimestamp(values.get('createdAt') // 1000, timezone.utc)
         self.size = values.get('size')
         self.duration = values.get('duration')
         self.url = values.get('url')
