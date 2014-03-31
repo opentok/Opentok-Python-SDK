@@ -28,10 +28,13 @@ class Archive(object):
         self.url = values.get('url')
 
     def stop(self):
-        self.sdk.stop_archive(self.id)
+        temp_archive = self.sdk.stop_archive(self.id)
+        for k,v in iteritems(temp_archive.attrs()):
+            setattr(self, k, v)
 
     def delete(self):
         self.sdk.delete_archive(self.id)
+        # TODO: invalidate this object
 
     def attrs(self):
         return dict((k, v) for k, v in iteritems(self.__dict__) if k is not "sdk")
