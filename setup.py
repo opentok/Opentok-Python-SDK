@@ -28,7 +28,7 @@ with codecs.open('README.rst', encoding='utf-8') as f:
 
 setup(
     name = 'opentok',
-    version = find_version('opentok', '__init__.py'),
+    version = find_version('opentok', 'version.py'),
     description = 'OpenTok server-side SDK',
     long_description=long_description,
 
@@ -70,10 +70,12 @@ setup(
     packages=find_packages(exclude=["contrib", "docs", "tests*"]),
 
     install_requires=[
-        'requests>=1,<2',
+        'requests',
         'enum34',
         'six',
-        'pytz'
+        'pytz',
+        'httpretty',
+        'sure',
     ],
 
     # TODO: these aren't in the sample package, but might again become imp
@@ -86,6 +88,8 @@ setup(
     test_suite='nose.collector',
     tests_require=[
         'nose',
-        'six'
+        'six',
+        'httpretty',
+        'sure',
     ],
 )

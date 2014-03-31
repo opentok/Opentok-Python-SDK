@@ -7,8 +7,12 @@ import base64                  # generate_token
 import random                  # generate_token
 import requests                # create_session, archiving
 import json                    # archiving
+from socket import inet_aton   # create_session
+import xml.dom.minidom as xmldom # create_session
 
 from .exceptions import OpenTokException, RequestError, AuthError, NotFoundError, ArchiveError
+from .session import Session
+from .version import __version__
 
 # compat
 from six.moves import map
@@ -23,12 +27,6 @@ class Roles(Enum):
     subscriber = u('subscriber')   # Can only subscribe
     publisher =  u('publisher')    # Can publish, subscribe, and signal
     moderator =  u('moderator')    # Can do the above along with forceDisconnect and forceUnpublish
-
-
-class OpenTokSession(object):
-
-    def __init__(self, session_id):
-        self.session_id = session_id
 
 
 class OpenTokArchive(object):
@@ -160,7 +158,7 @@ class OpenTok(object):
         )
         return token
 
-    def create_session(self, location='', properties={}, **kwargs):
+    def create_session(self, location=None, p2p=False):
         """Create a new session in the OpenTok API. Returns an OpenTokSession
         object with a session_id property. location: IP address of the user
         requesting the session. This is used for geolocation to choose which
@@ -169,21 +167,29 @@ class OpenTok(object):
         to use features of the groups API. Look in the documentation for more
         details. Also accepts any dict-like object.
         """
-        #ip_passthru is a deprecated argument and has been replaced with location
-        if 'ip_passthru' in kwargs:
-            location = kwargs['ip_passthru']
-        params = dict(api_key=self.api_key)
-        params['location'] = location
-        params.update(properties)
+
+        # build options
+        options = {}
+        if p2p:
+            if not isinstance(p2p, bool):
+                raise OpenTokException(u('Cannot create session. p2p must be a bool {0}').format(p2p))
+            options[u('p2p.preference')] = u('enabled')
+        if location:
+            # validate IP address
+            try:
+                inet_aton(location)
+            except:
+                raise OpenTokException(u('Cannot create session. Location must be either None or a valid IPv4 address {0}').format(location))
+            options[u('location')] = location
 
         try:
-            response = requests.post(self.session_url(), data=params, headers=self.headers())
+            response = requests.post(self.session_url(), data=options, headers=self.headers())
+            response.encoding = 'utf-8'
 
             if response.status_code == 403:
                 raise AuthError('Failed to create session, invalid credentials')
             if not response.content:
                 raise RequestError()
-            import xml.dom.minidom as xmldom
             dom = xmldom.parseString(response.content)
         except Exception as e:
             raise RequestError('Failed to create session: %s' % str(e))
@@ -195,7 +201,7 @@ class OpenTok(object):
                 raise AuthError('Failed to create session (code=%s): %s' % (error.attributes['code'].value, error.firstChild.attributes['message'].value))
 
             session_id = dom.getElementsByTagName('session_id')[0].childNodes[0].nodeValue
-            return OpenTokSession(session_id)
+            return Session(session_id, location=location, p2p=p2p)
         except Exception as e:
             raise OpenTokException('Failed to generate session: %s' % str(e))
 
@@ -211,7 +217,7 @@ class OpenTok(object):
         return result
 
     def session_url(self):
-        url = OpenTok.API_URL + '/session/create'
+        url = self.api_url + '/session/create'
         return url
 
     def archive_url(self, archive_id=None):
