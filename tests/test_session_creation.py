@@ -11,8 +11,6 @@ class OpenTokSessionCreationTest(unittest.TestCase):
     def setUp(self):
         self.api_key = u('123456')
         self.api_secret = u('1234567890abcdef1234567890abcdef1234567890')
-        # self.api_key = u('854511')
-        # self.api_secret = u('***REMOVED***')
         self.opentok = OpenTok(self.api_key, self.api_secret)
 
     @httpretty.activate

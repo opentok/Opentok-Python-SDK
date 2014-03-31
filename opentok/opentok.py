@@ -1,18 +1,14 @@
 from datetime import datetime  # generate_token
 import calendar                # generate_token
+import base64                  # generate_token
+import random                  # generate_token
 import time                    # generate_token
 import hmac                    # _sign_string
 import hashlib                 # _sign_string
-import base64                  # generate_token
-import random                  # generate_token
 import requests                # create_session, archiving
 import json                    # archiving
 from socket import inet_aton   # create_session
 import xml.dom.minidom as xmldom # create_session
-
-from .exceptions import OpenTokException, RequestError, AuthError, NotFoundError, ArchiveError
-from .session import Session
-from .version import __version__
 
 # compat
 from six.moves import map
@@ -20,61 +16,16 @@ from six.moves.urllib.parse import urlencode
 from six import text_type, u, b, PY3
 from enum import Enum
 
-dthandler = lambda obj: obj.isoformat() if isinstance(obj, datetime.datetime)  or isinstance(obj, datetime.date) else None
+from .version import __version__
+from .session import Session
+from .archives import Archive, ArchiveList
+from .exceptions import OpenTokException, RequestError, AuthError, NotFoundError, ArchiveError
 
 class Roles(Enum):
     """List of valid roles for a token."""
     subscriber = u('subscriber')   # Can only subscribe
     publisher =  u('publisher')    # Can publish, subscribe, and signal
     moderator =  u('moderator')    # Can do the above along with forceDisconnect and forceUnpublish
-
-
-class OpenTokArchive(object):
-
-    def __init__(self, sdk, values):
-        self.sdk = sdk
-        self.id = values.get('id')
-        self.name = values.get('name')
-        self.status = values.get('status')
-        self.session_id = values.get('sessionId')
-        self.partner_id = values.get('partnerId')
-        self.created_at = datetime.datetime.fromtimestamp(values.get('createdAt') / 1000)
-        self.size = values.get('size')
-        self.duration = values.get('duration')
-        self.url = values.get('url')
-
-    def stop(self):
-        self.sdk.stop_archive(self.id)
-
-    def delete(self):
-        self.sdk.delete_archive(self.id)
-
-    def attrs(self):
-        return dict((k, v) for k, v in six.iteritems(self.__dict__) if k is not "sdk")
-
-    def json(self):
-        return json.dumps(self.attrs(), default=dthandler, indent=4)
-
-
-class OpenTokArchiveList(object):
-
-    def __init__(self, values):
-        self.count = values.get('count')
-        self.items = map(lambda x: OpenTokArchive(self, x), values.get('items', []))
-
-    def __iter__(self):
-        for x in self.items:
-            yield x
-
-    def attrs(self):
-        return {
-            'count': self.count,
-            'items': map(OpenTokArchive.attrs, self.items)
-        }
-
-    def json(self):
-        return json.dumps(self.attrs(), default=dthandler, indent=4)
-
 
 class OpenTok(object):
     """Use this SDK to create tokens and interface with the server-side portion
@@ -221,7 +172,7 @@ class OpenTok(object):
         return url
 
     def archive_url(self, archive_id=None):
-        url = OpenTok.API_URL + '/v2/partner/' + self.api_key + '/archive'
+        url = self.api_url + '/v2/partner/' + self.api_key + '/archive'
         if archive_id:
             url = url + '/' + archive_id
         return url
@@ -232,7 +183,7 @@ class OpenTok(object):
         response = requests.post(self.archive_url(), data=json.dumps(payload), headers=self.archive_headers())
 
         if response.status_code < 300:
-            return OpenTokArchive(self, response.json())
+            return Archive(self, response.json())
         elif response.status_code == 403:
             raise AuthError()
         elif response.status_code == 400:
@@ -248,7 +199,7 @@ class OpenTok(object):
         response = requests.post(self.archive_url(archive_id) + '/stop', headers=self.archive_headers())
 
         if response.status_code < 300:
-            return OpenTokArchive(self, response.json())
+            return Archive(self, response.json())
         elif response.status_code == 403:
             raise AuthError()
         elif response.status_code == 404:
@@ -274,7 +225,7 @@ class OpenTok(object):
         response = requests.get(self.archive_url(archive_id), headers=self.archive_headers())
 
         if response.status_code < 300:
-            return OpenTokArchive(self, response.json())
+            return Archive(self, response.json())
         elif response.status_code == 403:
             raise AuthError()
         elif response.status_code == 404:
@@ -292,7 +243,7 @@ class OpenTok(object):
         response = requests.get(self.archive_url() + "?" + urlencode(params), headers=self.archive_headers())
 
         if response.status_code < 300:
-            return OpenTokArchiveList(response.json())
+            return ArchiveList(response.json())
         elif response.status_code == 403:
             raise AuthError()
         elif response.status_code == 404:
@@ -302,3 +253,4 @@ class OpenTok(object):
 
     def _sign_string(self, string, secret):
         return hmac.new(secret.encode('utf-8'), string.encode('utf-8'), hashlib.sha1).hexdigest()
+
