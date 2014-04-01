@@ -41,8 +41,9 @@ Initializing
 ~~~~~~~~~~~~
 
 Import the package at the top of any file where you will use it. At the very least you will need the
-``OpenTok`` class. Then initialize an OpenTok instance with your own API Key and API Secret.::
+``OpenTok`` class. Then initialize an OpenTok instance with your own API Key and API Secret.
 
+.. code:: python
   from opentok import OpenTok
 
   opentok = OpenTok(api_key, api_secret)
@@ -53,8 +54,9 @@ Creating Sessions
 The create an OpenTok Session, use the ``opentok.create_session()`` method. There are two optional
 keyword parameters for this method: ``location`` which can be set to a string containing an IP
 address, and ``p2p`` which is a boolean. This method returns a ``Session`` object. Its
-``session_id`` attribute is useful when saving to a persistent store (e.g. database).::
+``session_id`` attribute is useful when saving to a persistent store (e.g. database).
 
+.. code:: python
   # Just a plain Session
   session = opentok.create_session()
   # A p2p Session
@@ -71,8 +73,9 @@ Generating Tokens
 Once a Session is created, you can start generating Tokens for clients to use when connecting to it.
 You can generate a token either by calling the ``opentok.generate_token(session_id)`` method or by
 calling the ``session.generate_token()`` method on a ``Session`` instance after creating it. There
-is a set of optional keyword parameters: ``role``, ``expire_time``, and ``data``.::
+is a set of optional keyword parameters: ``role``, ``expire_time``, and ``data``.
 
+.. code:: python
   # Generate a Token from just a session_id (fetched from a database)
   token = opentok.generate_token(session_id)
   # Generate a Token by calling the method on the Session (returned from create_session)
@@ -90,29 +93,33 @@ Working with Archives
 You can start the recording of an OpenTok Session using the ``opentok.start_archive(session_id)``
 method. This method takes an optional keyword argument ``name`` to assign a name to the archive.
 This method will return an ``Archive`` instance. Note that you can only start an Archive on
-a Session that has clients connection.::
+a Session that has clients connection.
 
+.. code:: python
   archive = opentok.start_archive(session_id, name=u'Important Presentation')
 
   # Store this archive_id in the database
   archive_id = archive.id
 
 You can stop the recording of a started Archive using the ``opentok.stop_archive(archive_id)``
-method. You can also do this using the ``archive.stop()`` method of an ``Archive`` instance.::
+method. You can also do this using the ``archive.stop()`` method of an ``Archive`` instance.
 
+.. code:: python
   # Stop an Archive from an archive_id (fetched from database)
   opentok.stop_archive(archive_id)
   # Stop an Archive from an instance (returned from opentok.start_archive)
   archive.stop()
 
 To get an ``Archive`` instance (and all the information about it) from an archive ID, use the
-``opentok.get_archive(archive_id)`` method.::
+``opentok.get_archive(archive_id)`` method.
 
+.. code:: python
   archive = opentok.get_archive(archive_id)
 
 To delete an Archive, you can call the ``opentok.delete_archive(archive_id)`` method or the
-``archive.delete()`` method of an ``Archive`` instance.::
+``archive.delete()`` method of an ``Archive`` instance.
 
+.. code:: python
   # Delete an Archive from an archive ID (fetched from database)
   opentok.delete_archive(archive_id)
   # Delete an Archive from an Archive instance (returned from opentok.start_archive or
@@ -122,8 +129,9 @@ To delete an Archive, you can call the ``opentok.delete_archive(archive_id)`` me
 You can also get a list of all the Archives you've created (up to 1000) with your API Key. This is
 done using the ``opentok.list_archives()`` method. There are two optional keyword parameters:
 ``count`` and ``offset``; they can help you paginate through the results. This method returns an
-instance of the ``ArchiveList`` class.::
+instance of the ``ArchiveList`` class.
 
+.. code:: python
   archive_list = opentok.list_archive()
 
   # Get a specific Archive from the list
