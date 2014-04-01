@@ -46,12 +46,10 @@ setup(
 
         'License :: OSI Approved :: MIT License',
 
-        # TODO: verify that the package actually works in all these versions
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.1',
         'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
 
@@ -74,8 +72,6 @@ setup(
         'enum34',
         'six',
         'pytz',
-        'httpretty',
-        'sure',
     ],
 
     # TODO: these aren't in the sample package, but might again become imp
@@ -86,10 +82,4 @@ setup(
     # NOTE: this isn't included in the sample packaging recommendation, but it seems to be the 
     #       de-facto standard for testing tools, Travis uses nose
     test_suite='nose.collector',
-    tests_require=[
-        'nose',
-        'six',
-        'httpretty',
-        'sure',
-    ],
 )

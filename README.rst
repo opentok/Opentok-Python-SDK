@@ -5,8 +5,10 @@ OpenTok Python SDK
 .. image:: https://travis-ci.org/aoberoi/Opentok-Python-SDK.svg?branch=modernization
    :target: https://travis-ci.org/aoberoi/Opentok-Python-SDK
 
-The OpenTok Python SDK lets you generate `sessions <http://tokbox.com/opentok/tutorials/create-session/>`_ and
-`tokens <http://tokbox.com/opentok/tutorials/create-token/>`_ for `OpenTok <http://www.tokbox.com/>`_ applications. This version of the SDK also includes support for working with OpenTok 2.0 archives.
+The OpenTok Python SDK lets you generate
+`sessions <http://tokbox.com/opentok/tutorials/create-session/>`_ and
+`tokens <http://tokbox.com/opentok/tutorials/create-token/>`_ for `OpenTok <http://www.tokbox.com/>`_
+applications. This version of the SDK also includes support for working with OpenTok 2.0 archives.
 
 
 Installation
