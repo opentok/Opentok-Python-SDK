@@ -58,6 +58,7 @@ address, and ``p2p`` which is a boolean. This method returns a ``Session`` objec
 ``session_id`` attribute is useful when saving to a persistent store (e.g. database).
 
 .. code:: python
+
   # Just a plain Session
   session = opentok.create_session()
   # A p2p Session
@@ -77,6 +78,7 @@ calling the ``session.generate_token()`` method on a ``Session`` instance after 
 is a set of optional keyword parameters: ``role``, ``expire_time``, and ``data``.
 
 .. code:: python
+
   # Generate a Token from just a session_id (fetched from a database)
   token = opentok.generate_token(session_id)
   # Generate a Token by calling the method on the Session (returned from create_session)
@@ -97,6 +99,7 @@ This method will return an ``Archive`` instance. Note that you can only start an
 a Session that has clients connection.
 
 .. code:: python
+
   archive = opentok.start_archive(session_id, name=u'Important Presentation')
 
   # Store this archive_id in the database
@@ -106,6 +109,7 @@ You can stop the recording of a started Archive using the ``opentok.stop_archive
 method. You can also do this using the ``archive.stop()`` method of an ``Archive`` instance.
 
 .. code:: python
+
   # Stop an Archive from an archive_id (fetched from database)
   opentok.stop_archive(archive_id)
   # Stop an Archive from an instance (returned from opentok.start_archive)
@@ -115,12 +119,14 @@ To get an ``Archive`` instance (and all the information about it) from an archiv
 ``opentok.get_archive(archive_id)`` method.
 
 .. code:: python
+
   archive = opentok.get_archive(archive_id)
 
 To delete an Archive, you can call the ``opentok.delete_archive(archive_id)`` method or the
 ``archive.delete()`` method of an ``Archive`` instance.
 
 .. code:: python
+
   # Delete an Archive from an archive ID (fetched from database)
   opentok.delete_archive(archive_id)
   # Delete an Archive from an Archive instance (returned from opentok.start_archive or
@@ -133,6 +139,7 @@ done using the ``opentok.list_archives()`` method. There are two optional keywor
 instance of the ``ArchiveList`` class.
 
 .. code:: python
+
   archive_list = opentok.list_archive()
 
   # Get a specific Archive from the list
