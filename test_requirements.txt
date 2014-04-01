@@ -1,3 +1,4 @@
 nose
 httpretty
 sure
+wheel
