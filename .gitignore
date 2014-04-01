@@ -41,7 +41,5 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
-# introduced by virtualenv
-.Python
-include/
-man/
+# Virtual env
+venv/
