@@ -44,6 +44,7 @@ Import the package at the top of any file where you will use it. At the very lea
 ``OpenTok`` class. Then initialize an OpenTok instance with your own API Key and API Secret.
 
 .. code:: python
+
   from opentok import OpenTok
 
   opentok = OpenTok(api_key, api_secret)
