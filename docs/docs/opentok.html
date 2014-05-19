@@ -1,0 +1,595 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>opentok package &mdash; OpenTok Python SDK 2.2 2.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="OpenTok Python SDK 2.2 2.2.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">OpenTok Python SDK 2.2 2.2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="opentok-package">
+<h1>opentok package<a class="headerlink" href="#opentok-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-opentok.archives">
+<span id="opentok-archives-module"></span><h2>opentok.archives module<a class="headerlink" href="#module-opentok.archives" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="opentok.archives.Archive">
+<em class="property">class </em><tt class="descclassname">opentok.archives.</tt><tt class="descname">Archive</tt><big>(</big><em>sdk</em>, <em>values</em><big>)</big><a class="headerlink" href="#opentok.archives.Archive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents an archive of an OpenTok session.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>created_at</strong> &#8211; The time at which the archive was created, in milliseconds since the UNIX epoch.</li>
+<li><strong>duration</strong> &#8211; The duration of the archive, in milliseconds.</li>
+<li><strong>id</strong> &#8211; The archive ID.</li>
+<li><strong>name</strong> &#8211; The name of the archive. If no name was provided when the archive was created, this is set
+to null.</li>
+<li><strong>partnerId</strong> &#8211; The API key associated with the archive.</li>
+<li><strong>reason</strong> &#8211; For archives with the status &#8220;stopped&#8221;, this can be set to &#8220;90 mins exceeded&#8221;, &#8220;failure&#8221;,
+&#8220;session ended&#8221;, or &#8220;user initiated&#8221;. For archives with the status &#8220;failed&#8221;, this can be set
+to &#8220;system failure&#8221;.</li>
+<li><strong>sessionId</strong> &#8211; The session ID of the OpenTok session associated with this archive.</li>
+<li><strong>size</strong> &#8211; The size of the MP4 file. For archives that have not been generated, this value is set to 0.</li>
+<li><strong>status</strong> &#8211; <p>The status of the archive, which can be one of the following:</p>
+<ul>
+<li>&#8220;available&#8221; &#8211; The archive is available for download from the OpenTok cloud.</li>
+<li>&#8220;failed&#8221; &#8211; The archive recording failed.</li>
+<li>&#8220;started&#8221; &#8211; The archive started and is in the process of being recorded.</li>
+<li>&#8220;stopped&#8221; &#8211; The archive stopped recording.</li>
+<li>&#8220;uploaded&#8221; &#8211; The archive is available for download from the the upload target
+S3 bucket.</li>
+</ul>
+</li>
+<li><strong>url</strong> &#8211; The download URL of the available MP4 file. This is only set for an archive with the status set to
+&#8220;available&#8221;; for other archives, (including archives with the status &#8220;uploaded&#8221;) this property is
+set to null. The download URL is obfuscated, and the file is only available from the URL for
+10 minutes. To generate a new URL, call the Archive.listArchives() or OpenTok.getArchive() method.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="opentok.archives.Archive.attrs">
+<tt class="descname">attrs</tt><big>(</big><big>)</big><a class="headerlink" href="#opentok.archives.Archive.attrs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary of the archive&#8217;s attributes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentok.archives.Archive.delete">
+<tt class="descname">delete</tt><big>(</big><big>)</big><a class="headerlink" href="#opentok.archives.Archive.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes an OpenTok archive.</p>
+<p>You can only delete an archive which has a status of &#8220;available&#8221; or &#8220;uploaded&#8221;. Deleting an
+archive removes its record from the list of archives. For an &#8220;available&#8221; archive, it also
+removes the archive file, making it unavailable for download.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentok.archives.Archive.json">
+<tt class="descname">json</tt><big>(</big><big>)</big><a class="headerlink" href="#opentok.archives.Archive.json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a JSON representation of the archive.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentok.archives.Archive.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="headerlink" href="#opentok.archives.Archive.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops an OpenTok archive that is being recorded.</p>
+<p>Archives automatically stop recording after 90 minutes or when all clients have disconnected
+from the session being archived.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="opentok.archives.ArchiveList">
+<em class="property">class </em><tt class="descclassname">opentok.archives.</tt><tt class="descname">ArchiveList</tt><big>(</big><em>values</em><big>)</big><a class="headerlink" href="#opentok.archives.ArchiveList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="opentok.archives.ArchiveList.attrs">
+<tt class="descname">attrs</tt><big>(</big><big>)</big><a class="headerlink" href="#opentok.archives.ArchiveList.attrs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="opentok.archives.ArchiveList.json">
+<tt class="descname">json</tt><big>(</big><big>)</big><a class="headerlink" href="#opentok.archives.ArchiveList.json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="opentok.archives.dthandler">
+<tt class="descclassname">opentok.archives.</tt><tt class="descname">dthandler</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#opentok.archives.dthandler" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-opentok.exceptions">
+<span id="opentok-exceptions-module"></span><h2>opentok.exceptions module<a class="headerlink" href="#module-opentok.exceptions" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="opentok.exceptions.ArchiveError">
+<em class="property">exception </em><tt class="descclassname">opentok.exceptions.</tt><tt class="descname">ArchiveError</tt><a class="headerlink" href="#opentok.exceptions.ArchiveError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#opentok.exceptions.OpenTokException" title="opentok.exceptions.OpenTokException"><tt class="xref py py-class docutils literal"><span class="pre">opentok.exceptions.OpenTokException</span></tt></a></p>
+<p>Indicates that there was a archive specific problem, probably the status
+of the requested archive is invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="opentok.exceptions.AuthError">
+<em class="property">exception </em><tt class="descclassname">opentok.exceptions.</tt><tt class="descname">AuthError</tt><a class="headerlink" href="#opentok.exceptions.AuthError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#opentok.exceptions.OpenTokException" title="opentok.exceptions.OpenTokException"><tt class="xref py py-class docutils literal"><span class="pre">opentok.exceptions.OpenTokException</span></tt></a></p>
+<p>Indicates that the problem was likely with credentials. Check your API
+key and API secret and try again.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="opentok.exceptions.NotFoundError">
+<em class="property">exception </em><tt class="descclassname">opentok.exceptions.</tt><tt class="descname">NotFoundError</tt><a class="headerlink" href="#opentok.exceptions.NotFoundError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#opentok.exceptions.OpenTokException" title="opentok.exceptions.OpenTokException"><tt class="xref py py-class docutils literal"><span class="pre">opentok.exceptions.OpenTokException</span></tt></a></p>
+<p>Indicates that the element requested was not found.  Check the parameters
+of the request.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="opentok.exceptions.OpenTokException">
+<em class="property">exception </em><tt class="descclassname">opentok.exceptions.</tt><tt class="descname">OpenTokException</tt><a class="headerlink" href="#opentok.exceptions.OpenTokException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.BaseException</span></tt></p>
+<p>Defines exceptions thrown by the OpenTok SDK.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="opentok.exceptions.RequestError">
+<em class="property">exception </em><tt class="descclassname">opentok.exceptions.</tt><tt class="descname">RequestError</tt><a class="headerlink" href="#opentok.exceptions.RequestError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#opentok.exceptions.OpenTokException" title="opentok.exceptions.OpenTokException"><tt class="xref py py-class docutils literal"><span class="pre">opentok.exceptions.OpenTokException</span></tt></a></p>
+<p>Indicates an error during the request. Most likely an error connecting
+to the OpenTok API servers. (HTTP 500 error).</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-opentok.opentok">
+<span id="opentok-opentok-module"></span><h2>opentok.opentok module<a class="headerlink" href="#module-opentok.opentok" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="opentok.opentok.OpenTok">
+<em class="property">class </em><tt class="descclassname">opentok.opentok.</tt><tt class="descname">OpenTok</tt><big>(</big><em>api_key</em>, <em>api_secret</em>, <em>api_url='https://api.opentok.com'</em><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Use this SDK to create tokens and interface with the server-side portion
+of the Opentok API.</p>
+<dl class="attribute">
+<dt id="opentok.opentok.OpenTok.TOKEN_SENTINEL">
+<tt class="descname">TOKEN_SENTINEL</tt><em class="property"> = 'T1=='</em><a class="headerlink" href="#opentok.opentok.OpenTok.TOKEN_SENTINEL" title="Permalink to this definition">¶</a></dt>
+<dd><p>For internal use.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentok.opentok.OpenTok.archive_headers">
+<tt class="descname">archive_headers</tt><big>(</big><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.archive_headers" title="Permalink to this definition">¶</a></dt>
+<dd><p>For internal use.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentok.opentok.OpenTok.archive_url">
+<tt class="descname">archive_url</tt><big>(</big><em>archive_id=None</em><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.archive_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>For internal use.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentok.opentok.OpenTok.create_session">
+<tt class="descname">create_session</tt><big>(</big><em>location=None</em>, <em>p2p=False</em><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.create_session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new OpenTok session and returns the session ID, which uniquely identifies
+the session.</p>
+<p>For example, when using the OpenTok JavaScript library, use the session ID when calling the
+OT.initSession() method (to initialize an OpenTok session).</p>
+<p>OpenTok sessions do not expire. However, authentication tokens do expire (see the
+generateToken() method). Also note that sessions cannot explicitly be destroyed.</p>
+<p>A session ID string can be up to 255 characters long.</p>
+<p>Calling this method results in an OpenTokException in the event of an error.
+Check the error message for details.</p>
+<p>You can also create a session using the OpenTok REST API (see
+<a class="reference external" href="http://www.tokbox.com/opentok/api/#session_id_production">http://www.tokbox.com/opentok/api/#session_id_production</a>) or the OpenTok dashboard
+(see <a class="reference external" href="https://dashboard.tokbox.com/projects">https://dashboard.tokbox.com/projects</a>).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>p2p</strong> (<em>String</em>) &#8211; <p>The session&#8217;s streams will be transmitted directly between
+peers (true) or using the OpenTok Media Router (false). By default, sessions use
+the OpenTok Media Router.</p>
+<p>The OpenTok Media Router provides benefits not available in peer-to-peer sessions.
+For example, the OpenTok Media Router can decrease bandwidth usage in multiparty 
+sessions. Also, the OpenTok Media Router can improve the quality of the user experience
+through dynamic traffic shaping. For more information, see
+<a class="reference external" href="http://www.tokbox.com/blog/mantis-next-generation-cloud-technology-for-webrtc">http://www.tokbox.com/blog/mantis-next-generation-cloud-technology-for-webrtc</a> and
+<a class="reference external" href="http://www.tokbox.com/blog/quality-of-experience-and-traffic-shaping-the-next-step-with-mantis">http://www.tokbox.com/blog/quality-of-experience-and-traffic-shaping-the-next-step-with-mantis</a>.</p>
+<p>For peer-to-peer sessions, the session will attempt to transmit streams directly
+between clients. If clients cannot connect due to firewall restrictions, the session
+uses the OpenTok TURN server to relay audio-video streams.</p>
+<p>You will be billed for streamed minutes if you use the OpenTok Media Router or if the
+peer-to-peer session uses the OpenTok TURN server to relay streams. For information on
+pricing, see the OpenTok pricing page (<a class="reference external" href="http://www.tokbox.com/pricing">http://www.tokbox.com/pricing</a>).</p>
+</li>
+<li><strong>location</strong> (<em>String</em>) &#8211; An IP address that the OpenTok servers will use to
+situate the session in its global network. If you do not set a location hint,
+the OpenTok servers will be based on the first client connecting to the session.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">The Session object. The session_id property of the object is the session ID.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentok.opentok.OpenTok.delete_archive">
+<tt class="descname">delete_archive</tt><big>(</big><em>archive_id</em><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.delete_archive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes an OpenTok archive.</p>
+<p>You can only delete an archive which has a status of &#8220;available&#8221; or &#8220;uploaded&#8221;. Deleting an
+archive removes its record from the list of archives. For an &#8220;available&#8221; archive, it also
+removes the archive file, making it unavailable for download.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>archive_id</strong> (<em>String</em>) &#8211; The archive ID of the archive to be deleted.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentok.opentok.OpenTok.generate_token">
+<tt class="descname">generate_token</tt><big>(</big><em>session_id</em>, <em>role=u'publisher'</em>, <em>expire_time=None</em>, <em>data=None</em><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.generate_token" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a token for a given session.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>session_id</strong> (<em>String</em>) &#8211; The session ID of the session to be accessed by the client using
+the token.</li>
+<li><strong>role</strong> (<em>String</em>) &#8211; <p>The role for the token. Valid values are defined in the Role
+class:</p>
+<ul>
+<li><cite>Roles.subscriber</cite> &#8211; A subscriber can only subscribe to streams.</li>
+<li><cite>Roles.publisher</cite> &#8211; A publisher can publish streams, subscribe to
+streams, and signal. (This is the default value if you do not specify a role.)</li>
+<li><cite>Roles.moderator</cite> &#8211; In addition to the privileges granted to a
+publisher, in clients using the OpenTok.js 2.2 library, a moderator can call the
+<cite>forceUnpublish()</cite> and <cite>forceDisconnect()</cite> method of the
+Session object.</li>
+</ul>
+</li>
+<li><strong>expire_time</strong> (<em>int</em>) &#8211; The expiration time of the token, in seconds since the UNIX epoch.
+The maximum expiration time is 30 days after the creation time. The default expiration
+time is 24 hours after the token creation time.</li>
+<li><strong>data</strong> (<em>String</em>) &#8211; A string containing connection metadata describing the
+end-user. For example, you can pass the user ID, name, or other data describing the
+end-user. The length of the string is limited to 1000 characters. This data cannot be
+updated once it is set.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">The token string.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentok.opentok.OpenTok.get_archive">
+<tt class="descname">get_archive</tt><big>(</big><em>archive_id</em><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.get_archive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets an Archive object for the given archive ID.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>archive_id</strong> (<em>String</em>) &#8211; The archive ID.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">The Archive object.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentok.opentok.OpenTok.get_archives">
+<tt class="descname">get_archives</tt><big>(</big><em>offset=None</em>, <em>count=None</em><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.get_archives" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an ArchiveList, which is an array of archives that are completed and in-progress,
+for your API key.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>int</strong> &#8211; offset Optional. The index offset of the first archive. 0 is offset</td>
+</tr>
+</tbody>
+</table>
+<p>of the most recently started archive. 1 is the offset of the archive that started prior to
+the most recent archive. If you do not specify an offset, 0 is used.
+:param int: count Optional. The number of archives to be returned. The maximum
+number of archives returned is 1000.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">An ArchiveList object, which is an array of Archive objects.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentok.opentok.OpenTok.headers">
+<tt class="descname">headers</tt><big>(</big><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.headers" title="Permalink to this definition">¶</a></dt>
+<dd><p>For internal use.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentok.opentok.OpenTok.session_url">
+<tt class="descname">session_url</tt><big>(</big><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.session_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>For internal use.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentok.opentok.OpenTok.start_archive">
+<tt class="descname">start_archive</tt><big>(</big><em>session_id</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.start_archive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts archiving an OpenTok 2.0 session.</p>
+<p>Clients must be actively connected to the OpenTok session for you to successfully start
+recording an archive.</p>
+<p>You can only record one archive at a time for a given session. You can only record archives
+of OpenTok server-enabled sessions; you cannot archive peer-to-peer sessions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>session_id</strong> (<em>String</em>) &#8211; The session ID of the OpenTok session to archive.</li>
+<li><strong>name</strong> (<em>String</em>) &#8211; This is the name of the archive. You can use this name
+to identify the archive. It is a property of the Archive object, and it is a property
+of archive-related events in the OpenTok.js library.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">The Archive object, which includes properties defining the archive,
+including the archive ID.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentok.opentok.OpenTok.stop_archive">
+<tt class="descname">stop_archive</tt><big>(</big><em>archive_id</em><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.stop_archive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops an OpenTok archive that is being recorded.</p>
+<p>Archives automatically stop recording after 90 minutes or when all clients have disconnected
+from the session being archived.</p>
+<p>&#64;param [String] archive_id The archive ID of the archive you want to stop recording.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">The Archive object corresponding to the archive being stopped.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="opentok.opentok.Roles">
+<em class="property">class </em><tt class="descclassname">opentok.opentok.</tt><tt class="descname">Roles</tt><big>(</big><em>*keys</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#opentok.opentok.Roles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></tt></p>
+<p>List of valid roles for a token.</p>
+<dl class="attribute">
+<dt id="opentok.opentok.Roles.moderator">
+<tt class="descname">moderator</tt><em class="property"> = u'moderator'</em><a class="headerlink" href="#opentok.opentok.Roles.moderator" title="Permalink to this definition">¶</a></dt>
+<dd><p>In addition to the privileges granted to a publisher, in clients using the OpenTok.js 2.2
+library, a moderator can call the <cite>forceUnpublish()</cite> and <cite>forceDisconnect()</cite> method of the
+Session object.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentok.opentok.Roles.publisher">
+<tt class="descname">publisher</tt><em class="property"> = u'publisher'</em><a class="headerlink" href="#opentok.opentok.Roles.publisher" title="Permalink to this definition">¶</a></dt>
+<dd><p>A publisher can publish streams, subscribe to streams, and signal</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentok.opentok.Roles.subscriber">
+<tt class="descname">subscriber</tt><em class="property"> = u'subscriber'</em><a class="headerlink" href="#opentok.opentok.Roles.subscriber" title="Permalink to this definition">¶</a></dt>
+<dd><p>A subscriber can only subscribe to streams.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-opentok.session">
+<span id="opentok-session-module"></span><h2>opentok.session module<a class="headerlink" href="#module-opentok.session" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="opentok.session.Session">
+<em class="property">class </em><tt class="descclassname">opentok.session.</tt><tt class="descname">Session</tt><big>(</big><em>sdk</em>, <em>session_id</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#opentok.session.Session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents an OpenTok session.</p>
+<p>Use the OpenTok.createSession() method to create an OpenTok session. Use the
+session_id property of the Session object to get the session ID.</p>
+<p>&#64;attr_reader [String] session_id The session ID.
+&#64;attr_reader [String] api_secret &#64;private The OpenTok API secret.
+&#64;attr_reader [String] api_key &#64;private The OpenTok API key.
+&#64;attr_reader [Boolean] p2p Set to true if the session&#8217;s streams will be transmitted directly</p>
+<blockquote>
+<div>between peers; set to false if the session&#8217;s streams will be transmitted using the OpenTok
+media server. See the OpenTok.createSession() method.</div></blockquote>
+<dl class="docutils">
+<dt>&#64;attr_reader [String] location The location hint IP address. See the OpenTok.createSession()</dt>
+<dd>method.</dd>
+</dl>
+<dl class="method">
+<dt id="opentok.session.Session.generate_token">
+<tt class="descname">generate_token</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#opentok.session.Session.generate_token" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a token for the session.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>role</strong> (<em>String</em>) &#8211; The role for the token. Valid values are defined in the Role</td>
+</tr>
+</tbody>
+</table>
+<p>class:</p>
+<ul class="simple">
+<li><cite>Roles.subscriber</cite> &#8211; A subscriber can only subscribe to streams.</li>
+<li><cite>Roles.publisher</cite> &#8211; A publisher can publish streams, subscribe to
+streams, and signal. (This is the default value if you do not specify a role.)</li>
+<li><cite>Roles.moderator</cite> &#8211; In addition to the privileges granted to a
+publisher, in clients using the OpenTok.js 2.2 library, a moderator can call the
+<cite>forceUnpublish()</cite> and <cite>forceDisconnect()</cite> method of the
+Session object.</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>expire_time</strong> (<em>int</em>) &#8211; The expiration time of the token, in seconds since the UNIX epoch.</td>
+</tr>
+</tbody>
+</table>
+<p>The maximum expiration time is 30 days after the creation time. The default expiration
+time is 24 hours after the token creation time.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>String</em>) &#8211; A string containing connection metadata describing the</td>
+</tr>
+</tbody>
+</table>
+<p>end-user. For example, you can pass the user ID, name, or other data describing the
+end-user. The length of the string is limited to 1000 characters. This data cannot be
+updated once it is set.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+<p>The token string.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-opentok.version">
+<span id="opentok-version-module"></span><h2>opentok.version module<a class="headerlink" href="#module-opentok.version" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-opentok">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-opentok" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">opentok package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-opentok.archives">opentok.archives module</a></li>
+<li><a class="reference internal" href="#module-opentok.exceptions">opentok.exceptions module</a></li>
+<li><a class="reference internal" href="#module-opentok.opentok">opentok.opentok module</a></li>
+<li><a class="reference internal" href="#module-opentok.session">opentok.session module</a></li>
+<li><a class="reference internal" href="#module-opentok.version">opentok.version module</a></li>
+<li><a class="reference internal" href="#module-opentok">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/docs/opentok.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">OpenTok Python SDK 2.2 2.2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, TokBox, Inc..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

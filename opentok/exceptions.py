@@ -1,5 +1,6 @@
 class OpenTokException(BaseException):
-    """Generic OpenTok Error. All other errors extend this."""
+    """Defines exceptions thrown by the OpenTok SDK.
+    """
     pass
 
 

@@ -22,15 +22,22 @@ from .exceptions import OpenTokException, RequestError, AuthError, NotFoundError
 
 class Roles(Enum):
     """List of valid roles for a token."""
-    subscriber = u('subscriber')   # Can only subscribe
-    publisher =  u('publisher')    # Can publish, subscribe, and signal
-    moderator =  u('moderator')    # Can do the above along with forceDisconnect and forceUnpublish
+    subscriber = u('subscriber')
+    """A subscriber can only subscribe to streams."""
+    publisher =  u('publisher')
+    """A publisher can publish streams, subscribe to streams, and signal"""
+    moderator =  u('moderator')
+    """In addition to the privileges granted to a publisher, in clients using the OpenTok.js 2.2
+    library, a moderator can call the `forceUnpublish()` and `forceDisconnect()` method of the
+    Session object.
+    """
 
 class OpenTok(object):
     """Use this SDK to create tokens and interface with the server-side portion
     of the Opentok API.
     """
     TOKEN_SENTINEL = 'T1=='
+    """For internal use."""
 
     def __init__(self, api_key, api_secret, api_url='https://api.opentok.com'):
         self.api_key = str(api_key)
@@ -39,10 +46,35 @@ class OpenTok(object):
 
     def generate_token(self, session_id, role=Roles.publisher, expire_time=None, data=None):
         """
-        Generate a token which is passed to the JS API to enable widgets to connect to the Opentok api.
-        session_id: Specify a session_id to make this token only valid for that session_id.
-        role: One of the constants defined in RoleConstants. Default is publisher, look in the documentation to learn more about roles.
-        expire_time: Integer timestamp. You can override the default token expire time of 24h by choosing an explicit expire time. Can be up to 7d after create_time.
+        Generates a token for a given session.
+
+        :param String session_id: The session ID of the session to be accessed by the client using
+          the token.
+
+        :param String role: The role for the token. Valid values are defined in the Role
+          class:
+
+          * `Roles.subscriber` -- A subscriber can only subscribe to streams.
+
+          * `Roles.publisher` -- A publisher can publish streams, subscribe to
+            streams, and signal. (This is the default value if you do not specify a role.)
+
+          * `Roles.moderator` -- In addition to the privileges granted to a
+            publisher, in clients using the OpenTok.js 2.2 library, a moderator can call the
+            `forceUnpublish()` and `forceDisconnect()` method of the
+            Session object.
+
+        :param int expire_time: The expiration time of the token, in seconds since the UNIX epoch.
+          The maximum expiration time is 30 days after the creation time. The default expiration
+          time is 24 hours after the token creation time.
+
+        :param String data: A string containing connection metadata describing the
+          end-user. For example, you can pass the user ID, name, or other data describing the
+          end-user. The length of the string is limited to 1000 characters. This data cannot be
+          updated once it is set.
+
+        :rtype:
+          The token string.
         """
 
         # normalize
@@ -109,13 +141,49 @@ class OpenTok(object):
         return token
 
     def create_session(self, location=None, p2p=False):
-        """Create a new session in the OpenTok API. Returns an OpenTokSession
-        object with a session_id property. location: IP address of the user
-        requesting the session. This is used for geolocation to choose which
-        datacenter the session will live on. properties: An instance of the
-        SessionProperties object. Fill in the fields that you are interested in
-        to use features of the groups API. Look in the documentation for more
-        details. Also accepts any dict-like object.
+        """
+        Creates a new OpenTok session and returns the session ID, which uniquely identifies
+        the session.
+        
+        For example, when using the OpenTok JavaScript library, use the session ID when calling the
+        OT.initSession() method (to initialize an OpenTok session).
+        
+        OpenTok sessions do not expire. However, authentication tokens do expire (see the
+        generateToken() method). Also note that sessions cannot explicitly be destroyed.
+        
+        A session ID string can be up to 255 characters long.
+        
+        Calling this method results in an OpenTokException in the event of an error.
+        Check the error message for details.
+        
+        You can also create a session using the OpenTok REST API (see
+        http://www.tokbox.com/opentok/api/#session_id_production) or the OpenTok dashboard
+        (see https://dashboard.tokbox.com/projects).
+        
+        :param String p2p: The session's streams will be transmitted directly between
+            peers (true) or using the OpenTok Media Router (false). By default, sessions use
+            the OpenTok Media Router.
+            
+            The OpenTok Media Router provides benefits not available in peer-to-peer sessions.
+            For example, the OpenTok Media Router can decrease bandwidth usage in multiparty 
+            sessions. Also, the OpenTok Media Router can improve the quality of the user experience
+            through dynamic traffic shaping. For more information, see
+            http://www.tokbox.com/blog/mantis-next-generation-cloud-technology-for-webrtc and
+            http://www.tokbox.com/blog/quality-of-experience-and-traffic-shaping-the-next-step-with-mantis.
+            
+            For peer-to-peer sessions, the session will attempt to transmit streams directly
+            between clients. If clients cannot connect due to firewall restrictions, the session
+            uses the OpenTok TURN server to relay audio-video streams.
+            
+            You will be billed for streamed minutes if you use the OpenTok Media Router or if the
+            peer-to-peer session uses the OpenTok TURN server to relay streams. For information on
+            pricing, see the OpenTok pricing page (http://www.tokbox.com/pricing).
+        
+        :param String location: An IP address that the OpenTok servers will use to
+            situate the session in its global network. If you do not set a location hint,
+            the OpenTok servers will be based on the first client connecting to the session.
+        
+        :rtype: The Session object. The session_id property of the object is the session ID.
         """
 
         # build options
@@ -156,27 +224,48 @@ class OpenTok(object):
             raise OpenTokException('Failed to generate session: %s' % str(e))
 
     def headers(self):
+        """For internal use."""
         return {
             'User-Agent': 'OpenTok-Python-SDK/' + __version__,
             'X-TB-PARTNER-AUTH': self.api_key + ':' + self.api_secret
         }
 
     def archive_headers(self):
+        """For internal use."""
         result = self.headers()
         result['Content-Type'] = 'application/json'
         return result
 
     def session_url(self):
+        """For internal use."""
         url = self.api_url + '/session/create'
         return url
 
     def archive_url(self, archive_id=None):
+        """For internal use."""
         url = self.api_url + '/v2/partner/' + self.api_key + '/archive'
         if archive_id:
             url = url + '/' + archive_id
         return url
 
     def start_archive(self, session_id, **kwargs):
+        """
+        Starts archiving an OpenTok 2.0 session.
+       
+        Clients must be actively connected to the OpenTok session for you to successfully start
+        recording an archive.
+       
+        You can only record one archive at a time for a given session. You can only record archives
+        of OpenTok server-enabled sessions; you cannot archive peer-to-peer sessions.
+       
+        :param String session_id: The session ID of the OpenTok session to archive.
+        :param String name: This is the name of the archive. You can use this name
+          to identify the archive. It is a property of the Archive object, and it is a property
+          of archive-related events in the OpenTok.js library.
+       
+        :rtype: The Archive object, which includes properties defining the archive,
+          including the archive ID.
+        """
         payload = {'name': kwargs.get('name'), 'sessionId': session_id}
 
         response = requests.post(self.archive_url(), data=json.dumps(payload), headers=self.archive_headers())
@@ -195,6 +284,16 @@ class OpenTok(object):
             raise RequestError("An unexpected error occurred", response.status_code)
 
     def stop_archive(self, archive_id):
+        """
+        Stops an OpenTok archive that is being recorded.
+        
+        Archives automatically stop recording after 90 minutes or when all clients have disconnected
+        from the session being archived.
+        
+        @param [String] archive_id The archive ID of the archive you want to stop recording.
+        
+        :rtype: The Archive object corresponding to the archive being stopped.
+        """
         response = requests.post(self.archive_url(archive_id) + '/stop', headers=self.archive_headers())
 
         if response.status_code < 300:
@@ -209,6 +308,15 @@ class OpenTok(object):
             raise RequestError("An unexpected error occurred", response.status_code)
 
     def delete_archive(self, archive_id):
+        """
+        Deletes an OpenTok archive.
+        
+        You can only delete an archive which has a status of "available" or "uploaded". Deleting an
+        archive removes its record from the list of archives. For an "available" archive, it also
+        removes the archive file, making it unavailable for download.
+
+        :param String archive_id: The archive ID of the archive to be deleted.
+        """
         response = requests.delete(self.archive_url(archive_id), headers=self.archive_headers())
 
         if response.status_code < 300:
@@ -221,6 +329,12 @@ class OpenTok(object):
             raise RequestError("An unexpected error occurred", response.status_code)
 
     def get_archive(self, archive_id):
+        """Gets an Archive object for the given archive ID.
+        
+        :param String archive_id: The archive ID.
+        
+        :rtype: The Archive object.
+        """
         response = requests.get(self.archive_url(archive_id), headers=self.archive_headers())
 
         if response.status_code < 300:
@@ -233,6 +347,17 @@ class OpenTok(object):
             raise RequestError("An unexpected error occurred", response.status_code)
 
     def get_archives(self, offset=None, count=None):
+        """Returns an ArchiveList, which is an array of archives that are completed and in-progress,
+        for your API key.
+        
+        :param int: offset Optional. The index offset of the first archive. 0 is offset
+        of the most recently started archive. 1 is the offset of the archive that started prior to
+        the most recent archive. If you do not specify an offset, 0 is used.
+        :param int: count Optional. The number of archives to be returned. The maximum
+        number of archives returned is 1000.
+        
+        :rtype: An ArchiveList object, which is an array of Archive objects.
+        """
         params = {}
         if offset is not None:
             params['offset'] = offset
