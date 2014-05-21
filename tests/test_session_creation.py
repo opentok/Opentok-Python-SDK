@@ -5,7 +5,7 @@ from nose.tools import raises
 from sure import expect
 import httpretty
 
-from opentok import OpenTok, Session, OpenTokException, __version__
+from opentok import OpenTok, Session, MediaModes, OpenTokException, __version__
 
 class OpenTokSessionCreationTest(unittest.TestCase):
     def setUp(self):
@@ -24,9 +24,10 @@ class OpenTokSessionCreationTest(unittest.TestCase):
 
         expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
+        expect(httpretty.last_request().body).to.equal(b('p2p.preference=disabled'))
         expect(session).to.be.a(Session)
         expect(session).to.have.property(u('session_id')).being.equal(u('1_MX4xMjM0NTZ-fk1vbiBNYXIgMTcgMDA6NDE6MzEgUERUIDIwMTR-MC42ODM3ODk1MzQ0OTQyODA4fg'))
-        expect(session).to.have.property(u('p2p')).being.equal(False)
+        expect(session).to.have.property(u('media_mode')).being.equal(MediaModes.routed)
         expect(session).to.have.property(u('location')).being.equal(None)
 
     @httpretty.activate
@@ -36,14 +37,14 @@ class OpenTokSessionCreationTest(unittest.TestCase):
                                status=200,
                                content_type=u('text/xml'))
 
-        session = self.opentok.create_session(p2p=True)
+        session = self.opentok.create_session(media_mode=MediaModes.relayed)
 
         expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         expect(httpretty.last_request().body).to.equal(b('p2p.preference=enabled'))
         expect(session).to.be.a(Session)
         expect(session).to.have.property(u('session_id')).being.equal(u('1_MX4xMjM0NTZ-fk1vbiBNYXIgMTcgMDA6NDE6MzEgUERUIDIwMTR-MC42ODM3ODk1MzQ0OTQyODA4fg'))
-        expect(session).to.have.property(u('p2p')).being.equal(True)
+        expect(session).to.have.property(u('media_mode')).being.equal(MediaModes.relayed)
         expect(session).to.have.property(u('location')).being.equal(None)
 
     @httpretty.activate
@@ -57,10 +58,13 @@ class OpenTokSessionCreationTest(unittest.TestCase):
 
         expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
-        expect(httpretty.last_request().body).to.equal(b('location=12.34.56.78'))
+        # ordering of keys is non-deterministic, must parse the body to see if it is correct
+        body = parse_qs(httpretty.last_request().body)
+        expect(body).to.have.key(b('location')).being.equal([b('12.34.56.78')])
+        expect(body).to.have.key(b('p2p.preference')).being.equal([b('disabled')])
         expect(session).to.be.a(Session)
         expect(session).to.have.property(u('session_id')).being.equal(u('1_MX4xMjM0NTZ-fk1vbiBNYXIgMTcgMDA6NDE6MzEgUERUIDIwMTR-MC42ODM3ODk1MzQ0OTQyODA4fg'))
-        expect(session).to.have.property(u('p2p')).being.equal(False)
+        expect(session).to.have.property(u('media_mode')).being.equal(MediaModes.routed)
         expect(session).to.have.property(u('location')).being.equal(u('12.34.56.78'))
 
     @httpretty.activate
@@ -70,7 +74,7 @@ class OpenTokSessionCreationTest(unittest.TestCase):
                                status=200,
                                content_type=u('text/xml'))
 
-        session = self.opentok.create_session(location='12.34.56.78', p2p=True)
+        session = self.opentok.create_session(location='12.34.56.78', media_mode=MediaModes.relayed)
 
         expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
@@ -80,9 +84,8 @@ class OpenTokSessionCreationTest(unittest.TestCase):
         expect(body).to.have.key(b('p2p.preference')).being.equal([b('enabled')])
         expect(session).to.be.a(Session)
         expect(session).to.have.property(u('session_id')).being.equal(u('1_MX4xMjM0NTZ-fk1vbiBNYXIgMTcgMDA6NDE6MzEgUERUIDIwMTR-MC42ODM3ODk1MzQ0OTQyODA4fg'))
-        expect(session).to.have.property(u('p2p')).being.equal(True)
+        expect(session).to.have.property(u('media_mode')).being.equal(MediaModes.relayed)
         expect(session).to.have.property(u('location')).being.equal(u('12.34.56.78'))
 
     # TODO: all the cases that throw exceptions
     # TODO: custom api_url requests
-
