@@ -158,7 +158,7 @@ instance of the ``ArchiveList`` class.
 Documentation
 -------------
 
-Reference documentation is available at <http://www.tokbox.com//opentok/libraries/server/python/reference/index.html> and in the
+Reference documentation is available at <http://www.tokbox.com/opentok/libraries/server/python/reference/index.html> and in the
 docs directory of the SDK.
 
 Requirements
