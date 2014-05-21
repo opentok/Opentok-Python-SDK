@@ -8,14 +8,12 @@ OpenTok Python SDK
 The OpenTok Python SDK lets you generate
 `sessions <http://tokbox.com/opentok/tutorials/create-session/>`_ and
 `tokens <http://tokbox.com/opentok/tutorials/create-token/>`_ for `OpenTok <http://www.tokbox.com/>`_
-applications. This version of the SDK also includes support for working with OpenTok 2.0 archives.
+applications. This version of the SDK also includes support for working with OpenTok 2.0 archives
+(see http://tokbox.com/#archiving).
 
 
-Installation
-------------
-
-Pip (recommended):
-~~~~~~~~~~~~~~~~~~
+Installation using Pip (recommended):
+-------------------------------------
 
 Pip helps manage dependencies for Python projects using the PyPI index. Find more info here:
 http://www.pip-installer.org/en/latest/
@@ -28,12 +26,6 @@ Add the ``opentok`` package as a dependency in your project. The most common way
 Next, install the dependencies::
 
   $ pip install -r requirements.txt
-
-Manually:
-~~~~~~~~~
-
-Download the latest package zip from the `Releases page
-<https://github.com/opentok/Opentok-Python-SDK/releases>`_
 
 
 Usage
@@ -56,8 +48,9 @@ Creating Sessions
 
 The create an OpenTok Session, use the ``opentok.create_session()`` method. There are two optional
 keyword parameters for this method: ``location`` which can be set to a string containing an IP
-address, and ``p2p`` which is a boolean. This method returns a ``Session`` object. Its
-``session_id`` attribute is useful when saving to a persistent store (e.g. database).
+address, and ``media_mode`` which is a String (defined by the MediaModes class). This method returns
+a ``Session`` object. Its ``session_id`` attribute is useful when saving to a persistent store (such
+as a database).
 
 .. code:: python
 
@@ -65,7 +58,7 @@ address, and ``p2p`` which is a boolean. This method returns a ``Session`` objec
   session = opentok.create_session()
   # A Session that attempts to send streams directly between clients (falling back
   # to use the OpenTok TURN server to relay streams if the clients cannot connect):
-  session = opentok.create_session(mediaMode=MediaModes.relayed)
+  session = opentok.create_session(media_mode=MediaModes.relayed)
   # A Session with a location hint
   session = opentok.create_session(location=u'12.34.56.78')
 
@@ -179,6 +172,11 @@ Important changes in v2.0
 
 This version of the SDK includes support for working with OpenTok 2.0 archives. (This API does not
 work with OpenTok 1.0 archives.)
+
+The OpenTok.create_session() method now includes a media_mode parameter, instead of a p2p parameter.
+
+For details, see the reference documentation at
+<http://www.tokbox.com/opentok/libraries/server/python/reference/index.html>.
 
 Development and Contributing
 ----------------------------
