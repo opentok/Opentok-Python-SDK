@@ -33,8 +33,13 @@ class Roles(Enum):
     """
 
 class MediaModes(Enum):
+    """List of valid settings for the mediaMode parameter of the OpenTok.createSession() method."""
     routed = u('disabled')
+    """The session will transmit streams using the OpenTok Media Server."""
     relayed = u('enabled')
+    """The session will attempt to transmit streams directly between clients. If two clients
+    cannot send and receive each others' streams, due to firewalls on the clients' networks,
+    their streams will be relayed using the OpenTok TURN Server."""
 
 class OpenTok(object):
     """Use this SDK to create tokens and interface with the server-side portion
@@ -164,24 +169,35 @@ class OpenTok(object):
         http://www.tokbox.com/opentok/api/#session_id_production) or the OpenTok dashboard
         (see https://dashboard.tokbox.com/projects).
 
-        :param String p2p: The session's streams will be transmitted directly between
-            peers (true) or using the OpenTok Media Router (false). By default, sessions use
-            the OpenTok Media Router.
+        :param String mediaMode: determine whether the session will transmit streams using the
+             OpenTok Media Router (MediaMode.ROUTED) or not (MediaMode.RELAYED). By default,
+             sessions use the OpenTok Media Router.
+             
+             The OpenTok Media Router (see http://www.tokbox.com/#multiparty)
+             provides the following benefits:
+            
+               * The OpenTok Media Router can decrease bandwidth usage in multiparty sessions.
+                   (When the mediaMode property is set to  MediaMode.ROUTED, each client must send
+                   a separate audio-video stream to each client subscribing to it.)
 
-            The OpenTok Media Router provides benefits not available in peer-to-peer sessions.
-            For example, the OpenTok Media Router can decrease bandwidth usage in multiparty
-            sessions. Also, the OpenTok Media Router can improve the quality of the user experience
-            through dynamic traffic shaping. For more information, see
-            http://www.tokbox.com/blog/mantis-next-generation-cloud-technology-for-webrtc and
-            http://www.tokbox.com/blog/quality-of-experience-and-traffic-shaping-the-next-step-with-mantis.
+               * The OpenTok Media Router can improve the quality of the user experience through
+                 Intelligent Quality Control (see http://tokbox.com/#iqc). With
+                 Intelligent Quality Control, if a client's connectivity degrades to a degree that
+                 it does not support video for a stream it's subscribing to, the video is dropped on
+                 that client (without affecting other clients), and the client receives audio only.
+                 If the client's connectivity improves, the video returns.
 
-            For peer-to-peer sessions, the session will attempt to transmit streams directly
-            between clients. If clients cannot connect due to firewall restrictions, the session
-            uses the OpenTok TURN server to relay audio-video streams.
-
-            You will be billed for streamed minutes if you use the OpenTok Media Router or if the
-            peer-to-peer session uses the OpenTok TURN server to relay streams. For information on
-            pricing, see the OpenTok pricing page (http://www.tokbox.com/pricing).
+               * The OpenTok Media Router supports the archiving and playback feature, which lets
+                 you record, save, and retrieve OpenTok sessions (see http://tokbox.com/#archiving).
+            
+             With the mediaMode property set to MediaMode.RELAYED, the session
+             will attempt to transmit streams directly between clients. If clients cannot connect 
+             due to firewall restrictions, the session uses the OpenTok TURN server to relay
+             audio-video streams.
+             
+             You will be billed for streamed minutes if you use the OpenTok Media Router or if the
+             session uses the OpenTok TURN server to relay streams. For information on pricing, see
+             the OpenTok pricing page (http://www.tokbox.com/pricing).
 
         :param String location: An IP address that the OpenTok servers will use to
             situate the session in its global network. If you do not set a location hint,
@@ -354,10 +370,10 @@ class OpenTok(object):
         for your API key.
 
         :param int: offset Optional. The index offset of the first archive. 0 is offset
-        of the most recently started archive. 1 is the offset of the archive that started prior to
-        the most recent archive. If you do not specify an offset, 0 is used.
+          of the most recently started archive. 1 is the offset of the archive that started prior to
+          the most recent archive. If you do not specify an offset, 0 is used.
         :param int: count Optional. The number of archives to be returned. The maximum
-        number of archives returned is 1000.
+          number of archives returned is 1000.
 
         :rtype: An ArchiveList object, which is an array of Archive objects.
         """
