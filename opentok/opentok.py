@@ -169,7 +169,7 @@ class OpenTok(object):
         http://www.tokbox.com/opentok/api/#session_id_production) or the OpenTok dashboard
         (see https://dashboard.tokbox.com/projects).
 
-        :param String mediaMode: determine whether the session will transmit streams using the
+        :param String mediaMode: Determines whether the session will transmit streams using the
              OpenTok Media Router (MediaMode.ROUTED) or not (MediaMode.RELAYED). By default,
              sessions use the OpenTok Media Router.
              
@@ -177,7 +177,7 @@ class OpenTok(object):
              provides the following benefits:
             
                * The OpenTok Media Router can decrease bandwidth usage in multiparty sessions.
-                   (When the mediaMode property is set to  MediaMode.ROUTED, each client must send
+                   (When the mediaMode property is set to  MediaMode.RELAYED, each client must send
                    a separate audio-video stream to each client subscribing to it.)
 
                * The OpenTok Media Router can improve the quality of the user experience through

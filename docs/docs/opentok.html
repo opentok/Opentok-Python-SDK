@@ -253,7 +253,7 @@ Check the error message for details.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mediaMode</strong> (<em>String</em>) &#8211; <p>determine whether the session will transmit streams using the
+<li><strong>mediaMode</strong> (<em>String</em>) &#8211; <p>Determines whether the session will transmit streams using the
 OpenTok Media Router (MediaMode.ROUTED) or not (MediaMode.RELAYED). By default,
 sessions use the OpenTok Media Router.</p>
 <p>The OpenTok Media Router (see <a class="reference external" href="http://www.tokbox.com/#multiparty">http://www.tokbox.com/#multiparty</a>)
@@ -262,7 +262,7 @@ provides the following benefits:</p>
 <div><ul>
 <li><dl class="first docutils">
 <dt>The OpenTok Media Router can decrease bandwidth usage in multiparty sessions.</dt>
-<dd>(When the mediaMode property is set to  MediaMode.ROUTED, each client must send
+<dd>(When the mediaMode property is set to  MediaMode.RELAYED, each client must send
 a separate audio-video stream to each client subscribing to it.)</dd>
 </dl>
 </li>
@@ -540,6 +540,9 @@ updated once it is set.</li>
 </dd></dl>
 
 </div>
+<div class="section" id="module-opentok.version">
+<span id="opentok-version-module"></span><h2>opentok.version module<a class="headerlink" href="#module-opentok.version" title="Permalink to this headline">¶</a></h2>
+</div>
 <div class="section" id="module-opentok">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-opentok" title="Permalink to this headline">¶</a></h2>
 </div>
@@ -559,6 +562,7 @@ updated once it is set.</li>
 <li><a class="reference internal" href="#module-opentok.exceptions">opentok.exceptions module</a></li>
 <li><a class="reference internal" href="#module-opentok.opentok">opentok.opentok module</a></li>
 <li><a class="reference internal" href="#module-opentok.session">opentok.session module</a></li>
+<li><a class="reference internal" href="#module-opentok.version">opentok.version module</a></li>
 <li><a class="reference internal" href="#module-opentok">Module contents</a></li>
 </ul>
 </li>
