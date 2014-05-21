@@ -61,10 +61,11 @@ address, and ``p2p`` which is a boolean. This method returns a ``Session`` objec
 
 .. code:: python
 
-  # Just a plain Session
+  # Just a plain Session:
   session = opentok.create_session()
-  # A p2p Session
-  session = opentok.create_session(p2p=True)
+  # A Session that attempts to send streams directly between clients (falling back
+  # to use the OpenTok TURN server to relay streams if the clients cannot connect):
+  session = opentok.create_session(mediaMode=MediaModes.relayed)
   # A Session with a location hint
   session = opentok.create_session(location=u'12.34.56.78')
 
