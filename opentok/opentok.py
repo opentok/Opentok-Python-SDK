@@ -370,7 +370,7 @@ class OpenTok(object):
         response = requests.get(self.archive_url() + "?" + urlencode(params), headers=self.archive_headers())
 
         if response.status_code < 300:
-            return ArchiveList(response.json())
+            return ArchiveList(self, response.json())
         elif response.status_code == 403:
             raise AuthError()
         elif response.status_code == 404:
