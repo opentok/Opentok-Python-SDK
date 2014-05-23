@@ -189,6 +189,27 @@ to the OpenTok API servers. (HTTP 500 error).</p>
 <div class="section" id="module-opentok.opentok">
 <span id="opentok-opentok-module"></span><h2>opentok.opentok module<a class="headerlink" href="#module-opentok.opentok" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
+<dt id="opentok.opentok.MediaModes">
+<em class="property">class </em><tt class="descclassname">opentok.opentok.</tt><tt class="descname">MediaModes</tt><big>(</big><em>*keys</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#opentok.opentok.MediaModes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></tt></p>
+<p>List of valid settings for the mediaMode parameter of the OpenTok.createSession() method.</p>
+<dl class="attribute">
+<dt id="opentok.opentok.MediaModes.relayed">
+<tt class="descname">relayed</tt><em class="property"> = u'enabled'</em><a class="headerlink" href="#opentok.opentok.MediaModes.relayed" title="Permalink to this definition">¶</a></dt>
+<dd><p>The session will attempt to transmit streams directly between clients. If two clients
+cannot send and receive each others&#8217; streams, due to firewalls on the clients&#8217; networks,
+their streams will be relayed using the OpenTok TURN Server.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentok.opentok.MediaModes.routed">
+<tt class="descname">routed</tt><em class="property"> = u'disabled'</em><a class="headerlink" href="#opentok.opentok.MediaModes.routed" title="Permalink to this definition">¶</a></dt>
+<dd><p>The session will transmit streams using the OpenTok Media Server.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="opentok.opentok.OpenTok">
 <em class="property">class </em><tt class="descclassname">opentok.opentok.</tt><tt class="descname">OpenTok</tt><big>(</big><em>api_key</em>, <em>api_secret</em>, <em>api_url='https://api.opentok.com'</em><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
@@ -214,7 +235,7 @@ of the Opentok API.</p>
 
 <dl class="method">
 <dt id="opentok.opentok.OpenTok.create_session">
-<tt class="descname">create_session</tt><big>(</big><em>location=None</em>, <em>p2p=False</em><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.create_session" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">create_session</tt><big>(</big><em>location=None</em>, <em>media_mode=u'disabled'</em><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.create_session" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new OpenTok session and returns the session ID, which uniquely identifies
 the session.</p>
 <p>For example, when using the OpenTok JavaScript library, use the session ID when calling the
@@ -232,21 +253,36 @@ Check the error message for details.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>p2p</strong> (<em>String</em>) &#8211; <p>The session&#8217;s streams will be transmitted directly between
-peers (true) or using the OpenTok Media Router (false). By default, sessions use
-the OpenTok Media Router.</p>
-<p>The OpenTok Media Router provides benefits not available in peer-to-peer sessions.
-For example, the OpenTok Media Router can decrease bandwidth usage in multiparty 
-sessions. Also, the OpenTok Media Router can improve the quality of the user experience
-through dynamic traffic shaping. For more information, see
-<a class="reference external" href="http://www.tokbox.com/blog/mantis-next-generation-cloud-technology-for-webrtc">http://www.tokbox.com/blog/mantis-next-generation-cloud-technology-for-webrtc</a> and
-<a class="reference external" href="http://www.tokbox.com/blog/quality-of-experience-and-traffic-shaping-the-next-step-with-mantis">http://www.tokbox.com/blog/quality-of-experience-and-traffic-shaping-the-next-step-with-mantis</a>.</p>
-<p>For peer-to-peer sessions, the session will attempt to transmit streams directly
-between clients. If clients cannot connect due to firewall restrictions, the session
-uses the OpenTok TURN server to relay audio-video streams.</p>
+<li><strong>mediaMode</strong> (<em>String</em>) &#8211; <p>Determines whether the session will transmit streams using the
+OpenTok Media Router (MediaMode.ROUTED) or not (MediaMode.RELAYED). By default,
+sessions use the OpenTok Media Router.</p>
+<p>The OpenTok Media Router (see <a class="reference external" href="http://www.tokbox.com/#multiparty">http://www.tokbox.com/#multiparty</a>)
+provides the following benefits:</p>
+<blockquote>
+<div><ul>
+<li><dl class="first docutils">
+<dt>The OpenTok Media Router can decrease bandwidth usage in multiparty sessions.</dt>
+<dd>(When the mediaMode property is set to  MediaMode.RELAYED, each client must send
+a separate audio-video stream to each client subscribing to it.)</dd>
+</dl>
+</li>
+<li>The OpenTok Media Router can improve the quality of the user experience through
+Intelligent Quality Control (see <a class="reference external" href="http://tokbox.com/#iqc">http://tokbox.com/#iqc</a>). With
+Intelligent Quality Control, if a client&#8217;s connectivity degrades to a degree that
+it does not support video for a stream it&#8217;s subscribing to, the video is dropped on
+that client (without affecting other clients), and the client receives audio only.
+If the client&#8217;s connectivity improves, the video returns.</li>
+<li>The OpenTok Media Router supports the archiving feature, which lets
+you record, save, and retrieve OpenTok sessions (see <a class="reference external" href="http://tokbox.com/platform/archiving">http://tokbox.com/platform/archiving</a>).</li>
+</ul>
+</div></blockquote>
+<p>With the mediaMode property set to MediaMode.RELAYED, the session
+will attempt to transmit streams directly between clients. If clients cannot connect 
+due to firewall restrictions, the session uses the OpenTok TURN server to relay
+audio-video streams.</p>
 <p>You will be billed for streamed minutes if you use the OpenTok Media Router or if the
-peer-to-peer session uses the OpenTok TURN server to relay streams. For information on
-pricing, see the OpenTok pricing page (<a class="reference external" href="http://www.tokbox.com/pricing">http://www.tokbox.com/pricing</a>).</p>
+session uses the OpenTok TURN server to relay streams. For information on pricing, see
+the OpenTok pricing page (<a class="reference external" href="http://www.tokbox.com/pricing">http://www.tokbox.com/pricing</a>).</p>
 </li>
 <li><strong>location</strong> (<em>String</em>) &#8211; An IP address that the OpenTok servers will use to
 situate the session in its global network. If you do not set a location hint,
@@ -343,19 +379,17 @@ for your API key.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>int</strong> &#8211; offset Optional. The index offset of the first archive. 0 is offset</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>int</strong> &#8211; offset Optional. The index offset of the first archive. 0 is offset
+of the most recently started archive. 1 is the offset of the archive that started prior to
+the most recent archive. If you do not specify an offset, 0 is used.</li>
+<li><strong>int</strong> &#8211; count Optional. The number of archives to be returned. The maximum
+number of archives returned is 1000.</li>
+</ul>
+</td>
 </tr>
-</tbody>
-</table>
-<p>of the most recently started archive. 1 is the offset of the archive that started prior to
-the most recent archive. If you do not specify an offset, 0 is used.
-:param int: count Optional. The number of archives to be returned. The maximum
-number of archives returned is 1000.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">An ArchiveList object, which is an array of Archive objects.</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">An ArchiveList object, which is an array of Archive objects.</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -457,17 +491,14 @@ Session object.</p>
 <p>Represents an OpenTok session.</p>
 <p>Use the OpenTok.createSession() method to create an OpenTok session. Use the
 session_id property of the Session object to get the session ID.</p>
-<p>&#64;attr_reader [String] session_id The session ID.
-&#64;attr_reader [String] api_secret &#64;private The OpenTok API secret.
-&#64;attr_reader [String] api_key &#64;private The OpenTok API key.
-&#64;attr_reader [Boolean] p2p Set to true if the session&#8217;s streams will be transmitted directly</p>
-<blockquote>
-<div>between peers; set to false if the session&#8217;s streams will be transmitted using the OpenTok
-media server. See the OpenTok.createSession() method.</div></blockquote>
-<dl class="docutils">
-<dt>&#64;attr_reader [String] location The location hint IP address. See the OpenTok.createSession()</dt>
-<dd>method.</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><strong>session_id</strong> (<em>String</em>) &#8211; The session ID.</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="opentok.session.Session.generate_token">
 <tt class="descname">generate_token</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#opentok.session.Session.generate_token" title="Permalink to this definition">¶</a></dt>
@@ -476,12 +507,10 @@ media server. See the OpenTok.createSession() method.</div></blockquote>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>role</strong> (<em>String</em>) &#8211; The role for the token. Valid values are defined in the Role</td>
-</tr>
-</tbody>
-</table>
-<p>class:</p>
-<ul class="simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>role</strong> (<em>String</em>) &#8211; <p>The role for the token. Valid values are defined in the Role
+class.</p>
+<ul>
 <li><cite>Roles.subscriber</cite> &#8211; A subscriber can only subscribe to streams.</li>
 <li><cite>Roles.publisher</cite> &#8211; A publisher can publish streams, subscribe to
 streams, and signal. (This is the default value if you do not specify a role.)</li>
@@ -490,40 +519,29 @@ publisher, in clients using the OpenTok.js 2.2 library, a moderator can call the
 <cite>forceUnpublish()</cite> and <cite>forceDisconnect()</cite> method of the
 Session object.</li>
 </ul>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>expire_time</strong> (<em>int</em>) &#8211; The expiration time of the token, in seconds since the UNIX epoch.</td>
-</tr>
-</tbody>
-</table>
-<p>The maximum expiration time is 30 days after the creation time. The default expiration
-time is 24 hours after the token creation time.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>String</em>) &#8211; A string containing connection metadata describing the</td>
-</tr>
-</tbody>
-</table>
-<p>end-user. For example, you can pass the user ID, name, or other data describing the
+</li>
+<li><strong>expire_time</strong> (<em>int</em>) &#8211; The expiration time of the token, in seconds since the UNIX epoch.
+The maximum expiration time is 30 days after the creation time. The default expiration
+time is 24 hours after the token creation time.</li>
+<li><strong>data</strong> (<em>String</em>) &#8211; A string containing connection metadata describing the
+end-user. For example, you can pass the user ID, name, or other data describing the
 end-user. The length of the string is limited to 1000 characters. This data cannot be
-updated once it is set.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"></td>
+updated once it is set.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">The token string.</p>
+</td>
 </tr>
 </tbody>
 </table>
-<p>The token string.</p>
 </dd></dl>
 
 </dd></dl>
 
+</div>
+<div class="section" id="module-opentok.version">
+<span id="opentok-version-module"></span><h2>opentok.version module<a class="headerlink" href="#module-opentok.version" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-opentok">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-opentok" title="Permalink to this headline">¶</a></h2>
@@ -544,6 +562,7 @@ updated once it is set.</p>
 <li><a class="reference internal" href="#module-opentok.exceptions">opentok.exceptions module</a></li>
 <li><a class="reference internal" href="#module-opentok.opentok">opentok.opentok module</a></li>
 <li><a class="reference internal" href="#module-opentok.session">opentok.session module</a></li>
+<li><a class="reference internal" href="#module-opentok.version">opentok.version module</a></li>
 <li><a class="reference internal" href="#module-opentok">Module contents</a></li>
 </ul>
 </li>
