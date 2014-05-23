@@ -36,7 +36,7 @@ setup(
 
     author='TokBox, Inc.',
     author_email='support@tokbox.com',
-    license='MIT',
+    license='LICENSE.txt',
 
     classifiers = [
         'Development Status :: 5 - Production/Stable',
