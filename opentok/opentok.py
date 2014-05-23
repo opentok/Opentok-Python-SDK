@@ -187,8 +187,8 @@ class OpenTok(object):
                  that client (without affecting other clients), and the client receives audio only.
                  If the client's connectivity improves, the video returns.
 
-               * The OpenTok Media Router supports the archiving and playback feature, which lets
-                 you record, save, and retrieve OpenTok sessions (see http://tokbox.com/#archiving).
+               * The OpenTok Media Router supports the archiving feature, which lets
+                 you record, save, and retrieve OpenTok sessions (see http://tokbox.com/platform/archiving).
             
              With the mediaMode property set to MediaMode.RELAYED, the session
              will attempt to transmit streams directly between clients. If clients cannot connect 
