@@ -1,5 +1,5 @@
 from datetime import datetime, date
-from six import iteritems, PY2, PY3
+from six import iteritems, PY2, PY3, u
 import json
 import pytz
 if PY3:
@@ -75,7 +75,7 @@ class Archive(object):
     def stop(self):
         """
         Stops an OpenTok archive that is being recorded.
-       
+
         Archives automatically stop recording after 90 minutes or when all clients have disconnected
         from the session being archived.
         """
@@ -86,7 +86,7 @@ class Archive(object):
     def delete(self):
         """
         Deletes an OpenTok archive.
-       
+
         You can only delete an archive which has a status of "available" or "uploaded". Deleting an
         archive removes its record from the list of archives. For an "available" archive, it also
         removes the archive file, making it unavailable for download.
@@ -108,9 +108,9 @@ class Archive(object):
 
 class ArchiveList(object):
 
-    def __init__(self, values):
+    def __init__(self, sdk, values):
         self.count = values.get('count')
-        self.items = map(lambda x: Archive(self, x), values.get('items', []))
+        self.items = list(map(lambda x: Archive(sdk, x), values.get('items', [])))
 
     def __iter__(self):
         for x in self.items:
@@ -125,4 +125,11 @@ class ArchiveList(object):
     def json(self):
         return json.dumps(self.attrs(), default=dthandler, indent=4)
 
+    def __getitem__(self, key):
+        return self.items.get(key)
 
+    def __setitem__(self, key, item):
+        raise ArchiveError(u('Cannot set item {0} for key {1} in Archive object').format(item, key))
+
+    def __len__(self):
+        return len(self.items)
