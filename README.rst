@@ -2,8 +2,8 @@
 OpenTok Python SDK
 ==================
 
-.. image:: https://travis-ci.org/aoberoi/Opentok-Python-SDK.svg?branch=modernization
-   :target: https://travis-ci.org/aoberoi/Opentok-Python-SDK
+.. image:: https://travis-ci.org/opentok/Opentok-Python-SDK.svg?branch=modernization
+   :target: https://travis-ci.org/opentok/Opentok-Python-SDK
 
 The OpenTok Python SDK lets you generate
 `sessions <http://tokbox.com/opentok/tutorials/create-session/>`_ and
@@ -147,6 +147,15 @@ instance of the ``ArchiveList`` class.
   # Get the total number of Archives for this API Key
   total = archive_list.total
 
+Samples
+-------
+
+There are two sample applications included in this repository. To get going as fast as possible, clone the whole
+repository and follow the Walkthroughs:
+
+- `HelloWorld <sample/HelloWorld/README.md>`_
+- `Archiving <sample/Archiving/README.md>`_
+
 Documentation
 -------------
 
@@ -166,7 +175,7 @@ Release Notes
 See the `Releases <https://github.com/opentok/Opentok-Python-SDK/releases>`_ page for details about
 each release.
 
-Important changes in v2.0
+Important changes in v2.2
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This version of the SDK includes support for working with OpenTok 2.0 archives. (This API does not
