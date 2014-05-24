@@ -34,7 +34,7 @@ Finally, start the server.
 (venv)$ python helloworld.py
 ```
 
-Visit <http://127.0.0.1:5000/> in your browser. Open it again in a second window. Smile! You've just
+Visit <http://localhost:5000/> in your browser. Open it again in a second window. Smile! You've just
 set up a group chat.
 
 ## Walkthrough
@@ -58,7 +58,7 @@ Next this file performs some basic checks on the environment. If it cannot find 
 `API_SECRET` environment variables, there is no point in continuing.
 
 The object `app` is our application and its initialized by instantiating an object from Flask.
-Then we initialize an instance of OpenTok as `opentok`. If this file is run as the main file, 
+Then we initialize an instance of OpenTok as `opentok`. If this file is run as the main file,
 we should start running the app.
 
 ```python

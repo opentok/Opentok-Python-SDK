@@ -1,8 +1,7 @@
-# OpenTok Hello World Python
+# OpenTok Archiving Sample for Python
 
-This is a simple demo app that shows how you can use the OpenTok-Python-SDK to create Sessions,
-generate Tokens with those Sessions, and then pass these values to a JavaScript client that can
-connect and conduct a group chat.
+This is a simple demo app that shows how you can use the OpenTok Python SDK to archive (or record)
+Sessions, list archives that have been created, download the recordings, and delete the recordings.
 
 ## Running the App
 
@@ -31,99 +30,151 @@ this but the simplest would be to do it right in your shell.
 Finally, start the server.
 
 ```
-(venv)$ python helloworld.py
+(venv)$ python archiving.py
 ```
 
-Visit <http://127.0.0.1:5000/> in your browser. Open it again in a second window. Smile! You've just
+Visit <http://localhost:5000/> in your browser. Open it again in a second window. Smile! You've just
 set up a group chat.
 
 ## Walkthrough
 
-This demo application uses the [Flask web microframework](http://flask.pocoo.org/). It is similar to
-many other popular web frameworks. We are only covering the very basics of the framework, but you can
-learn more by following the links above.
+This demo application uses the same frameworks and libraries as the HelloWorld sample. If you have
+not already gotten familiar with the code in that project, consider doing so before continuing.
 
-### Main Application (helloworld.py)
+The explanations below are separated by page. Each section will focus on a route handler within the
+main application (archiving.py).
 
-The first thing done in this file is to import the dependencies we will be using. In this case that
-is the Flask web framework, the os module, and most importantly the OpenTok SDK.
+### Creating Archives – Host View
 
-```python
-from flask import Flask, render_template
-from opentok import OpenTok
-import os
-```
+Start by visiting the host page at <http://localhost:5000/host> and using the application to record
+an archive. Your browser will first ask you to approve permission to use the camera and microphone.
+Once you've accepted, your image will appear inside the section titled 'Host'. To start recording
+the video stream, press the 'Start Archiving' button. Once archiving has begun the button will turn
+green and change to 'Stop Archiving'. You should also see a red blinking indicator that you are
+being recorded. Wave and say hello! Stop archiving when you are done.
 
-Next this file performs some basic checks on the environment. If it cannot find the `API_KEY`and
-`API_SECRET` environment variables, there is no point in continuing.
-
-The object `app` is our application and its initialized by instantiating an object from Flask.
-Then we initialize an instance of OpenTok as `opentok`. If this file is run as the main file, 
-we should start running the app.
+Next we will see how the host view is implemented on the server. The route handler for this page is
+shown below:
 
 ```python
-app = Flask(__name__)
-opentok = OpenTok(api_key, api_secret)
-
-# ...
-
-if __name__ == "__main__":
-    app.run()
-```
-
-Now, lets discuss the Hello World application's functionality. We want to set up a group chat so
-that any client that visits a page will connect to the same OpenTok Session. Once they are connected
-they can Publish a Stream and Subscribe to all the other streams in that Session. So we just need
-one Session object, and it needs to be accessible every time a request is made. On the next line we
-simply call the `OpenTok` instance's `create_session` method to get a Session and store it in the
-`session` variable. Alternatively, `session_id`s are commonly stored in databses for applications
-that have many of them.
-
-```python
-session = opentok.create_session()
-```
-
-We only need one page, so we create one route handler for any HTTP GET requests to trigger.
-
-```python
-@app.route("/")
-def hello():
-  # ...
-```
-
-Now all we have to do is serve a page with the three values the client will need to connect to the
-session: `api_key`, `session_id`, and `token`. The `api_key` is available in the outer scope so we
-can just assign it. The `session_id` is available as the `session.session_id` attribute. The `token`
-is generated freshly on this request by calling the `generate_token` method of the `opentok`
-instance, and passing in the `session_id`. This is because a Token is a piece of information that
-carries a specific client's permissions in a certain Session. Ideally, as we've done here, you
-generate a unique token for each client that will connect.
-
-```python
+@app.route("/host")
+def host():
     key = api_key
     session_id = session.session_id
     token = opentok.generate_token(session_id)
+    return render_template('host.html', api_key=key, session_id=session_id, token=token)
 ```
 
-Now all we have to do is serve a page with those three values. Lets call our `render_template`
-helper that will pick up a template called `index.html` from the `templates/` directory in our
-application and pass in the variables for it to include on the page.
+If you've completed the HelloWorld walkthrough, this should look familiar. This handler simply
+generates the three strings that the client (JavaScript) needs to connect to the session: `api_key`,
+`session_id` and `token`. After the user has connected to the session, they press the
+'Start Archiving' button, which sends an XHR (or Ajax) request to the <http://localhost:5000/start>
+URL. The route handler for this URL is shown below:
 
 ```python
-    return render_template('index.html', api_key=key, session_id=session_id, token=token)
+@app.route("/start")
+def start():
+    archive = opentok.start_archive(session.session_id, name="Python Archiving Sample App")
+    return archive.json()
 ```
 
-### Main Template (templates/index.html)
+In this handler, the `start_archive()` method of the `opentok` instance is called with the `session_id`
+for the session that needs to be archived. The optional second argument is `name`, which is stored with
+the archive and can be read later. In this case, as in the HelloWorld sample app, there is
+only one session created and it is used here and for the participant view. This will trigger the
+recording to begin. The response sent back to the client's XHR request will be the JSON
+representation of the archive, which is returned from the `json()` method. The client is also
+listening for the `archiveStarted` event, and uses that event to change the 'Start Archiving' button
+to show 'Stop Archiving' instead. When the user presses the button this time, another XHR request
+is sent to the <http://localhost:5000/stop/<archive_id>> URL where `<archive_id>` represents the ID the
+client receives in the 'archiveStarted' event. The route handler for this request is shown below:
 
-This file simply sets up the HTML page for the JavaScript application to run, imports the
-JavaScript library, and passes the values created by the server into the JavaScript application
-inside `public/js/helloworld.js`
+```python
+@app.route("/stop/<archive_id>")
+def stop(archive_id):
+    archive = opentok.stop_archive(archive_id)
+    return archive.json()
+```
 
-### JavaScript Applicaton (static/js/helloworld.js)
+This handler is very similar to the previous one. Instead of calling the `start_archive()` method,
+the `stop_archive()` method is called. This method takes an `archive_id` as its parameter, which
+is different for each time a session starts recording. But the client has sent this to the server
+as part of the URL, so the `archive_id` argument from the route matcher is used to retrieve it.
 
-The group chat is mostly implemented in this file. At a high level, we connect to the given
-Session, publish a stream from our webcam, and listen for new streams from other clients to
-subscribe to.
+Now you have understood the three main routes that are used to create the Host experience of
+creating an archive. Much of the functionality is done in the client with JavaScript. That code can
+be found in the `public/js/host.js` file. Read about the
+[OpenTok.js JavaScript](http://tokbox.com/opentok/libraries/client/js/) library to learn more.
 
-For more details, read the comments in the file or go to the
-[JavaScript Client Library](http://tokbox.com/opentok/libraries/client/js/) for a full reference.
+### Past Archives
+
+Start by visiting the history page at <http://localhost:5000/history>. You will see a table that
+displays all the archives created with your API Key. If there are more than five, the older ones
+can be seen by clicking the "Older →" link. If you click on the name of an archive, your browser
+will start downloading the archive file. If you click the "Delete" link in the end of the row
+for any archive, that archive will be deleted and no longer available. Some basic information like
+when the archive was created, how long it is, and its status is also shown. You should see the
+archives you created in the previous sections here.
+
+We begin to see how this page is created by looking at the route handler for this URL:
+
+```python
+@app.route("/history")
+def history():
+    page = int(request.args.get('page', '1'))
+    offset = (page - 1) * 5
+    archives = opentok.get_archives(offset=offset, count=5)
+
+    show_previous = '/history?page=' + str(page-1) if page > 1 else None
+    show_next = '/history?page=' + str(page+1) if archives.count > (offset + 5) else None
+
+    return render_template('history.html', archives=archives, show_previous=show_previous,
+                            show_next=show_next)
+```
+
+This view is paginated so that we don't potentially show hundreds of rows on the table, which would
+be difficult for the user to navigate. So this code starts by figuring out which page needs to be
+shown, where each page is a set of 5 archives. The `page` number is read from the request's query
+string parameters as a string (defaulting to 1 if its not present) and then casted into an `int`.
+The `offset`, which represents how many archives are being skipped is always calculated as five
+times as many pages that are less than the current page, which is `(page - 1) * 5`. Now there is
+enough information to ask for a list of archives from OpenTok, which we do by calling the
+`get_archives()` method of the `opentok` instance. This method optionally takes the offset and count
+that was just calculated. If we are not at the first page, we can pass the view a string that
+contains the relative URL for the previous page. Similarly, we can also include one for the next
+page. Now the application renders the view using that information and the partial list of archives.
+
+At this point the template file `templates/history.html` handles
+looping over the array of archives and outputting the proper information for each column in the
+table. It also places a link to the download and delete routes around the archive's name and
+its delete button, respectively.
+
+The code for the download route handler is shown below:
+
+```python
+@app.route("/download/<archive_id>")
+def download(archive_id):
+    archive = opentok.get_archive(archive_id)
+    return redirect(archive.url)
+```
+
+The download URL for an archive is available as a property of an `Archive` instance. In order to get
+an instance to this archive, the `get_archive()` method of the `opentok` instance is used. The only
+parameter it needs is the `archive_id`. We use the same technique as above to read that `archive_id`
+from the URL. Lastly, we send a redirect response back to the browser so the download begins.
+
+The code for the delete route handler is shown below:
+
+```python
+@app.route("/delete/<archive_id>")
+def delete(archive_id):
+    opentok.delete_archive(archive_id)
+    return redirect(url_for('history'))
+```
+
+Once again the `archive_id` is retrieved from the URL of the request. This value is then passed the
+`delete_archive()` method of the `opentok` instance. Now that the archive has been deleted, a
+redirect response back to the first page of the history is sent back to the browser.
+
+That completes the walkthrough for this Archiving sample application. Feel free to continue to use
+this application to browse the archives created for your API Key.
