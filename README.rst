@@ -192,11 +192,6 @@ Development and Contributing
 Interested in contributing? We :heart: pull requests! See the `Development <DEVELOPING.md>`_ and
 `Contribution <CONTRIBUTING.md>`_ guidelines.
 
-File a new
-`Issue <https://github.com/opentok/opentok-python-sdk/issues>`_ or take a look at the existing ones.
-If you are going to send us a pull request, please try to run the test suite first and also include
-tests for your changes.
-
 Support
 -------
 
