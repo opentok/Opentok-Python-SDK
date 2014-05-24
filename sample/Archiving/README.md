@@ -103,7 +103,7 @@ as part of the URL, so the `archive_id` argument from the route matcher is used 
 
 Now you have understood the three main routes that are used to create the Host experience of
 creating an archive. Much of the functionality is done in the client with JavaScript. That code can
-be found in the `public/js/host.js` file. Read about the
+be found in the `static/js/host.js` file. Read about the
 [OpenTok.js JavaScript](http://tokbox.com/opentok/libraries/client/js/) library to learn more.
 
 ### Past Archives
