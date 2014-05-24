@@ -196,7 +196,7 @@ def delete(archive_id):
     return redirect(url_for('history'))
 ```
 
-Once again the `archive_id` is retrieved from the URL of the request. This value is then passed the
+Once again the `archive_id` is retrieved from the URL of the request. This value is then passed to the
 `delete_archive()` method of the `opentok` instance. Now that the archive has been deleted, a
 redirect response back to the first page of the history is sent back to the browser.
 
