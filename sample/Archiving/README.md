@@ -106,6 +106,30 @@ creating an archive. Much of the functionality is done in the client with JavaSc
 be found in the `static/js/host.js` file. Read about the
 [OpenTok.js JavaScript](http://tokbox.com/opentok/libraries/client/js/) library to learn more.
 
+### Creating Archives - Participant View
+
+With the host view still open and publishing, open an additional window or tab and navigate to
+<http://localhost:5000/participant> and allow the browser to use your camera and microphone. Once
+again, start archiving in the host view. Back in the participant view, notice that the red blinking
+indicator has been shown so that the participant knows his video is being recorded. Now stop the
+archiving in the host view. Notice that the indicator has gone away in the participant view too.
+
+Creating this view on the server is as simple as the HelloWorld sample application. See the code
+for the route handler below:
+
+```python
+@app.route("/participant")
+def participant():
+    key = api_key
+    session_id = session.session_id
+    token = opentok.generate_token(session_id)
+    return render_template('participant.html', api_key=key, session_id=session_id, token=token)
+```
+
+Since this view has no further interactivity with buttons, this is all that is needed for a client
+that is participating in an archived session. Once again, much of the functionality is implemented
+in the client, in code that can be found in the `static/js/participant.js` file.
+
 ### Past Archives
 
 Start by visiting the history page at <http://localhost:5000/history>. You will see a table that
