@@ -33,8 +33,8 @@ Finally, start the server.
 (venv)$ python archiving.py
 ```
 
-Visit <http://localhost:5000/> in your browser. Open it again in a second window. Smile! You've just
-set up a group chat.
+Visit <http://localhost:5000/> in your browser. You can now create new archives (either as a host or
+as a participant) and also play archives that have already been created.
 
 ## Walkthrough
 
