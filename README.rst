@@ -2,7 +2,7 @@
 OpenTok Python SDK
 ==================
 
-.. image:: https://travis-ci.org/opentok/Opentok-Python-SDK.svg?branch=modernization
+.. image:: https://travis-ci.org/opentok/Opentok-Python-SDK.svg
    :target: https://travis-ci.org/opentok/Opentok-Python-SDK
 
 The OpenTok Python SDK lets you generate
