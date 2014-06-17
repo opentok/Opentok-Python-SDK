@@ -32,6 +32,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li><a href="index.html">OpenTok Python SDK 2.2 2.2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -43,30 +46,25 @@
             
   <div class="section" id="opentok-python-sdk">
 <h1>OpenTok Python SDK<a class="headerlink" href="#opentok-python-sdk" title="Permalink to this headline">¶</a></h1>
-<a class="reference external image-reference" href="https://travis-ci.org/aoberoi/Opentok-Python-SDK"><img alt="https://travis-ci.org/aoberoi/Opentok-Python-SDK.svg?branch=modernization" src="https://travis-ci.org/aoberoi/Opentok-Python-SDK.svg?branch=modernization" /></a>
+<a class="reference external image-reference" href="https://travis-ci.org/opentok/Opentok-Python-SDK"><img src="https://travis-ci.org/opentok/Opentok-Python-SDK.svg" /></a>
 <p>The OpenTok Python SDK lets you generate
 <a class="reference external" href="http://tokbox.com/opentok/tutorials/create-session/">sessions</a> and
 <a class="reference external" href="http://tokbox.com/opentok/tutorials/create-token/">tokens</a> for <a class="reference external" href="http://www.tokbox.com/">OpenTok</a>
-applications. This version of the SDK also includes support for working with OpenTok 2.0 archives.</p>
-<div class="section" id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="pip-recommended">
-<h3>Pip (recommended):<a class="headerlink" href="#pip-recommended" title="Permalink to this headline">¶</a></h3>
+applications, and <a class="reference external" href="http://www.tokbox.com/platform/archiving">archive</a> Opentok 2.0 sessions.</p>
+<p>If you are updating from a previous version of this SDK, see
+<a class="reference external" href="#important-changes-in-v22">Important changes in v2.2</a>.</p>
+<div class="section" id="installation-using-pip-recommended">
+<h2>Installation using Pip (recommended):<a class="headerlink" href="#installation-using-pip-recommended" title="Permalink to this headline">¶</a></h2>
 <p>Pip helps manage dependencies for Python projects using the PyPI index. Find more info here:
 <a class="reference external" href="http://www.pip-installer.org/en/latest/">http://www.pip-installer.org/en/latest/</a></p>
 <p>Add the <tt class="docutils literal"><span class="pre">opentok</span></tt> package as a dependency in your project. The most common way is to add it to your
 <tt class="docutils literal"><span class="pre">requirements.txt</span></tt> file:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">opentok</span><span class="o">&gt;=</span><span class="mf">2.2</span>
+<div class="highlight-python"><div class="highlight"><pre>opentok&gt;=2.2.0
 </pre></div>
 </div>
 <p>Next, install the dependencies:</p>
 <div class="highlight-python"><div class="highlight"><pre>$ pip install -r requirements.txt
 </pre></div>
-</div>
-</div>
-<div class="section" id="manually">
-<h3>Manually:<a class="headerlink" href="#manually" title="Permalink to this headline">¶</a></h3>
-<p>Download the latest package zip from the <a class="reference external" href="https://github.com/opentok/Opentok-Python-SDK/releases">Releases page</a></p>
 </div>
 </div>
 <div class="section" id="usage">
@@ -85,12 +83,14 @@ applications. This version of the SDK also includes support for working with Ope
 <h3>Creating Sessions<a class="headerlink" href="#creating-sessions" title="Permalink to this headline">¶</a></h3>
 <p>The create an OpenTok Session, use the <tt class="docutils literal"><span class="pre">opentok.create_session()</span></tt> method. There are two optional
 keyword parameters for this method: <tt class="docutils literal"><span class="pre">location</span></tt> which can be set to a string containing an IP
-address, and <tt class="docutils literal"><span class="pre">p2p</span></tt> which is a boolean. This method returns a <tt class="docutils literal"><span class="pre">Session</span></tt> object. Its
-<tt class="docutils literal"><span class="pre">session_id</span></tt> attribute is useful when saving to a persistent store (e.g. database).</p>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="c"># Just a plain Session</span>
+address, and <tt class="docutils literal"><span class="pre">media_mode</span></tt> which is a String (defined by the MediaModes class). This method returns
+a <tt class="docutils literal"><span class="pre">Session</span></tt> object. Its <tt class="docutils literal"><span class="pre">session_id</span></tt> attribute is useful when saving to a persistent store (such
+as a database).</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="c"># Just a plain Session:</span>
 <span class="n">session</span> <span class="o">=</span> <span class="n">opentok</span><span class="o">.</span><span class="n">create_session</span><span class="p">()</span>
-<span class="c"># A p2p Session</span>
-<span class="n">session</span> <span class="o">=</span> <span class="n">opentok</span><span class="o">.</span><span class="n">create_session</span><span class="p">(</span><span class="n">p2p</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="c"># A Session that attempts to send streams directly between clients (falling back</span>
+<span class="c"># to use the OpenTok TURN server to relay streams if the clients cannot connect):</span>
+<span class="n">session</span> <span class="o">=</span> <span class="n">opentok</span><span class="o">.</span><span class="n">create_session</span><span class="p">(</span><span class="n">media_mode</span><span class="o">=</span><span class="n">MediaModes</span><span class="o">.</span><span class="n">relayed</span><span class="p">)</span>
 <span class="c"># A Session with a location hint</span>
 <span class="n">session</span> <span class="o">=</span> <span class="n">opentok</span><span class="o">.</span><span class="n">create_session</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="s">u&#39;12.34.56.78&#39;</span><span class="p">)</span>
 
@@ -171,9 +171,18 @@ instance of the <tt class="docutils literal"><span class="pre">ArchiveList</span
 </div>
 </div>
 </div>
+<div class="section" id="samples">
+<h2>Samples<a class="headerlink" href="#samples" title="Permalink to this headline">¶</a></h2>
+<p>There are two sample applications included in this repository. To get going as fast as possible, clone the whole
+repository and follow the Walkthroughs:</p>
+<ul class="simple">
+<li><a class="reference external" href="sample/HelloWorld/README.md">HelloWorld</a></li>
+<li><a class="reference external" href="sample/Archiving/README.md">Archiving</a></li>
+</ul>
+</div>
 <div class="section" id="documentation">
 <h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
-<p>Reference documentation is available at &lt;<a class="reference external" href="http://www.tokbox.com//opentok/libraries/server/python/reference/index.html">http://www.tokbox.com//opentok/libraries/server/python/reference/index.html</a>&gt; and in the
+<p>Reference documentation is available at &lt;<a class="reference external" href="http://www.tokbox.com/opentok/libraries/server/python/reference/index.html">http://www.tokbox.com/opentok/libraries/server/python/reference/index.html</a>&gt; and in the
 docs directory of the SDK.</p>
 </div>
 <div class="section" id="requirements">
@@ -185,18 +194,19 @@ docs directory of the SDK.</p>
 <h2>Release Notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h2>
 <p>See the <a class="reference external" href="https://github.com/opentok/Opentok-Python-SDK/releases">Releases</a> page for details about
 each release.</p>
-<div class="section" id="important-changes-in-v2-0">
-<h3>Important changes in v2.0<a class="headerlink" href="#important-changes-in-v2-0" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="id1">
+<h2>Important changes in v2.2<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>This version of the SDK includes support for working with OpenTok 2.0 archives. (This API does not
 work with OpenTok 1.0 archives.)</p>
-</div>
+<p>The OpenTok.create_session() method now includes a media_mode parameter, instead of a p2p parameter.</p>
+<p>For details, see the reference documentation at
+&lt;<a class="reference external" href="http://www.tokbox.com/opentok/libraries/server/python/reference/index.html">http://www.tokbox.com/opentok/libraries/server/python/reference/index.html</a>&gt;.</p>
 </div>
 <div class="section" id="development-and-contributing">
 <h2>Development and Contributing<a class="headerlink" href="#development-and-contributing" title="Permalink to this headline">¶</a></h2>
-<p>Interested in contributing? We &lt;3 pull requests! File a new
-<a class="reference external" href="https://github.com/opentok/opentok-python-sdk/issues">Issue</a> or take a look at the existing ones.
-If you are going to send us a pull request, please try to run the test suite first and also include
-tests for your changes.</p>
+<p>Interested in contributing? We :heart: pull requests! See the <a class="reference external" href="DEVELOPING.md">Development</a> and
+<a class="reference external" href="CONTRIBUTING.md">Contribution</a> guidelines.</p>
 </div>
 <div class="section" id="support">
 <h2>Support<a class="headerlink" href="#support" title="Permalink to this headline">¶</a></h2>
@@ -215,11 +225,7 @@ Hint: test cases are really helpful!</p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">OpenTok Python SDK</a><ul>
-<li><a class="reference internal" href="#installation">Installation</a><ul>
-<li><a class="reference internal" href="#pip-recommended">Pip (recommended):</a></li>
-<li><a class="reference internal" href="#manually">Manually:</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#installation-using-pip-recommended">Installation using Pip (recommended):</a></li>
 <li><a class="reference internal" href="#usage">Usage</a><ul>
 <li><a class="reference internal" href="#initializing">Initializing</a></li>
 <li><a class="reference internal" href="#creating-sessions">Creating Sessions</a></li>
@@ -227,12 +233,11 @@ Hint: test cases are really helpful!</p>
 <li><a class="reference internal" href="#working-with-archives">Working with Archives</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#samples">Samples</a></li>
 <li><a class="reference internal" href="#documentation">Documentation</a></li>
 <li><a class="reference internal" href="#requirements">Requirements</a></li>
-<li><a class="reference internal" href="#release-notes">Release Notes</a><ul>
-<li><a class="reference internal" href="#important-changes-in-v2-0">Important changes in v2.0</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#release-notes">Release Notes</a></li>
+<li><a class="reference internal" href="#id1">Important changes in v2.2</a></li>
 <li><a class="reference internal" href="#development-and-contributing">Development and Contributing</a></li>
 <li><a class="reference internal" href="#support">Support</a></li>
 </ul>
@@ -267,6 +272,9 @@ Hint: test cases are really helpful!</p>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li><a href="index.html">OpenTok Python SDK 2.2 2.2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>

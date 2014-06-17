@@ -170,14 +170,19 @@ class OpenTok(object):
         (see https://dashboard.tokbox.com/projects).
 
         :param String mediaMode: Determines whether the session will transmit streams using the
-             OpenTok Media Router (MediaMode.ROUTED) or not (MediaMode.RELAYED). By default,
-             sessions use the OpenTok Media Router.
-
+             OpenTok Media Router (MediaMode.routed) or not (MediaMode.relayed). By default,
+             the setting is MediaMode.relayed.
+             
+             With the mediaMode property set to MediaMode.relayed, the session
+             will attempt to transmit streams directly between clients. If clients cannot connect 
+             due to firewall restrictions, the session uses the OpenTok TURN server to relay
+             audio-video streams.
+             
              The OpenTok Media Router (see http://www.tokbox.com/#multiparty)
              provides the following benefits:
 
                * The OpenTok Media Router can decrease bandwidth usage in multiparty sessions.
-                   (When the mediaMode property is set to  MediaMode.RELAYED, each client must send
+                   (When the mediaMode property is set to  MediaMode.relayed, each client must send
                    a separate audio-video stream to each client subscribing to it.)
 
                * The OpenTok Media Router can improve the quality of the user experience through
@@ -189,12 +194,7 @@ class OpenTok(object):
 
                * The OpenTok Media Router supports the archiving feature, which lets
                  you record, save, and retrieve OpenTok sessions (see http://tokbox.com/platform/archiving).
-
-             With the mediaMode property set to MediaMode.RELAYED, the session
-             will attempt to transmit streams directly between clients. If clients cannot connect
-             due to firewall restrictions, the session uses the OpenTok TURN server to relay
-             audio-video streams.
-
+            
              You will be billed for streamed minutes if you use the OpenTok Media Router or if the
              session uses the OpenTok TURN server to relay streams. For information on pricing, see
              the OpenTok pricing page (http://www.tokbox.com/pricing).
