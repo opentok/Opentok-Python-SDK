@@ -59,7 +59,7 @@ as a database).
   # to use the OpenTok TURN server to relay streams if the clients cannot connect):
   session = opentok.create_session()
   # A session that uses the OpenTok Media Router:
-  session = opentok.create_session(media_mode=MediaModes.relayed)
+  session = opentok.create_session(media_mode=MediaModes.routed)
   # A session with a location hint
   session = opentok.create_session(location=u'12.34.56.78')
 
