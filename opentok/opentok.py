@@ -149,7 +149,7 @@ class OpenTok(object):
         )
         return token
 
-    def create_session(self, location=None, media_mode=MediaModes.routed):
+    def create_session(self, location=None, media_mode=MediaModes.relayed):
         """
         Creates a new OpenTok session and returns the session ID, which uniquely identifies
         the session.
@@ -172,10 +172,10 @@ class OpenTok(object):
         :param String mediaMode: Determines whether the session will transmit streams using the
              OpenTok Media Router (MediaMode.ROUTED) or not (MediaMode.RELAYED). By default,
              sessions use the OpenTok Media Router.
-             
+
              The OpenTok Media Router (see http://www.tokbox.com/#multiparty)
              provides the following benefits:
-            
+
                * The OpenTok Media Router can decrease bandwidth usage in multiparty sessions.
                    (When the mediaMode property is set to  MediaMode.RELAYED, each client must send
                    a separate audio-video stream to each client subscribing to it.)
@@ -189,12 +189,12 @@ class OpenTok(object):
 
                * The OpenTok Media Router supports the archiving feature, which lets
                  you record, save, and retrieve OpenTok sessions (see http://tokbox.com/platform/archiving).
-            
+
              With the mediaMode property set to MediaMode.RELAYED, the session
-             will attempt to transmit streams directly between clients. If clients cannot connect 
+             will attempt to transmit streams directly between clients. If clients cannot connect
              due to firewall restrictions, the session uses the OpenTok TURN server to relay
              audio-video streams.
-             
+
              You will be billed for streamed minutes if you use the OpenTok Media Router or if the
              session uses the OpenTok TURN server to relay streams. For information on pricing, see
              the OpenTok pricing page (http://www.tokbox.com/pricing).
