@@ -124,7 +124,7 @@ from the session being archived.</p>
 
 <dl class="class">
 <dt id="opentok.archives.ArchiveList">
-<em class="property">class </em><tt class="descclassname">opentok.archives.</tt><tt class="descname">ArchiveList</tt><big>(</big><em>values</em><big>)</big><a class="headerlink" href="#opentok.archives.ArchiveList" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">opentok.archives.</tt><tt class="descname">ArchiveList</tt><big>(</big><em>sdk</em>, <em>values</em><big>)</big><a class="headerlink" href="#opentok.archives.ArchiveList" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <dl class="method">
 <dt id="opentok.archives.ArchiveList.attrs">
@@ -254,15 +254,19 @@ Check the error message for details.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>mediaMode</strong> (<em>String</em>) &#8211; <p>Determines whether the session will transmit streams using the
-OpenTok Media Router (MediaMode.ROUTED) or not (MediaMode.RELAYED). By default,
-sessions use the OpenTok Media Router.</p>
+OpenTok Media Router (MediaMode.routed) or not (MediaMode.relayed). By default,
+the setting is MediaMode.relayed.</p>
+<p>With the mediaMode property set to MediaMode.relayed, the session
+will attempt to transmit streams directly between clients. If clients cannot connect 
+due to firewall restrictions, the session uses the OpenTok TURN server to relay
+audio-video streams.</p>
 <p>The OpenTok Media Router (see <a class="reference external" href="http://www.tokbox.com/#multiparty">http://www.tokbox.com/#multiparty</a>)
 provides the following benefits:</p>
 <blockquote>
 <div><ul>
 <li><dl class="first docutils">
 <dt>The OpenTok Media Router can decrease bandwidth usage in multiparty sessions.</dt>
-<dd>(When the mediaMode property is set to  MediaMode.RELAYED, each client must send
+<dd>(When the mediaMode property is set to  MediaMode.relayed, each client must send
 a separate audio-video stream to each client subscribing to it.)</dd>
 </dl>
 </li>
@@ -276,10 +280,6 @@ If the client&#8217;s connectivity improves, the video returns.</li>
 you record, save, and retrieve OpenTok sessions (see <a class="reference external" href="http://tokbox.com/platform/archiving">http://tokbox.com/platform/archiving</a>).</li>
 </ul>
 </div></blockquote>
-<p>With the mediaMode property set to MediaMode.RELAYED, the session
-will attempt to transmit streams directly between clients. If clients cannot connect 
-due to firewall restrictions, the session uses the OpenTok TURN server to relay
-audio-video streams.</p>
 <p>You will be billed for streamed minutes if you use the OpenTok Media Router or if the
 session uses the OpenTok TURN server to relay streams. For information on pricing, see
 the OpenTok pricing page (<a class="reference external" href="http://www.tokbox.com/pricing">http://www.tokbox.com/pricing</a>).</p>

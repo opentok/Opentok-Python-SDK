@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-from opentok import OpenTok
+from opentok import OpenTok, MediaModes
 from email.utils import formatdate
 import os, time
 
@@ -11,7 +11,7 @@ except Exception:
 
 app = Flask(__name__)
 opentok = OpenTok(api_key, api_secret)
-session = opentok.create_session()
+session = opentok.create_session(media_mode=MediaModes.routed)
 
 @app.template_filter('datefmt')
 def datefmt(dt):

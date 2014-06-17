@@ -2,20 +2,19 @@
 OpenTok Python SDK
 ==================
 
-.. image:: https://travis-ci.org/aoberoi/Opentok-Python-SDK.svg?branch=modernization
-   :target: https://travis-ci.org/aoberoi/Opentok-Python-SDK
+.. image:: https://travis-ci.org/opentok/Opentok-Python-SDK.svg
+   :target: https://travis-ci.org/opentok/Opentok-Python-SDK
 
 The OpenTok Python SDK lets you generate
 `sessions <http://tokbox.com/opentok/tutorials/create-session/>`_ and
 `tokens <http://tokbox.com/opentok/tutorials/create-token/>`_ for `OpenTok <http://www.tokbox.com/>`_
-applications. This version of the SDK also includes support for working with OpenTok 2.0 archives.
+applications, and `archive <http://www.tokbox.com/platform/archiving>`_ Opentok 2.0 sessions.
 
+If you are updating from a previous version of this SDK, see
+`Important changes in v2.2 <#important-changes-in-v22>`_.
 
-Installation
-------------
-
-Pip (recommended):
-~~~~~~~~~~~~~~~~~~
+Installation using Pip (recommended):
+-------------------------------------
 
 Pip helps manage dependencies for Python projects using the PyPI index. Find more info here:
 http://www.pip-installer.org/en/latest/
@@ -23,17 +22,11 @@ http://www.pip-installer.org/en/latest/
 Add the ``opentok`` package as a dependency in your project. The most common way is to add it to your
 ``requirements.txt`` file::
 
-  opentok>=2.2
+  opentok>=2.2.0
 
 Next, install the dependencies::
 
   $ pip install -r requirements.txt
-
-Manually:
-~~~~~~~~~
-
-Download the latest package zip from the `Releases page
-<https://github.com/opentok/Opentok-Python-SDK/releases>`_
 
 
 Usage
@@ -56,15 +49,17 @@ Creating Sessions
 
 The create an OpenTok Session, use the ``opentok.create_session()`` method. There are two optional
 keyword parameters for this method: ``location`` which can be set to a string containing an IP
-address, and ``p2p`` which is a boolean. This method returns a ``Session`` object. Its
-``session_id`` attribute is useful when saving to a persistent store (e.g. database).
+address, and ``media_mode`` which is a String (defined by the MediaModes class). This method returns
+a ``Session`` object. Its ``session_id`` attribute is useful when saving to a persistent store (such
+as a database).
 
 .. code:: python
 
-  # Just a plain Session
+  # Just a plain Session:
   session = opentok.create_session()
-  # A p2p Session
-  session = opentok.create_session(p2p=True)
+  # A Session that attempts to send streams directly between clients (falling back
+  # to use the OpenTok TURN server to relay streams if the clients cannot connect):
+  session = opentok.create_session(media_mode=MediaModes.relayed)
   # A Session with a location hint
   session = opentok.create_session(location=u'12.34.56.78')
 
@@ -154,10 +149,19 @@ instance of the ``ArchiveList`` class.
   # Get the total number of Archives for this API Key
   total = archive_list.total
 
+Samples
+-------
+
+There are two sample applications included in this repository. To get going as fast as possible, clone the whole
+repository and follow the Walkthroughs:
+
+- `HelloWorld <sample/HelloWorld/README.md>`_
+- `Archiving <sample/Archiving/README.md>`_
+
 Documentation
 -------------
 
-Reference documentation is available at <http://www.tokbox.com//opentok/libraries/server/python/reference/index.html> and in the
+Reference documentation is available at <http://www.tokbox.com/opentok/libraries/server/python/reference/index.html> and in the
 docs directory of the SDK.
 
 Requirements
@@ -173,19 +177,22 @@ Release Notes
 See the `Releases <https://github.com/opentok/Opentok-Python-SDK/releases>`_ page for details about
 each release.
 
-Important changes in v2.0
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Important changes in v2.2
+-------------------------
 
 This version of the SDK includes support for working with OpenTok 2.0 archives. (This API does not
 work with OpenTok 1.0 archives.)
 
+The OpenTok.create_session() method now includes a media_mode parameter, instead of a p2p parameter.
+
+For details, see the reference documentation at
+<http://www.tokbox.com/opentok/libraries/server/python/reference/index.html>.
+
 Development and Contributing
 ----------------------------
 
-Interested in contributing? We <3 pull requests! File a new
-`Issue <https://github.com/opentok/opentok-python-sdk/issues>`_ or take a look at the existing ones.
-If you are going to send us a pull request, please try to run the test suite first and also include
-tests for your changes.
+Interested in contributing? We :heart: pull requests! See the `Development <DEVELOPING.md>`_ and
+`Contribution <CONTRIBUTING.md>`_ guidelines.
 
 Support
 -------
