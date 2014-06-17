@@ -55,12 +55,12 @@ as a database).
 
 .. code:: python
 
-  # Just a plain Session:
-  session = opentok.create_session()
-  # A Session that attempts to send streams directly between clients (falling back
+  # Create a session that attempts to send streams directly between clients (falling back
   # to use the OpenTok TURN server to relay streams if the clients cannot connect):
+  session = opentok.create_session()
+  # A session that uses the OpenTok Media Router:
   session = opentok.create_session(media_mode=MediaModes.relayed)
-  # A Session with a location hint
+  # A session with a location hint
   session = opentok.create_session(location=u'12.34.56.78')
 
   # Store this session ID in the database
