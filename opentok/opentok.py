@@ -170,11 +170,13 @@ class OpenTok(object):
         (see https://dashboard.tokbox.com/projects).
 
         :param String mediaMode: Determines whether the session will transmit streams using the
-             OpenTok Media Router (MediaMode.ROUTED) or not (MediaMode.RELAYED). By default,
-             sessions use the OpenTok Media Router.
+             OpenTok Media Router (MediaMode.routed) or not (MediaMode.relayed). By default,
+             the setting is MediaMode.relayed.
 
-             The OpenTok Media Router (see http://www.tokbox.com/#multiparty)
-             provides the following benefits:
+             With the mediaMode property set to MediaMode.relayed, the session
+             will attempt to transmit streams directly between clients. If clients cannot connect
+             due to firewall restrictions, the session uses the OpenTok TURN server to relay
+             audio-video streams.
 
                * The OpenTok Media Router can decrease bandwidth usage in multiparty sessions.
                    (When the mediaMode property is set to  MediaMode.RELAYED, each client must send
