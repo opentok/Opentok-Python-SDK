@@ -10,8 +10,7 @@ The OpenTok Python SDK lets you generate
 `tokens <http://tokbox.com/opentok/tutorials/create-token/>`_ for `OpenTok <http://www.tokbox.com/>`_
 applications, and `archive <http://www.tokbox.com/platform/archiving>`_ Opentok 2.0 sessions.
 
-If you are updating from a previous version of this SDK, see
-`Important changes since v2.2.0`_.
+If you are updating from a previous version of this SDK, see "Important changes since v2.2.0" below.
 
 Installation using Pip (recommended):
 -------------------------------------
