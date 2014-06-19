@@ -11,7 +11,7 @@ The OpenTok Python SDK lets you generate
 applications, and `archive <http://www.tokbox.com/platform/archiving>`_ Opentok 2.0 sessions.
 
 If you are updating from a previous version of this SDK, see
-`Important changes in v2.2 <#important-changes-in-v22>`_.
+`Important changes since v2.2.0 <#important-changes-since-v220>`_.
 
 Installation using Pip (recommended):
 -------------------------------------
@@ -177,18 +177,23 @@ Release Notes
 See the `Releases <https://github.com/opentok/Opentok-Python-SDK/releases>`_ page for details about
 each release.
 
-Important changes in v2.2
--------------------------
+Important changes since v2.2
+----------------------------
 
-This version of the SDK includes support for working with OpenTok 2.0 archives. (This API does not
-work with OpenTok 1.0 archives.)
+**Changes in v2.2.1:**
 
-The OpenTok.create_session() method now includes a media_mode parameter, instead of a p2p parameter.
 The default setting for the create_session() method is to create a session with the media mode set
 to relayed. In previous versions of the SDK, the default setting was to use the OpenTok Media Router
 (media mode set to routed). In a relayed session, clients will attempt to send streams directly
 between each other (peer-to-peer); if clients cannot connect due to firewall restrictions, the
 session uses the OpenTok TURN server to relay audio-video streams.
+
+**Changes in v2.2.0:**
+
+This version of the SDK includes support for working with OpenTok 2.0 archives. (This API does not
+work with OpenTok 1.0 archives.)
+
+The OpenTok.create_session() method now includes a media_mode parameter, instead of a p2p parameter.
 
 For details, see the reference documentation at
 <http://www.tokbox.com/opentok/libraries/server/python/reference/index.html>.
