@@ -75,11 +75,13 @@ to &#8220;system failure&#8221;.</li>
 <li><strong>status</strong> &#8211; <p>The status of the archive, which can be one of the following:</p>
 <ul>
 <li>&#8220;available&#8221; &#8211; The archive is available for download from the OpenTok cloud.</li>
+<li>&#8220;expired&#8221; &#8211; The archive is no longer available for download from the OpenTok cloud.</li>
 <li>&#8220;failed&#8221; &#8211; The archive recording failed.</li>
 <li>&#8220;started&#8221; &#8211; The archive started and is in the process of being recorded.</li>
 <li>&#8220;stopped&#8221; &#8211; The archive stopped recording.</li>
 <li>&#8220;uploaded&#8221; &#8211; The archive is available for download from the the upload target
-S3 bucket.</li>
+Amazon S3 bucket or Windows Azure container that you set at the
+<a class="reference external" href="https://dashboard.tokbox.com">OpenTok dashboard</a>.</li>
 </ul>
 </li>
 <li><strong>url</strong> &#8211; The download URL of the available MP4 file. This is only set for an archive with the status set to
@@ -235,7 +237,7 @@ of the Opentok API.</p>
 
 <dl class="method">
 <dt id="opentok.opentok.OpenTok.create_session">
-<tt class="descname">create_session</tt><big>(</big><em>location=None</em>, <em>media_mode=u'disabled'</em><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.create_session" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">create_session</tt><big>(</big><em>location=None</em>, <em>media_mode=u'enabled'</em><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.create_session" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new OpenTok session and returns the session ID, which uniquely identifies
 the session.</p>
 <p>For example, when using the OpenTok JavaScript library, use the session ID when calling the
@@ -414,7 +416,8 @@ number of archives returned is 1000.</li>
 <p>Clients must be actively connected to the OpenTok session for you to successfully start
 recording an archive.</p>
 <p>You can only record one archive at a time for a given session. You can only record archives
-of OpenTok server-enabled sessions; you cannot archive peer-to-peer sessions.</p>
+of sessions that use the OpenTok Media Router (sessions witht the media mode set to routed);
+you cannot archive sessions witht the media mode set to relayed.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />

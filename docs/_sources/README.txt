@@ -10,8 +10,7 @@ The OpenTok Python SDK lets you generate
 `tokens <http://tokbox.com/opentok/tutorials/create-token/>`_ for `OpenTok <http://www.tokbox.com/>`_
 applications, and `archive <http://www.tokbox.com/platform/archiving>`_ Opentok 2.0 sessions.
 
-If you are updating from a previous version of this SDK, see
-`Important changes in v2.2 <#important-changes-in-v22>`_.
+If you are updating from a previous version of this SDK, see "Important changes since v2.2.0" below.
 
 Installation using Pip (recommended):
 -------------------------------------
@@ -22,7 +21,7 @@ http://www.pip-installer.org/en/latest/
 Add the ``opentok`` package as a dependency in your project. The most common way is to add it to your
 ``requirements.txt`` file::
 
-  opentok>=2.2.0
+  opentok>=2.2.1
 
 Next, install the dependencies::
 
@@ -55,12 +54,12 @@ as a database).
 
 .. code:: python
 
-  # Just a plain Session:
-  session = opentok.create_session()
-  # A Session that attempts to send streams directly between clients (falling back
+  # Create a session that attempts to send streams directly between clients (falling back
   # to use the OpenTok TURN server to relay streams if the clients cannot connect):
-  session = opentok.create_session(media_mode=MediaModes.relayed)
-  # A Session with a location hint
+  session = opentok.create_session()
+  # A session that uses the OpenTok Media Router:
+  session = opentok.create_session(media_mode=MediaModes.routed)
+  # A session with a location hint
   session = opentok.create_session(location=u'12.34.56.78')
 
   # Store this session ID in the database
@@ -177,8 +176,18 @@ Release Notes
 See the `Releases <https://github.com/opentok/Opentok-Python-SDK/releases>`_ page for details about
 each release.
 
-Important changes in v2.2
--------------------------
+Important changes since v2.2
+----------------------------
+
+**Changes in v2.2.1:**
+
+The default setting for the create_session() method is to create a session with the media mode set
+to relayed. In previous versions of the SDK, the default setting was to use the OpenTok Media Router
+(media mode set to routed). In a relayed session, clients will attempt to send streams directly
+between each other (peer-to-peer); if clients cannot connect due to firewall restrictions, the
+session uses the OpenTok TURN server to relay audio-video streams.
+
+**Changes in v2.2.0:**
 
 This version of the SDK includes support for working with OpenTok 2.0 archives. (This API does not
 work with OpenTok 1.0 archives.)
