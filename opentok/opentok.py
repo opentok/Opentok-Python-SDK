@@ -275,7 +275,8 @@ class OpenTok(object):
         recording an archive.
 
         You can only record one archive at a time for a given session. You can only record archives
-        of OpenTok server-enabled sessions; you cannot archive peer-to-peer sessions.
+        of sessions that use the OpenTok Media Router (sessions witht the media mode set to routed);
+        you cannot archive sessions witht the media mode set to relayed.
 
         :param String session_id: The session ID of the OpenTok session to archive.
         :param String name: This is the name of the archive. You can use this name
