@@ -93,4 +93,3 @@ class OpenTokArchiveTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
         # TODO: test that the object is invalidated
-
