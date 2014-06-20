@@ -460,3 +460,53 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(archive_list).to.have.property(u('count')).being.equal(6)
         expect(list(archive_list.items)).to.have.length_of(4)
         # TODO: we could inspect each item in the list
+
+    @httpretty.activate
+    def test_find_expired_archive(self):
+        archive_id = u('f6e7ee58-d6cf-4a59-896b-6d56b158ec71')
+        httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/partner/{0}/archive/{1}').format(self.api_key, archive_id),
+                               body=textwrap.dedent(u("""\
+                                       {
+                                          "createdAt" : 1395187836000,
+                                          "duration" : 62,
+                                          "id" : "f6e7ee58-d6cf-4a59-896b-6d56b158ec71",
+                                          "name" : "",
+                                          "partnerId" : 123456,
+                                          "reason" : "",
+                                          "sessionId" : "SESSIONID",
+                                          "size" : 8347554,
+                                          "status" : "expired",
+                                          "url" : null
+                                        }""")),
+                               status=200,
+                               content_type=u('application/json'))
+
+        archive = self.opentok.get_archive(archive_id)
+
+        expect(archive).to.be.an(Archive)
+        expect(archive).to.have.property(u('status')).being.equal(u('expired'))
+
+    @httpretty.activate
+    def test_find_archive_with_unknown_properties(self):
+        archive_id = u('f6e7ee58-d6cf-4a59-896b-6d56b158ec71')
+        httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/partner/{0}/archive/{1}').format(self.api_key, archive_id),
+                               body=textwrap.dedent(u("""\
+                                       {
+                                          "createdAt" : 1395187836000,
+                                          "duration" : 62,
+                                          "id" : "f6e7ee58-d6cf-4a59-896b-6d56b158ec71",
+                                          "name" : "",
+                                          "partnerId" : 123456,
+                                          "reason" : "",
+                                          "sessionId" : "SESSIONID",
+                                          "size" : 8347554,
+                                          "status" : "expired",
+                                          "url" : null,
+                                          "notarealproperty" : "not a real value"
+                                        }""")),
+                               status=200,
+                               content_type=u('application/json'))
+
+        archive = self.opentok.get_archive(archive_id)
+
+        expect(archive).to.be.an(Archive)
