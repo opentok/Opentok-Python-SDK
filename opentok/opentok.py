@@ -194,10 +194,6 @@ class OpenTok(object):
 
                * The OpenTok Media Router supports the archiving feature, which lets
                  you record, save, and retrieve OpenTok sessions (see http://tokbox.com/platform/archiving).
-            
-             You will be billed for streamed minutes if you use the OpenTok Media Router or if the
-             session uses the OpenTok TURN server to relay streams. For information on pricing, see
-             the OpenTok pricing page (http://www.tokbox.com/pricing).
 
         :param String location: An IP address that the OpenTok servers will use to
             situate the session in its global network. If you do not set a location hint,
