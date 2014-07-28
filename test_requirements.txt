@@ -2,3 +2,4 @@ nose
 httpretty
 sure
 wheel
+mock

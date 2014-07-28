@@ -7,18 +7,29 @@ import textwrap
 import json
 import datetime
 import pytz
+import os
 
 from opentok import OpenTok, Archive, ArchiveList, __version__
 
 class OpenTokArchiveApiTest(unittest.TestCase):
     def setUp(self):
-        self.api_key = u('123456')
-        self.api_secret = u('1234567890abcdef1234567890abcdef1234567890')
-        self.session_id = u('SESSIONID')
-        self.opentok = OpenTok(self.api_key, self.api_secret)
+        self.api_key = os.environ.get('API_KEY') or u('123456')
+        self.api_secret = (os.environ.get('API_SECRET') or
+            u('1234567890abcdef1234567890abcdef1234567890'))
+        self.api_url = os.environ.get('API_URL')
+        # self.mock = not (os.environ.get('API_MOCK') == 'FALSE')
 
-    @httpretty.activate
+        self.opentok = OpenTok(self.api_key, self.api_secret)
+        self.session_id = u('SESSIONID')
+
+    def httpretty_enable(self):
+        httpretty.enable()
+
+    def httpretty_disable(self):
+        httpretty.disable()
+
     def test_start_archive(self):
+        self.httpretty_enable()
         httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/partner/{0}/archive').format(self.api_key),
                                body=textwrap.dedent(u("""\
                                        {
@@ -48,6 +59,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
             body = json.loads(httpretty.last_request().body.decode('utf-8'))
         expect(body).to.have.key(u('name')).being.equal(None)
         expect(body).to.have.key(u('sessionId')).being.equal(u('SESSIONID'))
+
         expect(archive).to.be.an(Archive)
         expect(archive).to.have.property(u('id')).being.equal(u('30b3ebf1-ba36-4f5b-8def-6f70d9986fe9'))
         expect(archive).to.have.property(u('name')).being.equal(u(''))
@@ -62,9 +74,10 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(archive).to.have.property(u('size')).being.equal(0)
         expect(archive).to.have.property(u('duration')).being.equal(0)
         expect(archive).to.have.property(u('url')).being.equal(None)
+        self.httpretty_disable()
 
-    @httpretty.activate
     def test_start_archive_with_name(self):
+        self.httpretty_enable()
         httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/partner/{0}/archive').format(self.api_key),
                                body=textwrap.dedent(u("""\
                                        {
@@ -108,9 +121,63 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(archive).to.have.property(u('size')).being.equal(0)
         expect(archive).to.have.property(u('duration')).being.equal(0)
         expect(archive).to.have.property(u('url')).being.equal(None)
+        self.httpretty_disable()
 
-    @httpretty.activate
-    def test_stop_archive(self):
+    def test_stop_archive_1(self):
+        self.httpretty_enable()
+        archive_id = u('ARCHIVEID')
+        archive = Archive(self.opentok, {
+            u('createdAt'): 1395183243556,
+            u('duration'): 0,
+            u('id'): archive_id,
+            u('name'): u(''),
+            u('partnerId'): 123456,
+            u('reason'): u(''),
+            u('sessionId'): u('SESSIONID'),
+            u('size'): 0,
+            u('status'): u('started'),
+            u('url'): None,
+        })
+        httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/partner/{0}/archive/{1}/stop').format(self.api_key, archive_id),
+                               body=textwrap.dedent(u("""\
+                                       {
+                                          "createdAt" : 1395183243556,
+                                          "duration" : 0,
+                                          "id" : "ARCHIVEID",
+                                          "name" : "",
+                                          "partnerId" : 123456,
+                                          "reason" : "",
+                                          "sessionId" : "SESSIONID",
+                                          "size" : 0,
+                                          "status" : "stopped",
+                                          "url" : null
+                                        }""")),
+                               status=200,
+                               content_type=u('application/json'))
+
+        archive.stop()
+
+        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
+        expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
+        expect(archive).to.be.an(Archive)
+        expect(archive).to.have.property(u('id')).being.equal(archive_id)
+        expect(archive).to.have.property(u('name')).being.equal(u(''))
+        expect(archive).to.have.property(u('status')).being.equal(u('stopped'))
+        expect(archive).to.have.property(u('session_id')).being.equal(u('SESSIONID'))
+        expect(archive).to.have.property(u('partner_id')).being.equal(123456)
+        if PY2:
+            created_at = datetime.datetime.fromtimestamp(1395183243, pytz.UTC)
+        if PY3:
+            created_at = datetime.datetime.fromtimestamp(1395183243, datetime.timezone.utc)
+        expect(archive).to.have.property(u('created_at')).being.equal(created_at)
+        expect(archive).to.have.property(u('size')).being.equal(0)
+        expect(archive).to.have.property(u('duration')).being.equal(0)
+        expect(archive).to.have.property(u('url')).being.equal(None)
+        self.httpretty_disable()
+
+    def test_stop_archive_2(self):
+        self.httpretty_enable()
         archive_id = u('30b3ebf1-ba36-4f5b-8def-6f70d9986fe9')
         httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/partner/{0}/archive/{1}/stop').format(self.api_key, archive_id),
                                body=textwrap.dedent(u("""\
@@ -148,9 +215,38 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(archive).to.have.property(u('size')).being.equal(0)
         expect(archive).to.have.property(u('duration')).being.equal(0)
         expect(archive).to.have.property(u('url')).being.equal(None)
+        self.httpretty_disable()
 
-    @httpretty.activate
-    def test_delete_archive(self):
+
+    def test_delete_archive_1(self):
+        self.httpretty_enable()
+        archive_id = u('ARCHIVEID')
+        archive = Archive(self.opentok, {
+            u('createdAt'): 1395183243556,
+            u('duration'): 0,
+            u('id'): archive_id,
+            u('name'): u(''),
+            u('partnerId'): 123456,
+            u('reason'): u(''),
+            u('sessionId'): u('SESSIONID'),
+            u('size'): 0,
+            u('status'): u('available'),
+            u('url'): None,
+        })
+        httpretty.register_uri(httpretty.DELETE, u('https://api.opentok.com/v2/partner/{0}/archive/{1}').format(self.api_key, archive_id),
+                               body=u(''),
+                               status=204)
+
+        archive.delete()
+
+        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
+        expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
+        self.httpretty_disable()
+        # TODO: test that the object is invalidated
+
+    def test_delete_archive_2(self):
+        self.httpretty_enable()
         archive_id = u('30b3ebf1-ba36-4f5b-8def-6f70d9986fe9')
         httpretty.register_uri(httpretty.DELETE, u('https://api.opentok.com/v2/partner/{0}/archive/{1}').format(self.api_key, archive_id),
                                body=u(''),
@@ -161,9 +257,10 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
+        self.httpretty_disable()
 
-    @httpretty.activate
     def test_find_archive(self):
+        self.httpretty_enable()
         archive_id = u('f6e7ee58-d6cf-4a59-896b-6d56b158ec71')
         httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/partner/{0}/archive/{1}').format(self.api_key, archive_id),
                                body=textwrap.dedent(u("""\
@@ -201,9 +298,10 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(archive).to.have.property(u('size')).being.equal(8347554)
         expect(archive).to.have.property(u('duration')).being.equal(62)
         expect(archive).to.have.property(u('url')).being.equal(u('http://tokbox.com.archive2.s3.amazonaws.com/123456%2Ff6e7ee58-d6cf-4a59-896b-6d56b158ec71%2Farchive.mp4?Expires=1395194362&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'))
+        self.httpretty_disable()
 
-    @httpretty.activate
     def test_find_archives(self):
+        self.httpretty_enable()
         httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/partner/{0}/archive').format(self.api_key),
                                body=textwrap.dedent(u("""\
                                        {
@@ -287,10 +385,11 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(archive_list).to.be.an(ArchiveList)
         expect(archive_list).to.have.property(u('count')).being.equal(6)
         expect(list(archive_list.items)).to.have.length_of(6)
+        self.httpretty_disable()
         # TODO: we could inspect each item in the list
 
-    @httpretty.activate
     def test_find_archives_with_offset(self):
+        self.httpretty_enable()
         httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/partner/{0}/archive').format(self.api_key),
                                body=textwrap.dedent(u("""\
                                        {
@@ -344,10 +443,11 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(archive_list).to.be.an(ArchiveList)
         expect(archive_list).to.have.property(u('count')).being.equal(6)
         expect(list(archive_list.items)).to.have.length_of(3)
+        self.httpretty_disable()
         # TODO: we could inspect each item in the list
 
-    @httpretty.activate
     def test_find_archives_with_count(self):
+        self.httpretty_enable()
         httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/partner/{0}/archive').format(self.api_key),
                                body=textwrap.dedent(u("""\
                                        {
@@ -390,10 +490,11 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(archive_list).to.be.an(ArchiveList)
         expect(archive_list).to.have.property(u('count')).being.equal(6)
         expect(list(archive_list.items)).to.have.length_of(2)
+        self.httpretty_disable()
         # TODO: we could inspect each item in the list
 
-    @httpretty.activate
     def test_find_archives_with_offset_and_count(self):
+        self.httpretty_enable()
         httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/partner/{0}/archive').format(self.api_key),
                                body=textwrap.dedent(u("""\
                                        {
@@ -459,10 +560,11 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(archive_list).to.be.an(ArchiveList)
         expect(archive_list).to.have.property(u('count')).being.equal(6)
         expect(list(archive_list.items)).to.have.length_of(4)
+        self.httpretty_disable()
         # TODO: we could inspect each item in the list
 
-    @httpretty.activate
     def test_find_expired_archive(self):
+        self.httpretty_enable()
         archive_id = u('f6e7ee58-d6cf-4a59-896b-6d56b158ec71')
         httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/partner/{0}/archive/{1}').format(self.api_key, archive_id),
                                body=textwrap.dedent(u("""\
@@ -486,8 +588,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(archive).to.be.an(Archive)
         expect(archive).to.have.property(u('status')).being.equal(u('expired'))
 
-    @httpretty.activate
     def test_find_archive_with_unknown_properties(self):
+        self.httpretty_enable()
         archive_id = u('f6e7ee58-d6cf-4a59-896b-6d56b158ec71')
         httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/partner/{0}/archive/{1}').format(self.api_key, archive_id),
                                body=textwrap.dedent(u("""\
@@ -510,3 +612,4 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         archive = self.opentok.get_archive(archive_id)
 
         expect(archive).to.be.an(Archive)
+        self.httpretty_disable()
