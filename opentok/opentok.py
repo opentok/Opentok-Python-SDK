@@ -103,7 +103,7 @@ class OpenTok(object):
         # validations
         if not text_type(session_id):
             raise OpenTokException(u('Cannot generate token, session_id was not valid {0}').format(session_id))
-        if not role in [u'moderator', u'publisher', u'subscriber']:
+        if not role in [u('moderator'), u('publisher'), u('subscriber')]:
             raise OpenTokException(u('Cannot generate token, {0} is not a valid role').format(role))
         now = int(time.time())
         if expire_time < now:
@@ -204,9 +204,9 @@ class OpenTok(object):
 
         # build options
         options = {}
-        if not isinstance(media_mode, MediaModes):
-            raise OpenTokException(u('Cannot create session, {0} is not a valid media mode').format(role))
-        options[u('p2p.preference')] = media_mode.value
+        if media_mode not in [u('disabled'), u('enabled')]:
+            raise OpenTokException(u('Cannot create session, {0} is not a valid media mode').format(media_mode))
+        options[u('p2p.preference')] = media_mode
         if location:
             # validate IP address
             try:
