@@ -40,7 +40,7 @@ class OpenTokArchiveTest(unittest.TestCase):
                                    status=404,
                                    content_type=u('application/json'))
         expect(self.opentok.start_archive).when.called_with(self.session_id).to.throw(OpenTokException)
-        expect(self.opentok.start_archive).when.called_with(self.session_id).to.throw('Session not found')
+        expect(self.opentok.start_archive).when.called_with(self.session_id).to.throw('Session ID is invalid')
         self.httpretty_disable()
 
     def test_stop_archive(self):
