@@ -31,6 +31,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                           "sessionId" : "SESSIONID",
                                           "size" : 0,
                                           "status" : "started",
+                                          "hasAudio": true,
+                                          "hasVideo": true,
                                           "url" : null
                                         }""")),
                                status=200,
@@ -61,6 +63,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(archive).to.have.property(u('created_at')).being.equal(created_at)
         expect(archive).to.have.property(u('size')).being.equal(0)
         expect(archive).to.have.property(u('duration')).being.equal(0)
+        expect(archive).to.have.property(u('hasAudio')).being.equal(True)
+        expect(archive).to.have.property(u('hasVideo')).being.equal(True)
         expect(archive).to.have.property(u('url')).being.equal(None)
 
     @httpretty.activate
@@ -77,6 +81,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                           "sessionId" : "SESSIONID",
                                           "size" : 0,
                                           "status" : "started",
+                                          "hasAudio": true,
+                                          "hasVideo": true,
                                           "url" : null
                                         }""")),
                                status=200,
@@ -110,6 +116,56 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(archive).to.have.property(u('url')).being.equal(None)
 
     @httpretty.activate
+    def test_start_voice_archive(self):
+        httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/partner/{0}/archive').format(self.api_key),
+                               body=textwrap.dedent(u("""\
+                                       {
+                                          "createdAt" : 1395183243556,
+                                          "duration" : 0,
+                                          "id" : "30b3ebf1-ba36-4f5b-8def-6f70d9986fe9",
+                                          "name" : "ARCHIVE NAME",
+                                          "partnerId" : 123456,
+                                          "reason" : "",
+                                          "sessionId" : "SESSIONID",
+                                          "size" : 0,
+                                          "status" : "started",
+                                          "hasAudio": true,
+                                          "hasVideo": false,
+                                          "url" : null
+                                        }""")),
+                               status=200,
+                               content_type=u('application/json'))
+
+        archive = self.opentok.start_archive(self.session_id, name=u('ARCHIVE NAME'), hasVideo=False)
+
+        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
+        expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
+        # non-deterministic json encoding. have to decode to test it properly
+        if PY2:
+            body = json.loads(httpretty.last_request().body)
+        if PY3:
+            body = json.loads(httpretty.last_request().body.decode('utf-8'))
+        expect(body).to.have.key(u('sessionId')).being.equal(u('SESSIONID'))
+        expect(body).to.have.key(u('name')).being.equal(u('ARCHIVE NAME'))
+        expect(archive).to.be.an(Archive)
+        expect(archive).to.have.property(u('id')).being.equal(u('30b3ebf1-ba36-4f5b-8def-6f70d9986fe9'))
+        expect(archive).to.have.property(u('name')).being.equal(u('ARCHIVE NAME'))
+        expect(archive).to.have.property(u('status')).being.equal(u('started'))
+        expect(archive).to.have.property(u('session_id')).being.equal(u('SESSIONID'))
+        expect(archive).to.have.property(u('partner_id')).being.equal(123456)
+        if PY2:
+            created_at = datetime.datetime.fromtimestamp(1395183243, pytz.UTC)
+        if PY3:
+            created_at = datetime.datetime.fromtimestamp(1395183243, datetime.timezone.utc)
+        expect(archive).to.have.property(u('created_at')).being.equal(created_at)
+        expect(archive).to.have.property(u('size')).being.equal(0)
+        expect(archive).to.have.property(u('duration')).being.equal(0)
+        expect(archive).to.have.property(u('hasAudio')).being.equal(True)
+        expect(archive).to.have.property(u('hasVideo')).being.equal(False)
+        expect(archive).to.have.property(u('url')).being.equal(None)
+
+    @httpretty.activate
     def test_stop_archive(self):
         archive_id = u('30b3ebf1-ba36-4f5b-8def-6f70d9986fe9')
         httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/partner/{0}/archive/{1}/stop').format(self.api_key, archive_id),
@@ -124,6 +180,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                           "sessionId" : "SESSIONID",
                                           "size" : 0,
                                           "status" : "stopped",
+                                          "hasAudio": true,
+                                          "hasVideo": true,
                                           "url" : null
                                         }""")),
                                status=200,
@@ -177,6 +235,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                           "sessionId" : "SESSIONID",
                                           "size" : 8347554,
                                           "status" : "available",
+                                          "hasAudio": true,
+                                          "hasVideo": true,
                                           "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2Ff6e7ee58-d6cf-4a59-896b-6d56b158ec71%2Farchive.mp4?Expires=1395194362&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                                         }""")),
                                status=200,
@@ -218,6 +278,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                             "sessionId" : "SESSIONID",
                                             "size" : 2909274,
                                             "status" : "available",
+                                            "hasAudio": true,
+                                            "hasVideo": true,
                                             "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2Fef546c5a-4fd7-4e59-ab3d-f1cfb4148d1d%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                                           }, {
                                             "createdAt" : 1395187910000,
@@ -229,6 +291,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                             "sessionId" : "SESSIONID",
                                             "size" : 1952651,
                                             "status" : "available",
+                                            "hasAudio": true,
+                                            "hasVideo": true,
                                             "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2F5350f06f-0166-402e-bc27-09ba54948512%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                                           }, {
                                             "createdAt" : 1395187836000,
@@ -240,6 +304,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                             "sessionId" : "SESSIONID",
                                             "size" : 8347554,
                                             "status" : "available",
+                                            "hasAudio": true,
+                                            "hasVideo": true,
                                             "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2Ff6e7ee58-d6cf-4a59-896b-6d56b158ec71%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                                           }, {
                                             "createdAt" : 1395183243000,
@@ -251,6 +317,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                             "sessionId" : "SESSIONID",
                                             "size" : 78499758,
                                             "status" : "available",
+                                            "hasAudio": true,
+                                            "hasVideo": true,
                                             "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2F30b3ebf1-ba36-4f5b-8def-6f70d9986fe9%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                                           }, {
                                             "createdAt" : 1394396753000,
@@ -262,6 +330,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                             "sessionId" : "SESSIONID",
                                             "size" : 2227849,
                                             "status" : "available",
+                                            "hasAudio": true,
+                                            "hasVideo": true,
                                             "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2Fb8f64de1-e218-4091-9544-4cbf369fc238%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                                           }, {
                                             "createdAt" : 1394321113000,
@@ -273,6 +343,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                             "sessionId" : "SESSIONID",
                                             "size" : 42165242,
                                             "status" : "available",
+                                            "hasAudio": true,
+                                            "hasVideo": true,
                                             "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2F832641bf-5dbf-41a1-ad94-fea213e59a92%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                                           } ]
                                         }""")),
@@ -305,6 +377,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                             "sessionId" : "SESSIONID",
                                             "size" : 78499758,
                                             "status" : "available",
+                                            "hasAudio": true,
+                                            "hasVideo": true,
                                             "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2F30b3ebf1-ba36-4f5b-8def-6f70d9986fe9%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                                           }, {
                                             "createdAt" : 1394396753000,
@@ -316,6 +390,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                             "sessionId" : "SESSIONID",
                                             "size" : 2227849,
                                             "status" : "available",
+                                            "hasAudio": true,
+                                            "hasVideo": true,
                                             "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2Fb8f64de1-e218-4091-9544-4cbf369fc238%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                                           }, {
                                             "createdAt" : 1394321113000,
@@ -327,6 +403,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                             "sessionId" : "SESSIONID",
                                             "size" : 42165242,
                                             "status" : "available",
+                                            "hasAudio": true,
+                                            "hasVideo": true,
                                             "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2F832641bf-5dbf-41a1-ad94-fea213e59a92%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                                           } ]
                                         }""")),
@@ -362,6 +440,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                             "sessionId" : "SESSIONID",
                                             "size" : 2909274,
                                             "status" : "available",
+                                            "hasAudio": true,
+                                            "hasVideo": true,
                                             "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2Fef546c5a-4fd7-4e59-ab3d-f1cfb4148d1d%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                                           }, {
                                             "createdAt" : 1395187910000,
@@ -373,6 +453,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                             "sessionId" : "SESSIONID",
                                             "size" : 1952651,
                                             "status" : "available",
+                                            "hasAudio": true,
+                                            "hasVideo": true,
                                             "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2F5350f06f-0166-402e-bc27-09ba54948512%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                                           } ]
                                         }""")),
@@ -408,6 +490,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                             "sessionId" : "SESSIONID",
                                             "size" : 8347554,
                                             "status" : "available",
+                                            "hasAudio": true,
+                                            "hasVideo": true,
                                             "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2Ff6e7ee58-d6cf-4a59-896b-6d56b158ec71%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                                           }, {
                                             "createdAt" : 1395183243000,
@@ -419,6 +503,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                             "sessionId" : "SESSIONID",
                                             "size" : 78499758,
                                             "status" : "available",
+                                            "hasAudio": true,
+                                            "hasVideo": true,
                                             "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2F30b3ebf1-ba36-4f5b-8def-6f70d9986fe9%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                                           }, {
                                             "createdAt" : 1394396753000,
@@ -430,6 +516,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                             "sessionId" : "SESSIONID",
                                             "size" : 2227849,
                                             "status" : "available",
+                                            "hasAudio": true,
+                                            "hasVideo": true,
                                             "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2Fb8f64de1-e218-4091-9544-4cbf369fc238%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                                           }, {
                                             "createdAt" : 1394321113000,
@@ -441,6 +529,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                             "sessionId" : "SESSIONID",
                                             "size" : 42165242,
                                             "status" : "available",
+                                            "hasAudio": true,
+                                            "hasVideo": true,
                                             "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2F832641bf-5dbf-41a1-ad94-fea213e59a92%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                                           } ]
                                         }""")),
@@ -476,6 +566,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                           "sessionId" : "SESSIONID",
                                           "size" : 8347554,
                                           "status" : "expired",
+                                          "hasAudio": true,
+                                          "hasVideo": true,
                                           "url" : null
                                         }""")),
                                status=200,
@@ -502,6 +594,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                           "size" : 8347554,
                                           "status" : "expired",
                                           "url" : null,
+                                          "hasAudio": true,
+                                          "hasVideo": true,
                                           "notarealproperty" : "not a real value"
                                         }""")),
                                status=200,

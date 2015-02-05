@@ -29,6 +29,8 @@ class OpenTokArchiveTest(unittest.TestCase):
             u('sessionId'): u('SESSIONID'),
             u('size'): 0,
             u('status'): u('started'),
+            u('hasAudio'): True,
+            u('hasVideo'): True,
             u('url'): None,
         })
         httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/partner/{0}/archive/{1}/stop').format(self.api_key, archive_id),
@@ -43,6 +45,8 @@ class OpenTokArchiveTest(unittest.TestCase):
                                           "sessionId" : "SESSIONID",
                                           "size" : 0,
                                           "status" : "stopped",
+                                          "hasAudio": true,
+                                          "hasVideo": false,
                                           "url" : null
                                         }""")),
                                status=200,
@@ -66,6 +70,8 @@ class OpenTokArchiveTest(unittest.TestCase):
         expect(archive).to.have.property(u('created_at')).being.equal(created_at)
         expect(archive).to.have.property(u('size')).being.equal(0)
         expect(archive).to.have.property(u('duration')).being.equal(0)
+        expect(archive).to.have.property(u('hasAudio')).being.equal(True)
+        expect(archive).to.have.property(u('hasVideo')).being.equal(False)
         expect(archive).to.have.property(u('url')).being.equal(None)
 
     @httpretty.activate
@@ -81,6 +87,8 @@ class OpenTokArchiveTest(unittest.TestCase):
             u('sessionId'): u('SESSIONID'),
             u('size'): 0,
             u('status'): u('available'),
+            u('hasAudio'): True,
+            u('hasVideo'): True,            
             u('url'): None,
         })
         httpretty.register_uri(httpretty.DELETE, u('https://api.opentok.com/v2/partner/{0}/archive/{1}').format(self.api_key, archive_id),

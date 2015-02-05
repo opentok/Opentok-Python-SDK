@@ -52,6 +52,14 @@ class Archive(object):
          Amazon S3 bucket or Windows Azure container that you set at the
          `OpenTok dashboard <https://dashboard.tokbox.com>`_.
 
+    :ivar hasAudio:
+       Boolean value set to true when the archive contains an audio track,
+       and set to false otherwise.
+
+    :ivar hasVideo:
+       Boolean value set to true when the archive contains a video track,
+       and set to false otherwise.
+
     :ivar url:
        The download URL of the available MP4 file. This is only set for an archive with the status set to
        "available"; for other archives, (including archives with the status "uploaded") this property is
@@ -72,6 +80,8 @@ class Archive(object):
             self.created_at = datetime.fromtimestamp(values.get('createdAt') // 1000, timezone.utc)
         self.size = values.get('size')
         self.duration = values.get('duration')
+        self.hasAudio = values.get('hasAudio')
+        self.hasVideo = values.get('hasVideo')
         self.url = values.get('url')
 
     def stop(self):
