@@ -48,10 +48,11 @@ class OpenTok(object):
     TOKEN_SENTINEL = 'T1=='
     """For internal use."""
 
-    def __init__(self, api_key, api_secret, api_url='https://api.opentok.com'):
+    def __init__(self, api_key, api_secret, api_url='https://api.opentok.com', timeout=None):
         self.api_key = str(api_key)
         self.api_secret = api_secret
         self.api_url = api_url
+        self.timeout = timeout
 
     def generate_token(self, session_id, role=Roles.publisher, expire_time=None, data=None):
         """
@@ -216,7 +217,7 @@ class OpenTok(object):
             options[u('location')] = location
 
         try:
-            response = requests.post(self.session_url(), data=options, headers=self.headers())
+            response = requests.post(self.session_url(), data=options, headers=self.headers(), timeout=self.timeout)
             response.encoding = 'utf-8'
 
             if response.status_code == 403:
@@ -284,7 +285,7 @@ class OpenTok(object):
         """
         payload = {'name': kwargs.get('name'), 'sessionId': session_id}
 
-        response = requests.post(self.archive_url(), data=json.dumps(payload), headers=self.archive_headers())
+        response = requests.post(self.archive_url(), data=json.dumps(payload), headers=self.archive_headers(), timeout=self.timeout)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -310,7 +311,7 @@ class OpenTok(object):
 
         :rtype: The Archive object corresponding to the archive being stopped.
         """
-        response = requests.post(self.archive_url(archive_id) + '/stop', headers=self.archive_headers())
+        response = requests.post(self.archive_url(archive_id) + '/stop', headers=self.archive_headers(), timeout=self.timeout)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -333,7 +334,7 @@ class OpenTok(object):
 
         :param String archive_id: The archive ID of the archive to be deleted.
         """
-        response = requests.delete(self.archive_url(archive_id), headers=self.archive_headers())
+        response = requests.delete(self.archive_url(archive_id), headers=self.archive_headers(), timeout=self.timeout)
 
         if response.status_code < 300:
             pass
@@ -351,7 +352,7 @@ class OpenTok(object):
 
         :rtype: The Archive object.
         """
-        response = requests.get(self.archive_url(archive_id), headers=self.archive_headers())
+        response = requests.get(self.archive_url(archive_id), headers=self.archive_headers(), timeout=self.timeout)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -380,7 +381,7 @@ class OpenTok(object):
         if count is not None:
             params['count'] = count
 
-        response = requests.get(self.archive_url() + "?" + urlencode(params), headers=self.archive_headers())
+        response = requests.get(self.archive_url() + "?" + urlencode(params), headers=self.archive_headers(), timeout=self.timeout)
 
         if response.status_code < 300:
             return ArchiveList(self, response.json())
