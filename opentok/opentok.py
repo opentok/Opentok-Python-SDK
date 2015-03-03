@@ -204,9 +204,9 @@ class OpenTok(object):
 
         # build options
         options = {}
-        if not isinstance(media_mode, MediaModes):
-            raise OpenTokException(u('Cannot create session, {0} is not a valid media mode').format(role))
-        options[u('p2p.preference')] = media_mode.value
+        #if not isinstance(media_mode, MediaModes):
+        #    raise OpenTokException(u('Cannot create session, {0} is not a valid media mode').format(role))
+        options[u('p2p.preference')] = media_mode
         if location:
             # validate IP address
             try:
