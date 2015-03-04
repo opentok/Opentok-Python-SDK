@@ -263,7 +263,7 @@ class OpenTok(object):
             url = url + '/' + archive_id
         return url
 
-    def start_archive(self, session_id, **kwargs):
+    def start_archive(self, session_id, hasAudio=True, hasVideo=True, name=None):
         """
         Starts archiving an OpenTok 2.0 session.
 
@@ -278,11 +278,17 @@ class OpenTok(object):
         :param String name: This is the name of the archive. You can use this name
           to identify the archive. It is a property of the Archive object, and it is a property
           of archive-related events in the OpenTok.js library.
+        :param Boolean hasAudio: if set to true, an audio track will be inserted to the archive. hasAudio is an optional parameter that is set to true by default.
+        :param Boolean hasVideo: if set to true, a video track will be inserted to the archive. hasVideo is an optional parameter that is set to true by default.
 
         :rtype: The Archive object, which includes properties defining the archive,
           including the archive ID.
         """
-        payload = {'name': kwargs.get('name'), 'sessionId': session_id}
+        payload = {'name': name,
+                   'sessionId': session_id,
+                   'hasAudio': hasAudio,
+                   'hasVideo': hasVideo
+        }
 
         response = requests.post(self.archive_url(), data=json.dumps(payload), headers=self.archive_headers())
 
