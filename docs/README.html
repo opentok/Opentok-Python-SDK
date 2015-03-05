@@ -129,6 +129,14 @@ a Session that has clients connection.</p>
 <span class="n">archive_id</span> <span class="o">=</span> <span class="n">archive</span><span class="o">.</span><span class="n">id</span>
 </pre></div>
 </div>
+<p>You can also disable audio or video recording by setting the <cite>hasAudio</cite> or <cite>hasVideo</cite> property of
+the <cite>options</cite> parameter to <cite>false</cite>:</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">archive</span> <span class="o">=</span> <span class="n">opentok</span><span class="o">.</span><span class="n">start_archive</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">u&#39;Important Presentation&#39;</span><span class="p">,</span> <span class="n">hasVideo</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="c"># Store this archive_id in the database</span>
+<span class="n">archive_id</span> <span class="o">=</span> <span class="n">archive</span><span class="o">.</span><span class="n">id</span>
+</pre></div>
+</div>
 <p>You can stop the recording of a started Archive using the <tt class="docutils literal"><span class="pre">opentok.stop_archive(archive_id)</span></tt>
 method. You can also do this using the <tt class="docutils literal"><span class="pre">archive.stop()</span></tt> method of an <tt class="docutils literal"><span class="pre">Archive</span></tt> instance.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="c"># Stop an Archive from an archive_id (fetched from database)</span>

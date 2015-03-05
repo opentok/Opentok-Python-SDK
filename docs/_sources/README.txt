@@ -101,6 +101,16 @@ a Session that has clients connection.
   # Store this archive_id in the database
   archive_id = archive.id
 
+You can also disable audio or video recording by setting the `hasAudio` or `hasVideo` property of
+the `options` parameter to `false`:
+
+.. code:: python
+
+  archive = opentok.start_archive(session_id, name=u'Important Presentation', hasVideo=False)
+
+  # Store this archive_id in the database
+  archive_id = archive.id
+
 You can stop the recording of a started Archive using the ``opentok.stop_archive(archive_id)``
 method. You can also do this using the ``archive.stop()`` method of an ``Archive`` instance.
 
