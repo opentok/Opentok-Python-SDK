@@ -278,8 +278,12 @@ class OpenTok(object):
         :param String name: This is the name of the archive. You can use this name
           to identify the archive. It is a property of the Archive object, and it is a property
           of archive-related events in the OpenTok.js library.
-        :param Boolean hasAudio: if set to true, an audio track will be inserted to the archive. hasAudio is an optional parameter that is set to true by default.
-        :param Boolean hasVideo: if set to true, a video track will be inserted to the archive. hasVideo is an optional parameter that is set to true by default.
+        :param Boolean hasAudio: if set to True, an audio track will be inserted to the archive.
+          hasAudio is an optional parameter that is set to True by default. If you set both
+          hasAudio and hasVideo to False, the call to the start_archive() method results in
+          an error.
+        :param Boolean hasVideo: if set to True, a video track will be inserted to the archive.
+          hasVideo is an optional parameter that is set to True by default.
 
         :rtype: The Archive object, which includes properties defining the archive,
           including the archive ID.
