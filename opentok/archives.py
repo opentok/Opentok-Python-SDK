@@ -19,6 +19,14 @@ class Archive(object):
     :ivar duration:
        The duration of the archive, in milliseconds.
 
+    :ivar hasAudio:
+       Boolean value set to true when the archive contains an audio track,
+       and set to false otherwise.
+
+    :ivar hasVideo:
+       Boolean value set to true when the archive contains a video track,
+       and set to false otherwise.
+
     :ivar id:
        The archive ID.
 
@@ -51,14 +59,6 @@ class Archive(object):
        * "uploaded" -- The archive is available for download from the the upload target
          Amazon S3 bucket or Windows Azure container that you set at the
          `OpenTok dashboard <https://dashboard.tokbox.com>`_.
-
-    :ivar hasAudio:
-       Boolean value set to true when the archive contains an audio track,
-       and set to false otherwise.
-
-    :ivar hasVideo:
-       Boolean value set to true when the archive contains a video track,
-       and set to false otherwise.
 
     :ivar url:
        The download URL of the available MP4 file. This is only set for an archive with the status set to
