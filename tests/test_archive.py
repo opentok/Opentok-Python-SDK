@@ -8,7 +8,7 @@ import json
 import datetime
 import pytz
 
-from opentok import OpenTok, Archive, __version__
+from opentok import OpenTok, Archive, __version__, OutputModes
 
 class OpenTokArchiveTest(unittest.TestCase):
     def setUp(self):
@@ -31,6 +31,7 @@ class OpenTokArchiveTest(unittest.TestCase):
             u('status'): u('started'),
             u('hasAudio'): True,
             u('hasVideo'): True,
+            u('outputMode'): OutputModes.composed.value,
             u('url'): None,
         })
         httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/partner/{0}/archive/{1}/stop').format(self.api_key, archive_id),
@@ -47,6 +48,7 @@ class OpenTokArchiveTest(unittest.TestCase):
                                           "status" : "stopped",
                                           "hasAudio": true,
                                           "hasVideo": false,
+                                          "outputMode": "composed",
                                           "url" : null
                                         }""")),
                                status=200,
@@ -70,8 +72,9 @@ class OpenTokArchiveTest(unittest.TestCase):
         expect(archive).to.have.property(u('created_at')).being.equal(created_at)
         expect(archive).to.have.property(u('size')).being.equal(0)
         expect(archive).to.have.property(u('duration')).being.equal(0)
-        expect(archive).to.have.property(u('hasAudio')).being.equal(True)
-        expect(archive).to.have.property(u('hasVideo')).being.equal(False)
+        expect(archive).to.have.property(u('has_audio')).being.equal(True)
+        expect(archive).to.have.property(u('has_video')).being.equal(False)
+        expect(archive).to.have.property(u('output_mode')).being.equal(OutputModes.composed)
         expect(archive).to.have.property(u('url')).being.equal(None)
 
     @httpretty.activate
@@ -89,6 +92,7 @@ class OpenTokArchiveTest(unittest.TestCase):
             u('status'): u('available'),
             u('hasAudio'): True,
             u('hasVideo'): True,            
+            u('outputMode'): OutputModes.composed.value,
             u('url'): None,
         })
         httpretty.register_uri(httpretty.DELETE, u('https://api.opentok.com/v2/partner/{0}/archive/{1}').format(self.api_key, archive_id),

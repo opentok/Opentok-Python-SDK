@@ -17,7 +17,7 @@ from enum import Enum
 
 from .version import __version__
 from .session import Session
-from .archives import Archive, ArchiveList
+from .archives import Archive, ArchiveList, OutputModes
 from .exceptions import OpenTokException, RequestError, AuthError, NotFoundError, ArchiveError
 
 class Roles(Enum):
@@ -263,7 +263,7 @@ class OpenTok(object):
             url = url + '/' + archive_id
         return url
 
-    def start_archive(self, session_id, hasAudio=True, hasVideo=True, name=None):
+    def start_archive(self, session_id, has_audio=True, has_video=True, name=None, output_mode=OutputModes.composed):
         """
         Starts archiving an OpenTok 2.0 session.
 
@@ -284,14 +284,22 @@ class OpenTok(object):
           an error.
         :param Boolean hasVideo: if set to True, a video track will be inserted to the archive.
           hasVideo is an optional parameter that is set to True by default.
+        :param OutputModes outputMode: if set to composed, a single MP4 file composed of all streams
+          will be generated. If you set it to individual it will create a ZIP container with multiple
+          individual WEBM files and a JSON metadata file for video synchronization.
+          outputMode is an optional parameter that is set to composed by default.
 
         :rtype: The Archive object, which includes properties defining the archive,
           including the archive ID.
         """
+        if not isinstance(output_mode, OutputModes):
+            raise OpenTokException(u('Cannot start archive, {0} is not a valid output mode').format(output_mode))
+
         payload = {'name': name,
                    'sessionId': session_id,
-                   'hasAudio': hasAudio,
-                   'hasVideo': hasVideo
+                   'hasAudio': has_audio,
+                   'hasVideo': has_video,
+                   'outputMode': output_mode.value
         }
 
         response = requests.post(self.archive_url(), data=json.dumps(payload), headers=self.archive_headers())
