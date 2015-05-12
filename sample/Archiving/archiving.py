@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-from opentok import OpenTok, MediaModes
+from opentok import OpenTok, MediaModes, OutputModes
 from email.utils import formatdate
 import os, time
 
@@ -52,9 +52,13 @@ def download(archive_id):
     archive = opentok.get_archive(archive_id)
     return redirect(archive.url)
 
-@app.route("/start")
+@app.route("/start", methods=['POST'])
 def start():
-    archive = opentok.start_archive(session.session_id, name="Python Archiving Sample App")
+    has_audio = 'hasAudio' in request.form.keys()
+    has_video = 'hasVideo' in request.form.keys()
+    output_mode = OutputModes[request.form.get('outputMode')]
+    archive = opentok.start_archive(session.session_id, name="Python Archiving Sample App",
+                                    has_audio=has_audio, has_video=has_video, output_mode=output_mode)
     return archive.json()
 
 @app.route("/stop/<archive_id>")
