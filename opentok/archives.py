@@ -2,6 +2,7 @@ from datetime import datetime, date
 from six import iteritems, PY2, PY3, u
 import json
 import pytz
+from enum import Enum
 if PY3:
     from datetime import timezone
 
@@ -9,6 +10,14 @@ if PY3:
 from six.moves import map
 
 dthandler = lambda obj: obj.isoformat() if isinstance(obj, datetime)  or isinstance(obj, date) else None
+
+class OutputModes(Enum):
+    """List of valid settings for the outputMode parameter of the OpenTok.start_archive() method."""
+    composed = u('composed')
+    """The archive will produce a single MP4 file composed of all streams."""
+    individual = u('individual')
+    """The archive will generate a ZIP container with multiple individual WEBM files and a JSON metadata
+    file for video synchronization."""
 
 class Archive(object):
     """Represents an archive of an OpenTok session.
@@ -26,6 +35,12 @@ class Archive(object):
     :ivar hasVideo:
        Boolean value set to true when the archive contains a video track,
        and set to false otherwise.
+
+    :ivar outputMode:
+        The output mode to be generated for this archive:
+        The default value is composed (a single MP4 file composed of all streams).
+        Value individual will generate a ZIP container with multiple individual WEBM files
+        and a JSON metadata file for video synchronization.
 
     :ivar id:
        The archive ID.
@@ -80,8 +95,9 @@ class Archive(object):
             self.created_at = datetime.fromtimestamp(values.get('createdAt') // 1000, timezone.utc)
         self.size = values.get('size')
         self.duration = values.get('duration')
-        self.hasAudio = values.get('hasAudio')
-        self.hasVideo = values.get('hasVideo')
+        self.has_audio = values.get('hasAudio')
+        self.has_video = values.get('hasVideo')
+        self.output_mode = OutputModes[values.get('outputMode', 'composed')]
         self.url = values.get('url')
 
     def stop(self):
