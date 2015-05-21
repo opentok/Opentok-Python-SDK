@@ -41,6 +41,13 @@ class MediaModes(Enum):
     cannot send and receive each others' streams, due to firewalls on the clients' networks,
     their streams will be relayed using the OpenTok TURN Server."""
 
+class ArchiveModes(Enum):
+    """List of valid settings for the archiveMode parameter of the OpenTok.createSession() method."""
+    manual = u('manual')
+    """The session will be manually archived."""
+    always = u('always')
+    """The session will be automatically archived."""
+
 class OpenTok(object):
     """Use this SDK to create tokens and interface with the server-side portion
     of the Opentok API.
@@ -149,7 +156,7 @@ class OpenTok(object):
         )
         return token
 
-    def create_session(self, location=None, media_mode=MediaModes.relayed):
+    def create_session(self, location=None, media_mode=MediaModes.relayed, archive_mode=ArchiveModes.manual):
         """
         Creates a new OpenTok session and returns the session ID, which uniquely identifies
         the session.
@@ -196,6 +203,13 @@ class OpenTok(object):
                * The OpenTok Media Router supports the archiving feature, which lets
                  you record, save, and retrieve OpenTok sessions (see http://tokbox.com/platform/archiving).
 
+         :param String archiveMode: Whether the session is automatically archived
+             (ArchiveMode.always) or not (ArchiveMode.manual). By default,
+             the setting is ArchiveMode.manual, and you must call the
+             start_archive() method of the OpenTok object to start archiving. To archive the session
+             (either automatically or not), you must set the mediaMode parameter to
+             MediaMode.routed.
+
         :param String location: An IP address that the OpenTok servers will use to
             situate the session in its global network. If you do not set a location hint,
             the OpenTok servers will be based on the first client connecting to the session.
@@ -207,7 +221,12 @@ class OpenTok(object):
         options = {}
         if not isinstance(media_mode, MediaModes):
             raise OpenTokException(u('Cannot create session, {0} is not a valid media mode').format(role))
+        if not isinstance(archive_mode, ArchiveModes):
+            raise OpenTokException(u('Cannot create session, {0} is not a valid archive mode').format(role))
+        if archive_mode == ArchiveModes.always and media_mode != MediaModes.routed:
+            raise OpenTokException(u('A session with always archive mode must also have the routed media mode.'))
         options[u('p2p.preference')] = media_mode.value
+        options[u('archiveMode')] = archive_mode.value
         if location:
             # validate IP address
             try:
@@ -235,7 +254,7 @@ class OpenTok(object):
                 raise AuthError('Failed to create session (code=%s): %s' % (error.attributes['code'].value, error.firstChild.attributes['message'].value))
 
             session_id = dom.getElementsByTagName('session_id')[0].childNodes[0].nodeValue
-            return Session(self, session_id, location=location, media_mode=media_mode)
+            return Session(self, session_id, location=location, media_mode=media_mode, archive_mode=archive_mode)
         except Exception as e:
             raise OpenTokException('Failed to generate session: %s' % str(e))
 
