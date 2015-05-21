@@ -69,6 +69,7 @@ class Archive(object):
        * "available" -- The archive is available for download from the OpenTok cloud.
        * "expired" -- The archive is no longer available for download from the OpenTok cloud.
        * "failed" -- The archive recording failed.
+       * "paused" -- The archive recording has paused.
        * "started" -- The archive started and is in the process of being recorded.
        * "stopped" -- The archive stopped recording.
        * "uploaded" -- The archive is available for download from the the upload target
