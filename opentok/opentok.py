@@ -178,7 +178,8 @@ class OpenTok(object):
              due to firewall restrictions, the session uses the OpenTok TURN server to relay
              audio-video streams.
              
-             The OpenTok Media Router (see http://www.tokbox.com/#multiparty)
+             The OpenTok Media Router (see
+             https://tokbox.com/opentok/tutorials/create-session/#media-mode)
              provides the following benefits:
 
                * The OpenTok Media Router can decrease bandwidth usage in multiparty sessions.
@@ -186,8 +187,8 @@ class OpenTok(object):
                    a separate audio-video stream to each client subscribing to it.)
 
                * The OpenTok Media Router can improve the quality of the user experience through
-                 Intelligent Quality Control (see http://tokbox.com/#iqc). With
-                 Intelligent Quality Control, if a client's connectivity degrades to a degree that
+                 audio fallback and video recovery (see https://tokbox.com/platform/fallback). With
+                 these features, if a client's connectivity degrades to a degree that
                  it does not support video for a stream it's subscribing to, the video is dropped on
                  that client (without affecting other clients), and the client receives audio only.
                  If the client's connectivity improves, the video returns.

@@ -8,7 +8,7 @@ OpenTok Python SDK
 The OpenTok Python SDK lets you generate
 `sessions <http://tokbox.com/opentok/tutorials/create-session/>`_ and
 `tokens <http://tokbox.com/opentok/tutorials/create-token/>`_ for `OpenTok <http://www.tokbox.com/>`_
-applications, and `archive <http://www.tokbox.com/platform/archiving>`_ Opentok 2.0 sessions.
+applications, and `archive <http://www.tokbox.com/platform/archiving>`_ OpenTok sessions.
 
 If you are updating from a previous version of this SDK, see "Important changes since v2.2.0" below.
 
