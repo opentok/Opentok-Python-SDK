@@ -103,7 +103,7 @@ class OpenTok(object):
         # validations
         if not text_type(session_id):
             raise OpenTokException(u('Cannot generate token, session_id was not valid {0}').format(session_id))
-        if not isinstance(role, Roles):
+        if not role in [u('moderator'), u('publisher'), u('subscriber')]:
             raise OpenTokException(u('Cannot generate token, {0} is not a valid role').format(role))
         now = int(time.time())
         if expire_time < now:
@@ -129,7 +129,7 @@ class OpenTok(object):
             session_id      = session_id,
             create_time     = now,
             expire_time     = expire_time,
-            role            = role.value,
+            role            = role,
             connection_data = (data or None),
             nonce           = random.randint(0,999999)
         )
@@ -204,9 +204,9 @@ class OpenTok(object):
 
         # build options
         options = {}
-        if not isinstance(media_mode, MediaModes):
-            raise OpenTokException(u('Cannot create session, {0} is not a valid media mode').format(role))
-        options[u('p2p.preference')] = media_mode.value
+        if media_mode not in [u('disabled'), u('enabled')]:
+            raise OpenTokException(u('Cannot create session, {0} is not a valid media mode').format(media_mode))
+        options[u('p2p.preference')] = media_mode
         if location:
             # validate IP address
             try:
@@ -285,7 +285,8 @@ class OpenTok(object):
         payload = {'name': kwargs.get('name'), 'sessionId': session_id}
 
         response = requests.post(self.archive_url(), data=json.dumps(payload), headers=self.archive_headers())
-
+        print 'response: '
+        print response.status_code
         if response.status_code < 300:
             return Archive(self, response.json())
         elif response.status_code == 403:

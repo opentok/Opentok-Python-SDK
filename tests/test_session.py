@@ -6,6 +6,7 @@ from opentok import OpenTok, Session, Roles, MediaModes
 from .helpers import token_decoder, token_signature_validator
 
 class SessionTest(unittest.TestCase):
+
     def setUp(self):
         self.api_key = u('123456')
         self.api_secret = u('1234567890abcdef1234567890abcdef1234567890')

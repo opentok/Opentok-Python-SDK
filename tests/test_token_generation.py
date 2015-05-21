@@ -26,11 +26,11 @@ class OpenTokTokenGenerationTest(unittest.TestCase):
     def test_generate_role_token(self):
         token = self.opentok.generate_token(self.session_id, Roles.moderator)
         assert isinstance(token, text_type)
-        assert token_decoder(token)[u('role')] == Roles.moderator.value
+        assert token_decoder(token)[u('role')] == Roles.moderator
         assert token_signature_validator(token, self.api_secret)
         token = self.opentok.generate_token(self.session_id, role=Roles.moderator)
         assert isinstance(token, text_type)
-        assert token_decoder(token)[u('role')] == Roles.moderator.value
+        assert token_decoder(token)[u('role')] == Roles.moderator
         assert token_signature_validator(token, self.api_secret)
 
     def test_generate_expires_token(self):
