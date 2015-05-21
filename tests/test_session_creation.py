@@ -24,7 +24,9 @@ class OpenTokSessionCreationTest(unittest.TestCase):
 
         expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
-        expect(httpretty.last_request().body).to.equal(b('archiveMode=manual&p2p.preference=enabled'))
+        body = parse_qs(httpretty.last_request().body)
+        expect(body).to.have.key(b('p2p.preference')).being.equal([b('enabled')])
+        expect(body).to.have.key(b('archiveMode')).being.equal([b('manual')])
         expect(session).to.be.a(Session)
         expect(session).to.have.property(u('session_id')).being.equal(u('1_MX4xMjM0NTZ-fk1vbiBNYXIgMTcgMDA6NDE6MzEgUERUIDIwMTR-MC42ODM3ODk1MzQ0OTQyODA4fg'))
         expect(session).to.have.property(u('media_mode')).being.equal(MediaModes.relayed)
@@ -41,7 +43,9 @@ class OpenTokSessionCreationTest(unittest.TestCase):
 
         expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
-        expect(httpretty.last_request().body).to.equal(b('archiveMode=manual&p2p.preference=disabled'))
+        body = parse_qs(httpretty.last_request().body)
+        expect(body).to.have.key(b('p2p.preference')).being.equal([b('disabled')])
+        expect(body).to.have.key(b('archiveMode')).being.equal([b('manual')])
         expect(session).to.be.a(Session)
         expect(session).to.have.property(u('session_id')).being.equal(u('1_MX4xMjM0NTZ-fk1vbiBNYXIgMTcgMDA6NDE6MzEgUERUIDIwMTR-MC42ODM3ODk1MzQ0OTQyODA4fg'))
         expect(session).to.have.property(u('media_mode')).being.equal(MediaModes.routed)
@@ -98,7 +102,9 @@ class OpenTokSessionCreationTest(unittest.TestCase):
 
         expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
-        expect(httpretty.last_request().body).to.equal(b('archiveMode=manual&p2p.preference=disabled'))
+        body = parse_qs(httpretty.last_request().body)
+        expect(body).to.have.key(b('p2p.preference')).being.equal([b('disabled')])
+        expect(body).to.have.key(b('archiveMode')).being.equal([b('manual')])
         expect(session).to.be.a(Session)
         expect(session).to.have.property(u('session_id')).being.equal(u('1_MX4xMjM0NTZ-fk1vbiBNYXIgMTcgMDA6NDE6MzEgUERUIDIwMTR-MC42ODM3ODk1MzQ0OTQyODA4fg'))
         expect(session).to.have.property(u('media_mode')).being.equal(MediaModes.routed)
@@ -115,7 +121,9 @@ class OpenTokSessionCreationTest(unittest.TestCase):
 
         expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
-        expect(httpretty.last_request().body).to.equal(b('archiveMode=always&p2p.preference=disabled'))
+        body = parse_qs(httpretty.last_request().body)
+        expect(body).to.have.key(b('p2p.preference')).being.equal([b('disabled')])
+        expect(body).to.have.key(b('archiveMode')).being.equal([b('always')])
         expect(session).to.be.a(Session)
         expect(session).to.have.property(u('session_id')).being.equal(u('1_MX4xMjM0NTZ-fk1vbiBNYXIgMTcgMDA6NDE6MzEgUERUIDIwMTR-MC42ODM3ODk1MzQ0OTQyODA4fg'))
         expect(session).to.have.property(u('media_mode')).being.equal(MediaModes.routed)
