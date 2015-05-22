@@ -46,11 +46,12 @@ Import the package at the top of any file where you will use it. At the very lea
 Creating Sessions
 ~~~~~~~~~~~~~~~~~
 
-The create an OpenTok Session, use the ``opentok.create_session()`` method. There are two optional
+The create an OpenTok Session, use the ``opentok.create_session()`` method. There are three optional
 keyword parameters for this method: ``location`` which can be set to a string containing an IP
-address, and ``media_mode`` which is a String (defined by the MediaModes class). This method returns
-a ``Session`` object. Its ``session_id`` attribute is useful when saving to a persistent store (such
-as a database).
+address, ``media_mode`` which is a String (defined by the MediaModes class) and ``archive_mode`` which 
+specifies whether the session will be automatically archived (``always``) or not (``manual``).
+This method returns a ``Session`` object. Its ``session_id`` attribute is useful when saving to a persistent 
+store (such as a database).
 
 .. code:: python
 
@@ -58,7 +59,7 @@ as a database).
   # to use the OpenTok TURN server to relay streams if the clients cannot connect):
   session = opentok.create_session()
   # A session that uses the OpenTok Media Router:
-  session = opentok.create_session(media_mode=MediaModes.routed)
+  session = opentok.create_session(media_mode=MediaModes.routed, archive_mode=ArchiveModes.always)
   # A session with a location hint
   session = opentok.create_session(location=u'12.34.56.78')
 
@@ -101,12 +102,23 @@ a Session that has clients connection.
   # Store this archive_id in the database
   archive_id = archive.id
 
-You can also disable audio or video recording by setting the `hasAudio` or `hasVideo` property of
+You can also disable audio or video recording by setting the `has_audio` or `has_video` property of
 the `options` parameter to `false`:
 
 .. code:: python
 
-  archive = opentok.start_archive(session_id, name=u'Important Presentation', hasVideo=False)
+  archive = opentok.start_archive(session_id, name=u'Important Presentation', has_video=False)
+
+  # Store this archive_id in the database
+  archive_id = archive.id
+
+By default, all streams are recorded to a single (composed) file. You can record the different
+streams in the session to individual files (instead of a single composed file) by setting the
+``output_mode`` parameter of the ``opentok.start_archive()`` method `OutputModesModes.individual`.
+
+.. code:: python
+
+  archive = opentok.start_archive(session_id, name=u'Important Presentation', output_mode=OutputModes.individual)
 
   # Store this archive_id in the database
   archive_id = archive.id
@@ -157,6 +169,10 @@ instance of the ``ArchiveList`` class.
 
   # Get the total number of Archives for this API Key
   total = archive_list.total
+
+Note that you can also create an automatically archived session, by passing in ``ArchiveModes.always``
+as the ``archive_mode`` parameter when you call the ``opentok.create_session()`` method (see "Creating
+Sessions," above).
 
 Samples
 -------
