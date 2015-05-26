@@ -63,13 +63,15 @@
 <tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
 <li><strong>created_at</strong> &#8211; The time at which the archive was created, in milliseconds since the UNIX epoch.</li>
 <li><strong>duration</strong> &#8211; The duration of the archive, in milliseconds.</li>
-<li><strong>hasAudio</strong> &#8211; Boolean value set to true when the archive contains an audio track,
+<li><strong>has_audio</strong> &#8211; Boolean value set to true when the archive contains an audio track,
 and set to false otherwise.</li>
-<li><strong>hasVideo</strong> &#8211; Boolean value set to true when the archive contains a video track,
+<li><strong>has_video</strong> &#8211; Boolean value set to true when the archive contains a video track,
 and set to false otherwise.</li>
 <li><strong>id</strong> &#8211; The archive ID.</li>
 <li><strong>name</strong> &#8211; The name of the archive. If no name was provided when the archive was created, this is set
 to null.</li>
+<li><strong>output_mode</strong> &#8211; Whether all streams in the archive are recorded to a single file
+(OutputModes.composed) or to individual files (OutputModes.individual).</li>
 <li><strong>partnerId</strong> &#8211; The API key associated with the archive.</li>
 <li><strong>reason</strong> &#8211; For archives with the status &#8220;stopped&#8221;, this can be set to &#8220;90 mins exceeded&#8221;, &#8220;failure&#8221;,
 &#8220;session ended&#8221;, or &#8220;user initiated&#8221;. For archives with the status &#8220;failed&#8221;, this can be set
@@ -81,6 +83,12 @@ to &#8220;system failure&#8221;.</li>
 <li>&#8220;available&#8221; &#8211; The archive is available for download from the OpenTok cloud.</li>
 <li>&#8220;expired&#8221; &#8211; The archive is no longer available for download from the OpenTok cloud.</li>
 <li>&#8220;failed&#8221; &#8211; The archive recording failed.</li>
+<li>&#8220;paused&#8221; &#8211; The archive is in progress and no clients are publishing streams to the
+session. When an archive is in progress and any client publishes a stream, the status is
+&#8220;started&#8221;. When an archive is paused, nothing is recorded. When a client starts publishing
+a stream, the recording starts (or resumes). If all clients disconnect from a session that
+is being archived, the status changes to &#8220;paused&#8221;, and after 60 seconds the archive
+recording stops (and the status changes to &#8220;stopped&#8221;).</li>
 <li>&#8220;started&#8221; &#8211; The archive started and is in the process of being recorded.</li>
 <li>&#8220;stopped&#8221; &#8211; The archive stopped recording.</li>
 <li>&#8220;uploaded&#8221; &#8211; The archive is available for download from the the upload target
@@ -144,6 +152,26 @@ from the session being archived.</p>
 
 </dd></dl>
 
+<dl class="class">
+<dt id="opentok.archives.OutputModes">
+<em class="property">class </em><tt class="descclassname">opentok.archives.</tt><tt class="descname">OutputModes</tt><a class="headerlink" href="#opentok.archives.OutputModes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></tt></p>
+<p>List of valid settings for the output_mode parameter of the OpenTok.start_archive()
+method.</p>
+<dl class="attribute">
+<dt id="opentok.archives.OutputModes.composed">
+<tt class="descname">composed</tt><em class="property"> = None</em><a class="headerlink" href="#opentok.archives.OutputModes.composed" title="Permalink to this definition">¶</a></dt>
+<dd><p>All streams in the archive are recorded to a single (composed) file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentok.archives.OutputModes.individual">
+<tt class="descname">individual</tt><em class="property"> = None</em><a class="headerlink" href="#opentok.archives.OutputModes.individual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Each stream in the archive is recorded to an individual file.</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="function">
 <dt id="opentok.archives.dthandler">
 <tt class="descclassname">opentok.archives.</tt><tt class="descname">dthandler</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#opentok.archives.dthandler" title="Permalink to this definition">¶</a></dt>
@@ -195,6 +223,26 @@ to the OpenTok API servers. (HTTP 500 error).</p>
 <div class="section" id="module-opentok.opentok">
 <span id="opentok-opentok-module"></span><h2>opentok.opentok module<a class="headerlink" href="#module-opentok.opentok" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
+<dt id="opentok.opentok.ArchiveModes">
+<em class="property">class </em><tt class="descclassname">opentok.opentok.</tt><tt class="descname">ArchiveModes</tt><a class="headerlink" href="#opentok.opentok.ArchiveModes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></tt></p>
+<p>List of valid settings for the archive_mode parameter of the OpenTok.createSession()
+method.</p>
+<dl class="attribute">
+<dt id="opentok.opentok.ArchiveModes.always">
+<tt class="descname">always</tt><em class="property"> = None</em><a class="headerlink" href="#opentok.opentok.ArchiveModes.always" title="Permalink to this definition">¶</a></dt>
+<dd><p>The session will be automatically archived.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentok.opentok.ArchiveModes.manual">
+<tt class="descname">manual</tt><em class="property"> = None</em><a class="headerlink" href="#opentok.opentok.ArchiveModes.manual" title="Permalink to this definition">¶</a></dt>
+<dd><p>The session will be manually archived.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="opentok.opentok.MediaModes">
 <em class="property">class </em><tt class="descclassname">opentok.opentok.</tt><tt class="descname">MediaModes</tt><a class="headerlink" href="#opentok.opentok.MediaModes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></tt></p>
@@ -241,7 +289,7 @@ of the Opentok API.</p>
 
 <dl class="method">
 <dt id="opentok.opentok.OpenTok.create_session">
-<tt class="descname">create_session</tt><big>(</big><em>location=None</em>, <em>media_mode=&lt;MediaModes.relayed: u'enabled'&gt;</em><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.create_session" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">create_session</tt><big>(</big><em>location=None</em>, <em>media_mode=&lt;MediaModes.relayed: u'enabled'&gt;</em>, <em>archive_mode=&lt;ArchiveModes.manual: u'manual'&gt;</em><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.create_session" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new OpenTok session and returns the session ID, which uniquely identifies
 the session.</p>
 <p>For example, when using the OpenTok JavaScript library, use the session ID when calling the
@@ -251,22 +299,23 @@ generateToken() method). Also note that sessions cannot explicitly be destroyed.
 <p>A session ID string can be up to 255 characters long.</p>
 <p>Calling this method results in an OpenTokException in the event of an error.
 Check the error message for details.</p>
-<p>You can also create a session using the OpenTok REST API (see
-<a class="reference external" href="http://www.tokbox.com/opentok/api/#session_id_production">http://www.tokbox.com/opentok/api/#session_id_production</a>) or the OpenTok dashboard
-(see <a class="reference external" href="https://dashboard.tokbox.com/projects">https://dashboard.tokbox.com/projects</a>).</p>
+<p>You can also create a session using the OpenTok
+<a class="reference external" href="https://tokbox.com/opentok/api/#session_id_production">REST API</a> or
+<a class="reference external" href="https://dashboard.tokbox.com/projects">the OpenTok dashboard</a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mediaMode</strong> (<em>String</em>) &#8211; <p>Determines whether the session will transmit streams using the
+<li><strong>media_mode</strong> (<em>String</em>) &#8211; <p>Determines whether the session will transmit streams using the
 OpenTok Media Router (MediaMode.routed) or not (MediaMode.relayed). By default,
 the setting is MediaMode.relayed.</p>
-<p>With the mediaMode property set to MediaMode.relayed, the session
+<p>With the media_mode property set to MediaMode.relayed, the session
 will attempt to transmit streams directly between clients. If clients cannot connect 
 due to firewall restrictions, the session uses the OpenTok TURN server to relay
 audio-video streams.</p>
-<p>The OpenTok Media Router (see <a class="reference external" href="https://tokbox.com/opentok/tutorials/create-session/#media-mode">https://tokbox.com/opentok/tutorials/create-session/#media-mode</a>)
+<p>The <a class="reference external" href="https://tokbox.com/opentok/tutorials/create-session/#media-mode">OpenTok Media
+Router</a>
 provides the following benefits:</p>
 <blockquote>
 <div><ul>
@@ -278,7 +327,7 @@ a separate audio-video stream to each client subscribing to it.)</dd>
 </li>
 <li>The OpenTok Media Router can improve the quality of the user experience through
 audio fallback and video recovery (see <a class="reference external" href="https://tokbox.com/platform/fallback">https://tokbox.com/platform/fallback</a>). With
-these features, if a client's connectivity degrades to a degree that
+these features, if a client&#8217;s connectivity degrades to a degree that
 it does not support video for a stream it&#8217;s subscribing to, the video is dropped on
 that client (without affecting other clients), and the client receives audio only.
 If the client&#8217;s connectivity improves, the video returns.</li>
@@ -287,6 +336,12 @@ you record, save, and retrieve OpenTok sessions (see <a class="reference externa
 </ul>
 </div></blockquote>
 </li>
+<li><strong>archive_mode</strong> (<em>String</em>) &#8211; Whether the session is automatically archived
+(ArchiveModes.always) or not (ArchiveModes.manual). By default,
+the setting is ArchiveModes.manual, and you must call the
+start_archive() method of the OpenTok object to start archiving. To archive the session
+(either automatically or not), you must set the media_mode parameter to
+MediaModes.routed.</li>
 <li><strong>location</strong> (<em>String</em>) &#8211; An IP address that the OpenTok servers will use to
 situate the session in its global network. If you do not set a location hint,
 the OpenTok servers will be based on the first client connecting to the session.</li>
@@ -412,13 +467,15 @@ number of archives returned is 1000.</li>
 
 <dl class="method">
 <dt id="opentok.opentok.OpenTok.start_archive">
-<tt class="descname">start_archive</tt><big>(</big><em>session_id</em>, <em>hasAudio=True</em>, <em>hasVideo=True</em>, <em>name=None</em><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.start_archive" title="Permalink to this definition">¶</a></dt>
-<dd><p>Starts archiving an OpenTok 2.0 session.</p>
+<tt class="descname">start_archive</tt><big>(</big><em>session_id</em>, <em>has_audio=True</em>, <em>has_video=True</em>, <em>name=None</em>, <em>output_mode=&lt;OutputModes.composed: u'composed'&gt;</em><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.start_archive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts archiving an OpenTok session.</p>
 <p>Clients must be actively connected to the OpenTok session for you to successfully start
 recording an archive.</p>
 <p>You can only record one archive at a time for a given session. You can only record archives
-of sessions that use the OpenTok Media Router (sessions witht the media mode set to routed);
-you cannot archive sessions witht the media mode set to relayed.</p>
+of sessions that use the OpenTok Media Router (sessions with the media mode set to routed);
+you cannot archive sessions with the media mode set to relayed.</p>
+<p>For more information on archiving, see the
+<a class="reference external" href="https://tokbox.com/opentok/tutorials/archiving/">OpenTok archiving</a> programming guide.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -428,12 +485,15 @@ you cannot archive sessions witht the media mode set to relayed.</p>
 <li><strong>name</strong> (<em>String</em>) &#8211; This is the name of the archive. You can use this name
 to identify the archive. It is a property of the Archive object, and it is a property
 of archive-related events in the OpenTok.js library.</li>
-<li><strong>hasAudio</strong> (<em>Boolean</em>) &#8211; if set to True, an audio track will be inserted to the archive. 
-hasAudio is an optional parameter that is set to True by default. If you set both  
-hasAudio and hasVideo to False, the call to the start_archive() method results in
+<li><strong>has_audio</strong> (<em>Boolean</em>) &#8211; if set to True, an audio track will be inserted to the archive.
+has_audio is an optional parameter that is set to True by default. If you set both
+has_audio and has_video to False, the call to the start_archive() method results in
 an error.</li>
-<li><strong>hasVideo</strong> (<em>Boolean</em>) &#8211; if set to True, a video track will be inserted to the archive. 
-hasVideo is an optional parameter that is set to True by default.</li>
+<li><strong>has_video</strong> (<em>Boolean</em>) &#8211; if set to True, a video track will be inserted to the archive.
+has_video is an optional parameter that is set to True by default.</li>
+<li><strong>output_mode</strong> (<em>OutputModes</em>) &#8211; Whether all streams in the archive are recorded
+to a single file (OutputModes.composed, the default) or to individual files
+(OutputModes.individual).</li>
 </ul>
 </td>
 </tr>
