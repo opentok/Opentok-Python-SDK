@@ -33,7 +33,7 @@ class Roles(Enum):
     """
 
 class MediaModes(Enum):
-    """List of valid settings for the mediaMode parameter of the OpenTok.createSession() method."""
+    """List of valid settings for the mediaMode parameter of the OpenTok.create_session() method."""
     routed = u('disabled')
     """The session will transmit streams using the OpenTok Media Server."""
     relayed = u('enabled')
@@ -42,7 +42,7 @@ class MediaModes(Enum):
     their streams will be relayed using the OpenTok TURN Server."""
 
 class ArchiveModes(Enum):
-    """List of valid settings for the archive_mode parameter of the OpenTok.createSession()
+    """List of valid settings for the archive_mode parameter of the OpenTok.create_Session()
     method."""
     manual = u('manual')
     """The session will be manually archived."""
