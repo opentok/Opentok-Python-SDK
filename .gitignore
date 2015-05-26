@@ -43,3 +43,6 @@ docs/_build/
 
 # Virtual env
 venv/
+
+# Mac Desktop files
+.DS_Store

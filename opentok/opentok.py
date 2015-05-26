@@ -42,7 +42,8 @@ class MediaModes(Enum):
     their streams will be relayed using the OpenTok TURN Server."""
 
 class ArchiveModes(Enum):
-    """List of valid settings for the archiveMode parameter of the OpenTok.createSession() method."""
+    """List of valid settings for the archive_mode parameter of the OpenTok.createSession()
+    method."""
     manual = u('manual')
     """The session will be manually archived."""
     always = u('always')
@@ -172,21 +173,21 @@ class OpenTok(object):
         Calling this method results in an OpenTokException in the event of an error.
         Check the error message for details.
 
-        You can also create a session using the OpenTok REST API (see
-        http://www.tokbox.com/opentok/api/#session_id_production) or the OpenTok dashboard
-        (see https://dashboard.tokbox.com/projects).
+        You can also create a session using the OpenTok
+        `REST API <https://tokbox.com/opentok/api/#session_id_production>`_ or
+        `the OpenTok dashboard <https://dashboard.tokbox.com/projects>`_.
 
-        :param String mediaMode: Determines whether the session will transmit streams using the
+        :param String media_mode: Determines whether the session will transmit streams using the
              OpenTok Media Router (MediaMode.routed) or not (MediaMode.relayed). By default,
              the setting is MediaMode.relayed.
              
-             With the mediaMode property set to MediaMode.relayed, the session
+             With the media_mode property set to MediaMode.relayed, the session
              will attempt to transmit streams directly between clients. If clients cannot connect 
              due to firewall restrictions, the session uses the OpenTok TURN server to relay
              audio-video streams.
              
-             The OpenTok Media Router (see
-             https://tokbox.com/opentok/tutorials/create-session/#media-mode)
+             The `OpenTok Media
+             Router <https://tokbox.com/opentok/tutorials/create-session/#media-mode>`_
              provides the following benefits:
 
                * The OpenTok Media Router can decrease bandwidth usage in multiparty sessions.
@@ -203,12 +204,12 @@ class OpenTok(object):
                * The OpenTok Media Router supports the archiving feature, which lets
                  you record, save, and retrieve OpenTok sessions (see http://tokbox.com/platform/archiving).
 
-         :param String archiveMode: Whether the session is automatically archived
-             (ArchiveMode.always) or not (ArchiveMode.manual). By default,
-             the setting is ArchiveMode.manual, and you must call the
-             start_archive() method of the OpenTok object to start archiving. To archive the session
-             (either automatically or not), you must set the mediaMode parameter to
-             MediaMode.routed.
+        :param String archive_mode: Whether the session is automatically archived
+            (ArchiveModes.always) or not (ArchiveModes.manual). By default,
+            the setting is ArchiveModes.manual, and you must call the
+            start_archive() method of the OpenTok object to start archiving. To archive the session
+            (either automatically or not), you must set the media_mode parameter to
+            MediaModes.routed.
 
         :param String location: An IP address that the OpenTok servers will use to
             situate the session in its global network. If you do not set a location hint,
@@ -285,29 +286,31 @@ class OpenTok(object):
 
     def start_archive(self, session_id, has_audio=True, has_video=True, name=None, output_mode=OutputModes.composed):
         """
-        Starts archiving an OpenTok 2.0 session.
+        Starts archiving an OpenTok session.
 
         Clients must be actively connected to the OpenTok session for you to successfully start
         recording an archive.
 
         You can only record one archive at a time for a given session. You can only record archives
-        of sessions that use the OpenTok Media Router (sessions witht the media mode set to routed);
-        you cannot archive sessions witht the media mode set to relayed.
+        of sessions that use the OpenTok Media Router (sessions with the media mode set to routed);
+        you cannot archive sessions with the media mode set to relayed.
+
+        For more information on archiving, see the
+        `OpenTok archiving <https://tokbox.com/opentok/tutorials/archiving/>`_ programming guide.
 
         :param String session_id: The session ID of the OpenTok session to archive.
         :param String name: This is the name of the archive. You can use this name
           to identify the archive. It is a property of the Archive object, and it is a property
           of archive-related events in the OpenTok.js library.
-        :param Boolean hasAudio: if set to True, an audio track will be inserted to the archive.
-          hasAudio is an optional parameter that is set to True by default. If you set both
-          hasAudio and hasVideo to False, the call to the start_archive() method results in
+        :param Boolean has_audio: if set to True, an audio track will be inserted to the archive.
+          has_audio is an optional parameter that is set to True by default. If you set both
+          has_audio and has_video to False, the call to the start_archive() method results in
           an error.
-        :param Boolean hasVideo: if set to True, a video track will be inserted to the archive.
-          hasVideo is an optional parameter that is set to True by default.
-        :param OutputModes outputMode: if set to composed, a single MP4 file composed of all streams
-          will be generated. If you set it to individual it will create a ZIP container with multiple
-          individual WEBM files and a JSON metadata file for video synchronization.
-          outputMode is an optional parameter that is set to composed by default.
+        :param Boolean has_video: if set to True, a video track will be inserted to the archive.
+          has_video is an optional parameter that is set to True by default.
+        :param OutputModes output_mode: Whether all streams in the archive are recorded
+          to a single file (OutputModes.composed, the default) or to individual files
+          (OutputModes.individual).
 
         :rtype: The Archive object, which includes properties defining the archive,
           including the archive ID.
