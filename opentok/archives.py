@@ -12,12 +12,12 @@ from six.moves import map
 dthandler = lambda obj: obj.isoformat() if isinstance(obj, datetime)  or isinstance(obj, date) else None
 
 class OutputModes(Enum):
-    """List of valid settings for the outputMode parameter of the OpenTok.start_archive() method."""
+    """List of valid settings for the output_mode parameter of the OpenTok.start_archive()
+    method."""
     composed = u('composed')
-    """The archive will produce a single MP4 file composed of all streams."""
+    """All streams in the archive are recorded to a single (composed) file."""
     individual = u('individual')
-    """The archive will generate a ZIP container with multiple individual WEBM files and a JSON metadata
-    file for video synchronization."""
+    """Each stream in the archive is recorded to an individual file."""
 
 class Archive(object):
     """Represents an archive of an OpenTok session.
@@ -28,19 +28,13 @@ class Archive(object):
     :ivar duration:
        The duration of the archive, in milliseconds.
 
-    :ivar hasAudio:
+    :ivar has_audio:
        Boolean value set to true when the archive contains an audio track,
        and set to false otherwise.
 
-    :ivar hasVideo:
+    :ivar has_video:
        Boolean value set to true when the archive contains a video track,
        and set to false otherwise.
-
-    :ivar outputMode:
-        The output mode to be generated for this archive:
-        The default value is composed (a single MP4 file composed of all streams).
-        Value individual will generate a ZIP container with multiple individual WEBM files
-        and a JSON metadata file for video synchronization.
 
     :ivar id:
        The archive ID.
@@ -48,6 +42,10 @@ class Archive(object):
     :ivar name:
        The name of the archive. If no name was provided when the archive was created, this is set
        to null.
+
+    :ivar output_mode:
+        Whether all streams in the archive are recorded to a single file
+        (OutputModes.composed) or to individual files (OutputModes.individual).
 
     :ivar partnerId:
        The API key associated with the archive.
@@ -69,7 +67,12 @@ class Archive(object):
        * "available" -- The archive is available for download from the OpenTok cloud.
        * "expired" -- The archive is no longer available for download from the OpenTok cloud.
        * "failed" -- The archive recording failed.
-       * "paused" -- The archive recording has paused.
+       * "paused" -- The archive is in progress and no clients are publishing streams to the
+         session. When an archive is in progress and any client publishes a stream, the status is
+         "started". When an archive is paused, nothing is recorded. When a client starts publishing
+         a stream, the recording starts (or resumes). If all clients disconnect from a session that
+         is being archived, the status changes to "paused", and after 60 seconds the archive
+         recording stops (and the status changes to "stopped").
        * "started" -- The archive started and is in the process of being recorded.
        * "stopped" -- The archive stopped recording.
        * "uploaded" -- The archive is available for download from the the upload target

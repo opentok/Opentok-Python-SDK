@@ -10,8 +10,6 @@ The OpenTok Python SDK lets you generate
 `tokens <http://tokbox.com/opentok/tutorials/create-token/>`_ for `OpenTok <http://www.tokbox.com/>`_
 applications, and `archive <http://www.tokbox.com/platform/archiving>`_ OpenTok sessions.
 
-If you are updating from a previous version of this SDK, see "Important changes since v2.2.0" below.
-
 Installation using Pip (recommended):
 -------------------------------------
 
@@ -59,6 +57,8 @@ store (such as a database).
   # to use the OpenTok TURN server to relay streams if the clients cannot connect):
   session = opentok.create_session()
   # A session that uses the OpenTok Media Router:
+  session = opentok.create_session(media_mode=MediaModes.routed)
+  # An automatically archived session:
   session = opentok.create_session(media_mode=MediaModes.routed, archive_mode=ArchiveModes.always)
   # A session with a location hint
   session = opentok.create_session(location=u'12.34.56.78')
@@ -114,7 +114,7 @@ the `options` parameter to `false`:
 
 By default, all streams are recorded to a single (composed) file. You can record the different
 streams in the session to individual files (instead of a single composed file) by setting the
-``output_mode`` parameter of the ``opentok.start_archive()`` method `OutputModesModes.individual`.
+``output_mode`` parameter of the ``opentok.start_archive()`` method `OutputModes.individual`.
 
 .. code:: python
 
@@ -170,9 +170,13 @@ instance of the ``ArchiveList`` class.
   # Get the total number of Archives for this API Key
   total = archive_list.total
 
-Note that you can also create an automatically archived session, by passing in ``ArchiveModes.always``
-as the ``archive_mode`` parameter when you call the ``opentok.create_session()`` method (see "Creating
-Sessions," above).
+Note that you can also create an automatically archived session, by passing in
+``ArchiveModes.always`` as the ``archive_mode`` parameter when you call the
+``opentok.create_session()`` method (see "Creating Sessions," above).
+
+For more information on archiving, see the
+`OpenTok archiving <https://tokbox.com/opentok/tutorials/archiving/>`_ programming guide.
+
 
 Samples
 -------
@@ -215,8 +219,7 @@ session uses the OpenTok TURN server to relay audio-video streams.
 
 **Changes in v2.2.0:**
 
-This version of the SDK includes support for working with OpenTok 2.0 archives. (This API does not
-work with OpenTok 1.0 archives.)
+This version of the SDK includes support for working with OpenTok archives.
 
 The OpenTok.create_session() method now includes a media_mode parameter, instead of a p2p parameter.
 

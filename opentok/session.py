@@ -2,7 +2,7 @@ class Session(object):
     """
     Represents an OpenTok session.
 
-    Use the OpenTok.createSession() method to create an OpenTok session. Use the
+    Use the OpenTok.create_session() method to create an OpenTok session. Use the
     session_id property of the Session object to get the session ID.
 
     :ivar String session_id: The session ID.
