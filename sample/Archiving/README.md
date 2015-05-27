@@ -74,13 +74,20 @@ URL. The route handler for this URL is shown below:
 ```python
 @app.route("/start")
 def start():
-    archive = opentok.start_archive(session.session_id, name="Python Archiving Sample App")
+    has_audio = 'hasAudio' in request.form.keys()
+    has_video = 'hasVideo' in request.form.keys()
+    output_mode = OutputModes[request.form.get('outputMode')]
+    archive = opentok.start_archive(session.session_id, name="Python Archiving Sample App",
+                                    has_audio=has_audio, has_video=has_video, output_mode=output_mode)
     return archive.json()
 ```
 
-In this handler, the `start_archive()` method of the `opentok` instance is called with the `session_id`
-for the session that needs to be archived. The optional second argument is `name`, which is stored with
-the archive and can be read later. In this case, as in the HelloWorld sample app, there is
+In this handler, the `start_archive()` method of the `opentok` instance is called with the
+`session_id` for the session that needs to be archived. The remaining arguments are a set of
+optional properties for the Archive. The `name` is stored with the archive and can be read later.
+The `has_audio`, `has_video`, and `output_mode` values are read from the request body; these define
+whether the archive will record audio and video, and whether it will record streams individually or
+to a single file composed of all streams. In this case, as in the HelloWorld sample app, there is
 only one session created and it is used here and for the participant view. This will trigger the
 recording to begin. The response sent back to the client's XHR request will be the JSON
 representation of the archive, which is returned from the `json()` method. The client is also
