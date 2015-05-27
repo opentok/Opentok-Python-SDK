@@ -72,7 +72,7 @@ generates the three strings that the client (JavaScript) needs to connect to the
 URL. The route handler for this URL is shown below:
 
 ```python
-@app.route("/start")
+@app.route("/start", methods=['POST'])
 def start():
     has_audio = 'hasAudio' in request.form.keys()
     has_video = 'hasVideo' in request.form.keys()
