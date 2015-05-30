@@ -2,6 +2,7 @@ from datetime import datetime, date
 from six import iteritems, PY2, PY3, u
 import json
 import pytz
+from enum import Enum
 if PY3:
     from datetime import timezone
 
@@ -9,6 +10,14 @@ if PY3:
 from six.moves import map
 
 dthandler = lambda obj: obj.isoformat() if isinstance(obj, datetime)  or isinstance(obj, date) else None
+
+class OutputModes(Enum):
+    """List of valid settings for the output_mode parameter of the OpenTok.start_archive()
+    method."""
+    composed = u('composed')
+    """All streams in the archive are recorded to a single (composed) file."""
+    individual = u('individual')
+    """Each stream in the archive is recorded to an individual file."""
 
 class Archive(object):
     """Represents an archive of an OpenTok session.
@@ -19,12 +28,24 @@ class Archive(object):
     :ivar duration:
        The duration of the archive, in milliseconds.
 
+    :ivar has_audio:
+       Boolean value set to true when the archive contains an audio track,
+       and set to false otherwise.
+
+    :ivar has_video:
+       Boolean value set to true when the archive contains a video track,
+       and set to false otherwise.
+
     :ivar id:
        The archive ID.
 
     :ivar name:
        The name of the archive. If no name was provided when the archive was created, this is set
        to null.
+
+    :ivar output_mode:
+        Whether all streams in the archive are recorded to a single file
+        (OutputModes.composed) or to individual files (OutputModes.individual).
 
     :ivar partnerId:
        The API key associated with the archive.
@@ -46,6 +67,12 @@ class Archive(object):
        * "available" -- The archive is available for download from the OpenTok cloud.
        * "expired" -- The archive is no longer available for download from the OpenTok cloud.
        * "failed" -- The archive recording failed.
+       * "paused" -- The archive is in progress and no clients are publishing streams to the
+         session. When an archive is in progress and any client publishes a stream, the status is
+         "started". When an archive is paused, nothing is recorded. When a client starts publishing
+         a stream, the recording starts (or resumes). If all clients disconnect from a session that
+         is being archived, the status changes to "paused", and after 60 seconds the archive
+         recording stops (and the status changes to "stopped").
        * "started" -- The archive started and is in the process of being recorded.
        * "stopped" -- The archive stopped recording.
        * "uploaded" -- The archive is available for download from the the upload target
@@ -72,6 +99,9 @@ class Archive(object):
             self.created_at = datetime.fromtimestamp(values.get('createdAt') // 1000, timezone.utc)
         self.size = values.get('size')
         self.duration = values.get('duration')
+        self.has_audio = values.get('hasAudio')
+        self.has_video = values.get('hasVideo')
+        self.output_mode = OutputModes[values.get('outputMode', 'composed')]
         self.url = values.get('url')
 
     def stop(self):

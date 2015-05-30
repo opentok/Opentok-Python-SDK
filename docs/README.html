@@ -50,8 +50,7 @@
 <p>The OpenTok Python SDK lets you generate
 <a class="reference external" href="http://tokbox.com/opentok/tutorials/create-session/">sessions</a> and
 <a class="reference external" href="http://tokbox.com/opentok/tutorials/create-token/">tokens</a> for <a class="reference external" href="http://www.tokbox.com/">OpenTok</a>
-applications, and <a class="reference external" href="http://www.tokbox.com/platform/archiving">archive</a> Opentok 2.0 sessions.</p>
-<p>If you are updating from a previous version of this SDK, see &#8220;Important changes since v2.2.0&#8221; below.</p>
+applications, and <a class="reference external" href="http://www.tokbox.com/platform/archiving">archive</a> OpenTok sessions.</p>
 <div class="section" id="installation-using-pip-recommended">
 <h2>Installation using Pip (recommended):<a class="headerlink" href="#installation-using-pip-recommended" title="Permalink to this headline">¶</a></h2>
 <p>Pip helps manage dependencies for Python projects using the PyPI index. Find more info here:
@@ -80,16 +79,19 @@ applications, and <a class="reference external" href="http://www.tokbox.com/plat
 </div>
 <div class="section" id="creating-sessions">
 <h3>Creating Sessions<a class="headerlink" href="#creating-sessions" title="Permalink to this headline">¶</a></h3>
-<p>The create an OpenTok Session, use the <tt class="docutils literal"><span class="pre">opentok.create_session()</span></tt> method. There are two optional
+<p>The create an OpenTok Session, use the <tt class="docutils literal"><span class="pre">opentok.create_session()</span></tt> method. There are three optional
 keyword parameters for this method: <tt class="docutils literal"><span class="pre">location</span></tt> which can be set to a string containing an IP
-address, and <tt class="docutils literal"><span class="pre">media_mode</span></tt> which is a String (defined by the MediaModes class). This method returns
-a <tt class="docutils literal"><span class="pre">Session</span></tt> object. Its <tt class="docutils literal"><span class="pre">session_id</span></tt> attribute is useful when saving to a persistent store (such
-as a database).</p>
+address, <tt class="docutils literal"><span class="pre">media_mode</span></tt> which is a String (defined by the MediaModes class) and <tt class="docutils literal"><span class="pre">archive_mode</span></tt> which
+specifies whether the session will be automatically archived (<tt class="docutils literal"><span class="pre">always</span></tt>) or not (<tt class="docutils literal"><span class="pre">manual</span></tt>).
+This method returns a <tt class="docutils literal"><span class="pre">Session</span></tt> object. Its <tt class="docutils literal"><span class="pre">session_id</span></tt> attribute is useful when saving to a persistent
+store (such as a database).</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="c"># Create a session that attempts to send streams directly between clients (falling back</span>
 <span class="c"># to use the OpenTok TURN server to relay streams if the clients cannot connect):</span>
 <span class="n">session</span> <span class="o">=</span> <span class="n">opentok</span><span class="o">.</span><span class="n">create_session</span><span class="p">()</span>
 <span class="c"># A session that uses the OpenTok Media Router:</span>
 <span class="n">session</span> <span class="o">=</span> <span class="n">opentok</span><span class="o">.</span><span class="n">create_session</span><span class="p">(</span><span class="n">media_mode</span><span class="o">=</span><span class="n">MediaModes</span><span class="o">.</span><span class="n">routed</span><span class="p">)</span>
+<span class="c"># An automatically archived session:</span>
+<span class="n">session</span> <span class="o">=</span> <span class="n">opentok</span><span class="o">.</span><span class="n">create_session</span><span class="p">(</span><span class="n">media_mode</span><span class="o">=</span><span class="n">MediaModes</span><span class="o">.</span><span class="n">routed</span><span class="p">,</span> <span class="n">archive_mode</span><span class="o">=</span><span class="n">ArchiveModes</span><span class="o">.</span><span class="n">always</span><span class="p">)</span>
 <span class="c"># A session with a location hint</span>
 <span class="n">session</span> <span class="o">=</span> <span class="n">opentok</span><span class="o">.</span><span class="n">create_session</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="s">u&#39;12.34.56.78&#39;</span><span class="p">)</span>
 
@@ -124,6 +126,23 @@ method. This method takes an optional keyword argument <tt class="docutils liter
 This method will return an <tt class="docutils literal"><span class="pre">Archive</span></tt> instance. Note that you can only start an Archive on
 a Session that has clients connection.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="n">archive</span> <span class="o">=</span> <span class="n">opentok</span><span class="o">.</span><span class="n">start_archive</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">u&#39;Important Presentation&#39;</span><span class="p">)</span>
+
+<span class="c"># Store this archive_id in the database</span>
+<span class="n">archive_id</span> <span class="o">=</span> <span class="n">archive</span><span class="o">.</span><span class="n">id</span>
+</pre></div>
+</div>
+<p>You can also disable audio or video recording by setting the <cite>has_audio</cite> or <cite>has_video</cite> property of
+the <cite>options</cite> parameter to <cite>false</cite>:</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">archive</span> <span class="o">=</span> <span class="n">opentok</span><span class="o">.</span><span class="n">start_archive</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">u&#39;Important Presentation&#39;</span><span class="p">,</span> <span class="n">has_video</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="c"># Store this archive_id in the database</span>
+<span class="n">archive_id</span> <span class="o">=</span> <span class="n">archive</span><span class="o">.</span><span class="n">id</span>
+</pre></div>
+</div>
+<p>By default, all streams are recorded to a single (composed) file. You can record the different
+streams in the session to individual files (instead of a single composed file) by setting the
+<tt class="docutils literal"><span class="pre">output_mode</span></tt> parameter of the <tt class="docutils literal"><span class="pre">opentok.start_archive()</span></tt> method <cite>OutputModes.individual</cite>.</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">archive</span> <span class="o">=</span> <span class="n">opentok</span><span class="o">.</span><span class="n">start_archive</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">u&#39;Important Presentation&#39;</span><span class="p">,</span> <span class="n">output_mode</span><span class="o">=</span><span class="n">OutputModes</span><span class="o">.</span><span class="n">individual</span><span class="p">)</span>
 
 <span class="c"># Store this archive_id in the database</span>
 <span class="n">archive_id</span> <span class="o">=</span> <span class="n">archive</span><span class="o">.</span><span class="n">id</span>
@@ -168,6 +187,11 @@ instance of the <tt class="docutils literal"><span class="pre">ArchiveList</span
 <span class="n">total</span> <span class="o">=</span> <span class="n">archive_list</span><span class="o">.</span><span class="n">total</span>
 </pre></div>
 </div>
+<p>Note that you can also create an automatically archived session, by passing in
+<tt class="docutils literal"><span class="pre">ArchiveModes.always</span></tt> as the <tt class="docutils literal"><span class="pre">archive_mode</span></tt> parameter when you call the
+<tt class="docutils literal"><span class="pre">opentok.create_session()</span></tt> method (see &#8220;Creating Sessions,&#8221; above).</p>
+<p>For more information on archiving, see the
+<a class="reference external" href="https://tokbox.com/opentok/tutorials/archiving/">OpenTok archiving</a> programming guide.</p>
 </div>
 </div>
 <div class="section" id="samples">
@@ -203,8 +227,7 @@ to relayed. In previous versions of the SDK, the default setting was to use the 
 between each other (peer-to-peer); if clients cannot connect due to firewall restrictions, the
 session uses the OpenTok TURN server to relay audio-video streams.</p>
 <p><strong>Changes in v2.2.0:</strong></p>
-<p>This version of the SDK includes support for working with OpenTok 2.0 archives. (This API does not
-work with OpenTok 1.0 archives.)</p>
+<p>This version of the SDK includes support for working with OpenTok archives.</p>
 <p>The OpenTok.create_session() method now includes a media_mode parameter, instead of a p2p parameter.</p>
 <p>For details, see the reference documentation at
 &lt;<a class="reference external" href="http://www.tokbox.com/opentok/libraries/server/python/reference/index.html">http://www.tokbox.com/opentok/libraries/server/python/reference/index.html</a>&gt;.</p>
