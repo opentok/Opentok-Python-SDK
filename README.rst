@@ -56,10 +56,14 @@ store (such as a database).
   # Create a session that attempts to send streams directly between clients (falling back
   # to use the OpenTok TURN server to relay streams if the clients cannot connect):
   session = opentok.create_session()
+
+  from opentok import MediaModes
   # A session that uses the OpenTok Media Router:
   session = opentok.create_session(media_mode=MediaModes.routed)
+
   # An automatically archived session:
   session = opentok.create_session(media_mode=MediaModes.routed, archive_mode=ArchiveModes.always)
+
   # A session with a location hint
   session = opentok.create_session(location=u'12.34.56.78')
 
@@ -235,7 +239,7 @@ Interested in contributing? We :heart: pull requests! See the `Development <DEVE
 Support
 -------
 
-See http://tokbox.com/opentok/support/ for all our support options.
+See https://support.tokbox.com/ for all our support options.
 
 Find a bug? File it on the `Issues <https://github.com/opentok/opentok-python-sdk/issues>`_ page.
 Hint: test cases are really helpful!
