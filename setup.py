@@ -2,6 +2,7 @@ from setuptools import setup, find_packages
 import codecs
 import os
 import re
+import sys
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -25,6 +26,17 @@ def find_version(*file_paths):
 # Get the long description from the relevant file
 with codecs.open('README.rst', encoding='utf-8') as f:
     long_description = f.read()
+
+
+# We only need enum34 for Pythons before 3.4
+install_requires = [
+    'requests',
+    'six',
+    'pytz',
+]
+if sys.version_info < (3, 4):
+    install_requires.append('enum34')
+
 
 setup(
     name = 'opentok',
@@ -68,12 +80,7 @@ setup(
 
     packages=find_packages(exclude=["contrib", "docs", "tests*"]),
 
-    install_requires=[
-        'requests',
-        'enum34',
-        'six',
-        'pytz',
-    ],
+    install_requires=install_requires,
 
     include_package_data = True,
 )
