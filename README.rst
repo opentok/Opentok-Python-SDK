@@ -19,7 +19,7 @@ http://www.pip-installer.org/en/latest/
 Add the ``opentok`` package as a dependency in your project. The most common way is to add it to your
 ``requirements.txt`` file::
 
-  opentok>=2.3.0
+  opentok>=2.4.0
 
 Next, install the dependencies::
 
@@ -46,9 +46,9 @@ Creating Sessions
 
 The create an OpenTok Session, use the ``opentok.create_session()`` method. There are three optional
 keyword parameters for this method: ``location`` which can be set to a string containing an IP
-address, ``media_mode`` which is a String (defined by the MediaModes class) and ``archive_mode`` which 
+address, ``media_mode`` which is a String (defined by the MediaModes class) and ``archive_mode`` which
 specifies whether the session will be automatically archived (``always``) or not (``manual``).
-This method returns a ``Session`` object. Its ``session_id`` attribute is useful when saving to a persistent 
+This method returns a ``Session`` object. Its ``session_id`` attribute is useful when saving to a persistent
 store (such as a database).
 
 .. code:: python
