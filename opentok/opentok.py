@@ -7,6 +7,7 @@ import hmac                    # _sign_string
 import hashlib                 # _sign_string
 import requests                # create_session, archiving
 import json                    # archiving
+import platform                # user-agent
 from socket import inet_aton   # create_session
 import xml.dom.minidom as xmldom # create_session
 
@@ -271,7 +272,7 @@ class OpenTok(object):
     def headers(self):
         """For internal use."""
         return {
-            'User-Agent': 'OpenTok-Python-SDK/' + __version__,
+            'User-Agent': 'OpenTok-Python-SDK/' + __version__ + ' ' + platform.python_version(),
             'X-TB-PARTNER-AUTH': self.api_key + ':' + self.api_secret
         }
 
