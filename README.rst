@@ -45,11 +45,13 @@ Creating Sessions
 ~~~~~~~~~~~~~~~~~
 
 The create an OpenTok Session, use the ``opentok.create_session()`` method. There are three optional
-keyword parameters for this method: ``location`` which can be set to a string containing an IP
-address, ``media_mode`` which is a String (defined by the MediaModes class) and ``archive_mode`` which
-specifies whether the session will be automatically archived (``always``) or not (``manual``).
-This method returns a ``Session`` object. Its ``session_id`` attribute is useful when saving to a persistent
-store (such as a database).
+keyword parameters for this method:
+
+- ``location`` which can be set to a string containing an IP address
+- ``media_mode`` which is a String (defined by the MediaModes class)
+- ``archive_mode`` which specifies whether the session will be automatically archived (``always``) or not (``manual``).
+
+This method returns a ``Session`` object. Its ``session_id`` attribute is useful when saving to a persistent store (such as a database).
 
 .. code:: python
 
@@ -58,7 +60,7 @@ store (such as a database).
   session = opentok.create_session()
 
   from opentok import MediaModes
-  # A session that uses the OpenTok Media Router:
+  # A session that uses the OpenTok Media Router, which is required for archiving:
   session = opentok.create_session(media_mode=MediaModes.routed)
 
   # An automatically archived session:
@@ -93,6 +95,9 @@ is a set of optional keyword parameters: ``role``, ``expire_time``, and ``data``
 
 Working with Archives
 ~~~~~~~~~~~~~~~~~~~~~
+
+**Important:** You can only archive sessions that use the OpenTok Media
+Router (sessions with the media mode set to routed).
 
 You can start the recording of an OpenTok Session using the ``opentok.start_archive(session_id)``
 method. This method takes an optional keyword argument ``name`` to assign a name to the archive.
