@@ -4,6 +4,8 @@ from six.moves.urllib.parse import parse_qs
 from nose.tools import raises
 from sure import expect
 import httpretty
+from jose import jwt
+import time
 
 from opentok import OpenTok, Session, MediaModes, ArchiveModes, OpenTokException, __version__
 
@@ -22,7 +24,12 @@ class OpenTokSessionCreationTest(unittest.TestCase):
 
         session = self.opentok.create_session()
 
-        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        claims = jwt.decode(httpretty.last_request().headers[u('x-tb-opentok-auth')], self.api_secret, algorithms=[u('HS256')])
+        expect(claims[u('iss')]).to.equal(self.api_key)
+        expect(claims[u('ist')]).to.equal(u('project'))
+        expect(float(claims[u('exp')])).to.be.greater_than(float(time.time()))
+        expect(float(claims[u('jti')])).to.be.greater_than_or_equal_to(float(0))
+        expect(float(claims[u('jti')])).to.be.lower_than(float(1))
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         body = parse_qs(httpretty.last_request().body)
         expect(body).to.have.key(b('p2p.preference')).being.equal([b('enabled')])
@@ -41,7 +48,12 @@ class OpenTokSessionCreationTest(unittest.TestCase):
 
         session = self.opentok.create_session(media_mode=MediaModes.routed)
 
-        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        claims = jwt.decode(httpretty.last_request().headers[u('x-tb-opentok-auth')], self.api_secret, algorithms=[u('HS256')])
+        expect(claims[u('iss')]).to.equal(self.api_key)
+        expect(claims[u('ist')]).to.equal(u('project'))
+        expect(float(claims[u('exp')])).to.be.greater_than(float(time.time()))
+        expect(float(claims[u('jti')])).to.be.greater_than_or_equal_to(float(0))
+        expect(float(claims[u('jti')])).to.be.lower_than(float(1))
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         body = parse_qs(httpretty.last_request().body)
         expect(body).to.have.key(b('p2p.preference')).being.equal([b('disabled')])
@@ -60,7 +72,12 @@ class OpenTokSessionCreationTest(unittest.TestCase):
 
         session = self.opentok.create_session(location='12.34.56.78')
 
-        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        claims = jwt.decode(httpretty.last_request().headers[u('x-tb-opentok-auth')], self.api_secret, algorithms=[u('HS256')])
+        expect(claims[u('iss')]).to.equal(self.api_key)
+        expect(claims[u('ist')]).to.equal(u('project'))
+        expect(float(claims[u('exp')])).to.be.greater_than(float(time.time()))
+        expect(float(claims[u('jti')])).to.be.greater_than_or_equal_to(float(0))
+        expect(float(claims[u('jti')])).to.be.lower_than(float(1))
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         # ordering of keys is non-deterministic, must parse the body to see if it is correct
         body = parse_qs(httpretty.last_request().body)
@@ -80,7 +97,12 @@ class OpenTokSessionCreationTest(unittest.TestCase):
 
         session = self.opentok.create_session(location='12.34.56.78', media_mode=MediaModes.routed)
 
-        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        claims = jwt.decode(httpretty.last_request().headers[u('x-tb-opentok-auth')], self.api_secret, algorithms=[u('HS256')])
+        expect(claims[u('iss')]).to.equal(self.api_key)
+        expect(claims[u('ist')]).to.equal(u('project'))
+        expect(float(claims[u('exp')])).to.be.greater_than(float(time.time()))
+        expect(float(claims[u('jti')])).to.be.greater_than_or_equal_to(float(0))
+        expect(float(claims[u('jti')])).to.be.lower_than(float(1))
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         # ordering of keys is non-deterministic, must parse the body to see if it is correct
         body = parse_qs(httpretty.last_request().body)
@@ -100,7 +122,12 @@ class OpenTokSessionCreationTest(unittest.TestCase):
 
         session = self.opentok.create_session(media_mode=MediaModes.routed, archive_mode=ArchiveModes.manual)
 
-        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        claims = jwt.decode(httpretty.last_request().headers[u('x-tb-opentok-auth')], self.api_secret, algorithms=[u('HS256')])
+        expect(claims[u('iss')]).to.equal(self.api_key)
+        expect(claims[u('ist')]).to.equal(u('project'))
+        expect(float(claims[u('exp')])).to.be.greater_than(float(time.time()))
+        expect(float(claims[u('jti')])).to.be.greater_than_or_equal_to(float(0))
+        expect(float(claims[u('jti')])).to.be.lower_than(float(1))
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         body = parse_qs(httpretty.last_request().body)
         expect(body).to.have.key(b('p2p.preference')).being.equal([b('disabled')])
@@ -119,7 +146,12 @@ class OpenTokSessionCreationTest(unittest.TestCase):
 
         session = self.opentok.create_session(media_mode=MediaModes.routed, archive_mode=ArchiveModes.always)
 
-        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        claims = jwt.decode(httpretty.last_request().headers[u('x-tb-opentok-auth')], self.api_secret, algorithms=[u('HS256')])
+        expect(claims[u('iss')]).to.equal(self.api_key)
+        expect(claims[u('ist')]).to.equal(u('project'))
+        expect(float(claims[u('exp')])).to.be.greater_than(float(time.time()))
+        expect(float(claims[u('jti')])).to.be.greater_than_or_equal_to(float(0))
+        expect(float(claims[u('jti')])).to.be.lower_than(float(1))
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         body = parse_qs(httpretty.last_request().body)
         expect(body).to.have.key(b('p2p.preference')).being.equal([b('disabled')])
