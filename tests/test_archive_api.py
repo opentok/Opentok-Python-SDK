@@ -100,7 +100,11 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         archive = self.opentok.start_archive(self.session_id, name=u('ARCHIVE NAME'))
 
         claims = jwt.decode(httpretty.last_request().headers[u('x-tb-opentok-auth')], self.api_secret, algorithms=[u('HS256')])
-
+        expect(claims[u('iss')]).to.equal(self.api_key)
+        expect(claims[u('ist')]).to.equal(u('project'))
+        expect(float(claims[u('exp')])).to.be.greater_than(float(time.time()))
+        expect(float(claims[u('jti')])).to.be.greater_than_or_equal_to(float(0))
+        expect(float(claims[u('jti')])).to.be.lower_than(float(1))
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
         # non-deterministic json encoding. have to decode to test it properly
