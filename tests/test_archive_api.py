@@ -7,6 +7,7 @@ import textwrap
 import json
 import datetime
 import pytz
+from .validate_jwt import validate_jwt_header
 
 from opentok import OpenTok, Archive, ArchiveList, OutputModes, __version__
 
@@ -41,7 +42,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
         archive = self.opentok.start_archive(self.session_id)
 
-        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-tb-opentok-auth')])
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
         # non-deterministic json encoding. have to decode to test it properly
@@ -92,7 +93,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
         archive = self.opentok.start_archive(self.session_id, name=u('ARCHIVE NAME'))
 
-        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-tb-opentok-auth')])
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
         # non-deterministic json encoding. have to decode to test it properly
@@ -141,7 +142,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
         archive = self.opentok.start_archive(self.session_id, name=u('ARCHIVE NAME'), has_video=False)
 
-        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-tb-opentok-auth')])
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
         # non-deterministic json encoding. have to decode to test it properly
@@ -192,7 +193,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
         archive = self.opentok.start_archive(self.session_id, name=u('ARCHIVE NAME'), output_mode=OutputModes.individual)
 
-        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-tb-opentok-auth')])
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
         # non-deterministic json encoding. have to decode to test it properly
@@ -244,7 +245,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
         archive = self.opentok.start_archive(self.session_id, name=u('ARCHIVE NAME'), output_mode=OutputModes.composed)
 
-        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-tb-opentok-auth')])
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
         # non-deterministic json encoding. have to decode to test it properly
@@ -297,7 +298,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
         archive = self.opentok.stop_archive(archive_id)
 
-        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-tb-opentok-auth')])
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
         expect(archive).to.be.an(Archive)
@@ -324,7 +325,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
         self.opentok.delete_archive(archive_id)
 
-        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-tb-opentok-auth')])
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
 
@@ -353,7 +354,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
         archive = self.opentok.get_archive(archive_id)
 
-        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-tb-opentok-auth')])
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
         expect(archive).to.be.an(Archive)
@@ -468,7 +469,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
         archive_list = self.opentok.get_archives()
 
-        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-tb-opentok-auth')])
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
         expect(archive_list).to.be.an(ArchiveList)
@@ -528,7 +529,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
         archive_list = self.opentok.get_archives(offset=3)
 
-        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-tb-opentok-auth')])
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
         expect(httpretty.last_request()).to.have.property("querystring").being.equal({
@@ -578,7 +579,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
         archive_list = self.opentok.get_archives(count=2)
 
-        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-tb-opentok-auth')])
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
         expect(httpretty.last_request()).to.have.property("querystring").being.equal({
@@ -654,7 +655,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
         archive_list = self.opentok.get_archives(count=4, offset=2)
 
-        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-tb-opentok-auth')])
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
         expect(httpretty.last_request()).to.have.property("querystring").being.equal({

@@ -10,6 +10,8 @@ import json                    # archiving
 import platform                # user-agent
 from socket import inet_aton   # create_session
 import xml.dom.minidom as xmldom # create_session
+from jose import jwt           # _create_jwt_auth_header
+import random                  # _create_jwt_auth_header
 
 # compat
 from six.moves.urllib.parse import urlencode
@@ -273,7 +275,7 @@ class OpenTok(object):
         """For internal use."""
         return {
             'User-Agent': 'OpenTok-Python-SDK/' + __version__ + ' ' + platform.python_version(),
-            'X-TB-PARTNER-AUTH': self.api_key + ':' + self.api_secret
+            'X-TB-OPENTOK-AUTH': self._create_jwt_auth_header()
         }
 
     def archive_headers(self):
@@ -444,3 +446,13 @@ class OpenTok(object):
 
     def _sign_string(self, string, secret):
         return hmac.new(secret.encode('utf-8'), string.encode('utf-8'), hashlib.sha1).hexdigest()
+
+    def _create_jwt_auth_header(self):
+        payload = {
+                      'ist': 'project',
+                      'iss': self.api_key,
+                      'exp': int(time.time()) + (60*5), # 5 minutes
+                      'jti': '{:f}'.format(random.random())
+                  }
+
+        return jwt.encode(payload, self.api_secret, algorithm='HS256')

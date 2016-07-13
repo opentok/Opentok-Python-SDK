@@ -7,6 +7,7 @@ import textwrap
 import json
 import datetime
 import pytz
+from .validate_jwt import validate_jwt_header
 
 from opentok import OpenTok, Archive, __version__, OutputModes
 
@@ -56,7 +57,7 @@ class OpenTokArchiveTest(unittest.TestCase):
 
         archive.stop()
 
-        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-tb-opentok-auth')])
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
         expect(archive).to.be.an(Archive)
@@ -91,7 +92,7 @@ class OpenTokArchiveTest(unittest.TestCase):
             u('size'): 0,
             u('status'): u('available'),
             u('hasAudio'): True,
-            u('hasVideo'): True,            
+            u('hasVideo'): True,
             u('outputMode'): OutputModes.composed.value,
             u('url'): None,
         })
@@ -101,7 +102,7 @@ class OpenTokArchiveTest(unittest.TestCase):
 
         archive.delete()
 
-        expect(httpretty.last_request().headers[u('x-tb-partner-auth')]).to.equal(self.api_key+u(':')+self.api_secret)
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-tb-opentok-auth')])
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
         # TODO: test that the object is invalidated
