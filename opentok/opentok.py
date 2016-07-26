@@ -275,7 +275,7 @@ class OpenTok(object):
         """For internal use."""
         return {
             'User-Agent': 'OpenTok-Python-SDK/' + __version__ + ' ' + platform.python_version(),
-            'X-TB-OPENTOK-AUTH': self._create_jwt_auth_header()
+            'X-OPENTOK-AUTH': self._create_jwt_auth_header()
         }
 
     def archive_headers(self):
@@ -451,7 +451,8 @@ class OpenTok(object):
         payload = {
                       'ist': 'project',
                       'iss': self.api_key,
-                      'exp': int(time.time()) + (60*5), # 5 minutes
+                      'iat': int(time.time()), # current time in unix time (seconds)
+                      'exp': int(time.time()) + (60*3), # 3 minutes in the future (seconds)
                       'jti': '{:f}'.format(random.random())
                   }
 
