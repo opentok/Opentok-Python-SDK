@@ -1,4 +1,4 @@
-class OpenTokException(BaseException):
+class OpenTokException(Exception):
     """Defines exceptions thrown by the OpenTok SDK.
     """
     pass
