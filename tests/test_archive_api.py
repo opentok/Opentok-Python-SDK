@@ -1,7 +1,7 @@
 import unittest
 from six import text_type, u, b, PY2, PY3
 from nose.tools import raises
-from sure import expect
+from expects import *
 import httpretty
 import textwrap
 import json
@@ -43,31 +43,31 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         archive = self.opentok.start_archive(self.session_id)
 
         validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
-        expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
-        expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
         # non-deterministic json encoding. have to decode to test it properly
         if PY2:
             body = json.loads(httpretty.last_request().body)
         if PY3:
             body = json.loads(httpretty.last_request().body.decode('utf-8'))
-        expect(body).to.have.key(u('name')).being.equal(None)
-        expect(body).to.have.key(u('sessionId')).being.equal(u('SESSIONID'))
-        expect(archive).to.be.an(Archive)
-        expect(archive).to.have.property(u('id')).being.equal(u('30b3ebf1-ba36-4f5b-8def-6f70d9986fe9'))
-        expect(archive).to.have.property(u('name')).being.equal(u(''))
-        expect(archive).to.have.property(u('status')).being.equal(u('started'))
-        expect(archive).to.have.property(u('session_id')).being.equal(u('SESSIONID'))
-        expect(archive).to.have.property(u('partner_id')).being.equal(123456)
+        expect(body).to(have_key(u('name'), None))
+        expect(body).to(have_key(u('sessionId'), u('SESSIONID')))
+        expect(archive).to(be_an(Archive))
+        expect(archive).to(have_property(u('id'), u('30b3ebf1-ba36-4f5b-8def-6f70d9986fe9')))
+        expect(archive).to(have_property(u('name'), u('')))
+        expect(archive).to(have_property(u('status'), u('started')))
+        expect(archive).to(have_property(u('session_id'), u('SESSIONID')))
+        expect(archive).to(have_property(u('partner_id'), 123456))
         if PY2:
             created_at = datetime.datetime.fromtimestamp(1395183243, pytz.UTC)
         if PY3:
             created_at = datetime.datetime.fromtimestamp(1395183243, datetime.timezone.utc)
-        expect(archive).to.have.property(u('created_at')).being.equal(created_at)
-        expect(archive).to.have.property(u('size')).being.equal(0)
-        expect(archive).to.have.property(u('duration')).being.equal(0)
-        expect(archive).to.have.property(u('has_audio')).being.equal(True)
-        expect(archive).to.have.property(u('has_video')).being.equal(True)
-        expect(archive).to.have.property(u('url')).being.equal(None)
+        expect(archive).to(have_property(u('created_at'), created_at))
+        expect(archive).to(have_property(u('size'), 0))
+        expect(archive).to(have_property(u('duration'), 0))
+        expect(archive).to(have_property(u('has_audio'), True))
+        expect(archive).to(have_property(u('has_video'), True))
+        expect(archive).to(have_property(u('url'), None))
 
     @httpretty.activate
     def test_start_archive_with_name(self):
@@ -94,29 +94,29 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         archive = self.opentok.start_archive(self.session_id, name=u('ARCHIVE NAME'))
 
         validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
-        expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
-        expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
         # non-deterministic json encoding. have to decode to test it properly
         if PY2:
             body = json.loads(httpretty.last_request().body)
         if PY3:
             body = json.loads(httpretty.last_request().body.decode('utf-8'))
-        expect(body).to.have.key(u('sessionId')).being.equal(u('SESSIONID'))
-        expect(body).to.have.key(u('name')).being.equal(u('ARCHIVE NAME'))
-        expect(archive).to.be.an(Archive)
-        expect(archive).to.have.property(u('id')).being.equal(u('30b3ebf1-ba36-4f5b-8def-6f70d9986fe9'))
-        expect(archive).to.have.property(u('name')).being.equal(u('ARCHIVE NAME'))
-        expect(archive).to.have.property(u('status')).being.equal(u('started'))
-        expect(archive).to.have.property(u('session_id')).being.equal(u('SESSIONID'))
-        expect(archive).to.have.property(u('partner_id')).being.equal(123456)
+        expect(body).to(have_key(u('sessionId'), u('SESSIONID')))
+        expect(body).to(have_key(u('name'), u('ARCHIVE NAME')))
+        expect(archive).to(be_an(Archive))
+        expect(archive).to(have_property(u('id'), u('30b3ebf1-ba36-4f5b-8def-6f70d9986fe9')))
+        expect(archive).to(have_property(u('name'), ('ARCHIVE NAME')))
+        expect(archive).to(have_property(u('status'), u('started')))
+        expect(archive).to(have_property(u('session_id'), u('SESSIONID')))
+        expect(archive).to(have_property(u('partner_id'), 123456))
         if PY2:
             created_at = datetime.datetime.fromtimestamp(1395183243, pytz.UTC)
         if PY3:
             created_at = datetime.datetime.fromtimestamp(1395183243, datetime.timezone.utc)
-        expect(archive).to.have.property(u('created_at')).being.equal(created_at)
-        expect(archive).to.have.property(u('size')).being.equal(0)
-        expect(archive).to.have.property(u('duration')).being.equal(0)
-        expect(archive).to.have.property(u('url')).being.equal(None)
+        expect(archive).to(have_property(u('created_at'), equal(created_at)))
+        expect(archive).to(have_property(u('size'), equal(0)))
+        expect(archive).to(have_property(u('duration'), equal(0)))
+        expect(archive).to(have_property(u('url'), equal(None)))
 
     @httpretty.activate
     def test_start_voice_archive(self):
@@ -143,31 +143,31 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         archive = self.opentok.start_archive(self.session_id, name=u('ARCHIVE NAME'), has_video=False)
 
         validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
-        expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
-        expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
         # non-deterministic json encoding. have to decode to test it properly
         if PY2:
             body = json.loads(httpretty.last_request().body)
         if PY3:
             body = json.loads(httpretty.last_request().body.decode('utf-8'))
-        expect(body).to.have.key(u('sessionId')).being.equal(u('SESSIONID'))
-        expect(body).to.have.key(u('name')).being.equal(u('ARCHIVE NAME'))
-        expect(archive).to.be.an(Archive)
-        expect(archive).to.have.property(u('id')).being.equal(u('30b3ebf1-ba36-4f5b-8def-6f70d9986fe9'))
-        expect(archive).to.have.property(u('name')).being.equal(u('ARCHIVE NAME'))
-        expect(archive).to.have.property(u('status')).being.equal(u('started'))
-        expect(archive).to.have.property(u('session_id')).being.equal(u('SESSIONID'))
-        expect(archive).to.have.property(u('partner_id')).being.equal(123456)
+        expect(body).to(have_key(u('sessionId'), u('SESSIONID')))
+        expect(body).to(have_key(u('name'), u('ARCHIVE NAME')))
+        expect(archive).to(be_an(Archive))
+        expect(archive).to(have_property(u('id'), u('30b3ebf1-ba36-4f5b-8def-6f70d9986fe9')))
+        expect(archive).to(have_property(u('name'), ('ARCHIVE NAME')))
+        expect(archive).to(have_property(u('status'), u('started')))
+        expect(archive).to(have_property(u('session_id'), u('SESSIONID')))
+        expect(archive).to(have_property(u('partner_id'), 123456))
         if PY2:
             created_at = datetime.datetime.fromtimestamp(1395183243, pytz.UTC)
         if PY3:
             created_at = datetime.datetime.fromtimestamp(1395183243, datetime.timezone.utc)
-        expect(archive).to.have.property(u('created_at')).being.equal(created_at)
-        expect(archive).to.have.property(u('size')).being.equal(0)
-        expect(archive).to.have.property(u('duration')).being.equal(0)
-        expect(archive).to.have.property(u('has_audio')).being.equal(True)
-        expect(archive).to.have.property(u('has_video')).being.equal(False)
-        expect(archive).to.have.property(u('url')).being.equal(None)
+        expect(archive).to(have_property(u('created_at'), created_at))
+        expect(archive).to(have_property(u('size'), 0))
+        expect(archive).to(have_property(u('duration'), 0))
+        expect(archive).to(have_property(u('has_audio'), True))
+        expect(archive).to(have_property(u('has_video'), False))
+        expect(archive).to(have_property(u('url'), None))
 
     @httpretty.activate
     def test_start_individual_archive(self):
@@ -194,32 +194,32 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         archive = self.opentok.start_archive(self.session_id, name=u('ARCHIVE NAME'), output_mode=OutputModes.individual)
 
         validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
-        expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
-        expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
         # non-deterministic json encoding. have to decode to test it properly
         if PY2:
             body = json.loads(httpretty.last_request().body)
         if PY3:
             body = json.loads(httpretty.last_request().body.decode('utf-8'))
-        expect(body).to.have.key(u('sessionId')).being.equal(u('SESSIONID'))
-        expect(body).to.have.key(u('name')).being.equal(u('ARCHIVE NAME'))
-        expect(archive).to.be.an(Archive)
-        expect(archive).to.have.property(u('id')).being.equal(u('30b3ebf1-ba36-4f5b-8def-6f70d9986fe9'))
-        expect(archive).to.have.property(u('name')).being.equal(u('ARCHIVE NAME'))
-        expect(archive).to.have.property(u('status')).being.equal(u('started'))
-        expect(archive).to.have.property(u('session_id')).being.equal(u('SESSIONID'))
-        expect(archive).to.have.property(u('partner_id')).being.equal(123456)
+        expect(body).to(have_key(u('sessionId'), u('SESSIONID')))
+        expect(body).to(have_key(u('name'), u('ARCHIVE NAME')))
+        expect(archive).to(be_an(Archive))
+        expect(archive).to(have_property(u('id'), u('30b3ebf1-ba36-4f5b-8def-6f70d9986fe9')))
+        expect(archive).to(have_property(u('name'), ('ARCHIVE NAME')))
+        expect(archive).to(have_property(u('status'), u('started')))
+        expect(archive).to(have_property(u('session_id'), u('SESSIONID')))
+        expect(archive).to(have_property(u('partner_id'), 123456))
         if PY2:
             created_at = datetime.datetime.fromtimestamp(1395183243, pytz.UTC)
         if PY3:
             created_at = datetime.datetime.fromtimestamp(1395183243, datetime.timezone.utc)
-        expect(archive).to.have.property(u('created_at')).being.equal(created_at)
-        expect(archive).to.have.property(u('size')).being.equal(0)
-        expect(archive).to.have.property(u('duration')).being.equal(0)
-        expect(archive).to.have.property(u('has_audio')).being.equal(True)
-        expect(archive).to.have.property(u('has_video')).being.equal(True)
-        expect(archive).to.have.property(u('output_mode')).being.equal(OutputModes.individual)
-        expect(archive).to.have.property(u('url')).being.equal(None)
+        expect(archive).to(have_property(u('created_at'), created_at))
+        expect(archive).to(have_property(u('size'), 0))
+        expect(archive).to(have_property(u('duration'), 0))
+        expect(archive).to(have_property(u('has_audio'), True))
+        expect(archive).to(have_property(u('has_video'), True))
+        expect(archive).to(have_property(u('output_mode'), OutputModes.individual))
+        expect(archive).to(have_property(u('url'), None))
 
     @httpretty.activate
     def test_start_composed_archive(self):
@@ -246,32 +246,32 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         archive = self.opentok.start_archive(self.session_id, name=u('ARCHIVE NAME'), output_mode=OutputModes.composed)
 
         validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
-        expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
-        expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
         # non-deterministic json encoding. have to decode to test it properly
         if PY2:
             body = json.loads(httpretty.last_request().body)
         if PY3:
             body = json.loads(httpretty.last_request().body.decode('utf-8'))
-        expect(body).to.have.key(u('sessionId')).being.equal(u('SESSIONID'))
-        expect(body).to.have.key(u('name')).being.equal(u('ARCHIVE NAME'))
-        expect(archive).to.be.an(Archive)
-        expect(archive).to.have.property(u('id')).being.equal(u('30b3ebf1-ba36-4f5b-8def-6f70d9986fe9'))
-        expect(archive).to.have.property(u('name')).being.equal(u('ARCHIVE NAME'))
-        expect(archive).to.have.property(u('status')).being.equal(u('started'))
-        expect(archive).to.have.property(u('session_id')).being.equal(u('SESSIONID'))
-        expect(archive).to.have.property(u('partner_id')).being.equal(123456)
+        expect(body).to(have_key(u('sessionId'), u('SESSIONID')))
+        expect(body).to(have_key(u('name'), u('ARCHIVE NAME')))
+        expect(archive).to(be_an(Archive))
+        expect(archive).to(have_property(u('id'), u('30b3ebf1-ba36-4f5b-8def-6f70d9986fe9')))
+        expect(archive).to(have_property(u('name'), ('ARCHIVE NAME')))
+        expect(archive).to(have_property(u('status'), u('started')))
+        expect(archive).to(have_property(u('session_id'), u('SESSIONID')))
+        expect(archive).to(have_property(u('partner_id'), 123456))
         if PY2:
             created_at = datetime.datetime.fromtimestamp(1395183243, pytz.UTC)
         if PY3:
             created_at = datetime.datetime.fromtimestamp(1395183243, datetime.timezone.utc)
-        expect(archive).to.have.property(u('created_at')).being.equal(created_at)
-        expect(archive).to.have.property(u('size')).being.equal(0)
-        expect(archive).to.have.property(u('duration')).being.equal(0)
-        expect(archive).to.have.property(u('has_audio')).being.equal(True)
-        expect(archive).to.have.property(u('has_video')).being.equal(True)
-        expect(archive).to.have.property(u('output_mode')).being.equal(OutputModes.composed)
-        expect(archive).to.have.property(u('url')).being.equal(None)
+        expect(archive).to(have_property(u('created_at'), created_at))
+        expect(archive).to(have_property(u('size'), 0))
+        expect(archive).to(have_property(u('duration'), 0))
+        expect(archive).to(have_property(u('has_audio'), True))
+        expect(archive).to(have_property(u('has_video'), True))
+        expect(archive).to(have_property(u('output_mode'), OutputModes.composed))
+        expect(archive).to(have_property(u('url'), None))
 
     @httpretty.activate
     def test_stop_archive(self):
@@ -299,22 +299,22 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         archive = self.opentok.stop_archive(archive_id)
 
         validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
-        expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
-        expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
-        expect(archive).to.be.an(Archive)
-        expect(archive).to.have.property(u('id')).being.equal(archive_id)
-        expect(archive).to.have.property(u('name')).being.equal(u(''))
-        expect(archive).to.have.property(u('status')).being.equal(u('stopped'))
-        expect(archive).to.have.property(u('session_id')).being.equal(u('SESSIONID'))
-        expect(archive).to.have.property(u('partner_id')).being.equal(123456)
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
+        expect(archive).to(be_an(Archive))
+        expect(archive).to(have_property(u('id'), archive_id))
+        expect(archive).to(have_property(u('name'), u('')))
+        expect(archive).to(have_property(u('status'), u('stopped')))
+        expect(archive).to(have_property(u('session_id'), u('SESSIONID')))
+        expect(archive).to(have_property(u('partner_id'), 123456))
         if PY2:
             created_at = datetime.datetime.fromtimestamp(1395183243, pytz.UTC)
         if PY3:
             created_at = datetime.datetime.fromtimestamp(1395183243, datetime.timezone.utc)
-        expect(archive).to.have.property(u('created_at')).being.equal(created_at)
-        expect(archive).to.have.property(u('size')).being.equal(0)
-        expect(archive).to.have.property(u('duration')).being.equal(0)
-        expect(archive).to.have.property(u('url')).being.equal(None)
+        expect(archive).to(have_property(u('created_at'), created_at))
+        expect(archive).to(have_property(u('size'), 0))
+        expect(archive).to(have_property(u('duration'), 0))
+        expect(archive).to(have_property(u('url'), None))
 
     @httpretty.activate
     def test_delete_archive(self):
@@ -326,8 +326,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         self.opentok.delete_archive(archive_id)
 
         validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
-        expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
-        expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
 
     @httpretty.activate
     def test_find_archive(self):
@@ -355,22 +355,22 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         archive = self.opentok.get_archive(archive_id)
 
         validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
-        expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
-        expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
-        expect(archive).to.be.an(Archive)
-        expect(archive).to.have.property(u('id')).being.equal(archive_id)
-        expect(archive).to.have.property(u('name')).being.equal(u(''))
-        expect(archive).to.have.property(u('status')).being.equal(u('available'))
-        expect(archive).to.have.property(u('session_id')).being.equal(u('SESSIONID'))
-        expect(archive).to.have.property(u('partner_id')).being.equal(123456)
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
+        expect(archive).to(be_an(Archive))
+        expect(archive).to(have_property(u('id'), archive_id))
+        expect(archive).to(have_property(u('name'), u('')))
+        expect(archive).to(have_property(u('status'), u('available')))
+        expect(archive).to(have_property(u('session_id'), u('SESSIONID')))
+        expect(archive).to(have_property(u('partner_id'), 123456))
         if PY2:
             created_at = datetime.datetime.fromtimestamp(1395187836, pytz.UTC)
         if PY3:
             created_at = datetime.datetime.fromtimestamp(1395187836, datetime.timezone.utc)
-        expect(archive).to.have.property(u('created_at')).being.equal(created_at)
-        expect(archive).to.have.property(u('size')).being.equal(8347554)
-        expect(archive).to.have.property(u('duration')).being.equal(62)
-        expect(archive).to.have.property(u('url')).being.equal(u('http://tokbox.com.archive2.s3.amazonaws.com/123456%2Ff6e7ee58-d6cf-4a59-896b-6d56b158ec71%2Farchive.mp4?Expires=1395194362&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'))
+        expect(archive).to(have_property(u('created_at'), created_at))
+        expect(archive).to(have_property(u('size'), 8347554))
+        expect(archive).to(have_property(u('duration'), 62))
+        expect(archive).to(have_property(u('url'), u('http://tokbox.com.archive2.s3.amazonaws.com/123456%2Ff6e7ee58-d6cf-4a59-896b-6d56b158ec71%2Farchive.mp4?Expires=1395194362&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')))
 
     @httpretty.activate
     def test_find_archives(self):
@@ -470,11 +470,11 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         archive_list = self.opentok.get_archives()
 
         validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
-        expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
-        expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
-        expect(archive_list).to.be.an(ArchiveList)
-        expect(archive_list).to.have.property(u('count')).being.equal(6)
-        expect(list(archive_list.items)).to.have.length_of(6)
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
+        expect(archive_list).to(be_an(ArchiveList))
+        expect(archive_list).to(have_property(u('count'), 6))
+        expect(list(archive_list.items)).to(have_length(6))
         # TODO: we could inspect each item in the list
 
     @httpretty.activate
@@ -530,14 +530,14 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         archive_list = self.opentok.get_archives(offset=3)
 
         validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
-        expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
-        expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
-        expect(httpretty.last_request()).to.have.property("querystring").being.equal({
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
+        expect(httpretty.last_request()).to(have_property(u('querystring'), {
             u('offset'): [u('3')]
-        })
-        expect(archive_list).to.be.an(ArchiveList)
-        expect(archive_list).to.have.property(u('count')).being.equal(6)
-        expect(list(archive_list.items)).to.have.length_of(3)
+        }))
+        expect(archive_list).to(be_an(ArchiveList))
+        expect(archive_list).to(have_property(u('count'), 6))
+        expect(list(archive_list.items)).to(have_length(3))
         # TODO: we could inspect each item in the list
 
     @httpretty.activate
@@ -580,14 +580,14 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         archive_list = self.opentok.get_archives(count=2)
 
         validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
-        expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
-        expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
-        expect(httpretty.last_request()).to.have.property("querystring").being.equal({
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
+        expect(httpretty.last_request()).to(have_property(u('querystring'), {
             u('count'): [u('2')]
-        })
-        expect(archive_list).to.be.an(ArchiveList)
-        expect(archive_list).to.have.property(u('count')).being.equal(6)
-        expect(list(archive_list.items)).to.have.length_of(2)
+        }))
+        expect(archive_list).to(be_an(ArchiveList))
+        expect(archive_list).to(have_property(u('count'), 6))
+        expect(list(archive_list.items)).to(have_length(2))
         # TODO: we could inspect each item in the list
 
     @httpretty.activate
@@ -656,15 +656,15 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         archive_list = self.opentok.get_archives(count=4, offset=2)
 
         validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
-        expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
-        expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
-        expect(httpretty.last_request()).to.have.property("querystring").being.equal({
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
+        expect(httpretty.last_request()).to(have_property(u('querystring'), {
             u('offset'): [u('2')],
             u('count'): [u('4')]
-        })
-        expect(archive_list).to.be.an(ArchiveList)
-        expect(archive_list).to.have.property(u('count')).being.equal(6)
-        expect(list(archive_list.items)).to.have.length_of(4)
+        }))
+        expect(archive_list).to(be_an(ArchiveList))
+        expect(archive_list).to(have_property(u('count'), 6))
+        expect(list(archive_list.items)).to(have_length(4))
         # TODO: we could inspect each item in the list
 
     @httpretty.activate
@@ -691,8 +691,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
         archive = self.opentok.get_archive(archive_id)
 
-        expect(archive).to.be.an(Archive)
-        expect(archive).to.have.property(u('status')).being.equal(u('paused'))
+        expect(archive).to(be_an(Archive))
+        expect(archive).to(have_property(u('status'), u('paused')))
 
     @httpretty.activate
     def test_find_expired_archive(self):
@@ -718,8 +718,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
         archive = self.opentok.get_archive(archive_id)
 
-        expect(archive).to.be.an(Archive)
-        expect(archive).to.have.property(u('status')).being.equal(u('expired'))
+        expect(archive).to(be_an(Archive))
+        expect(archive).to(have_property(u('status'), u('expired')))
 
     @httpretty.activate
     def test_find_archive_with_unknown_properties(self):
@@ -746,4 +746,4 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
         archive = self.opentok.get_archive(archive_id)
 
-        expect(archive).to.be.an(Archive)
+        expect(archive).to(be_an(Archive))
