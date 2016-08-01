@@ -57,7 +57,7 @@ class OpenTokArchiveTest(unittest.TestCase):
 
         archive.stop()
 
-        validate_jwt_header(self, httpretty.last_request().headers[u('x-tb-opentok-auth')])
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
         expect(archive).to.be.an(Archive)
@@ -102,7 +102,7 @@ class OpenTokArchiveTest(unittest.TestCase):
 
         archive.delete()
 
-        validate_jwt_header(self, httpretty.last_request().headers[u('x-tb-opentok-auth')])
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
         expect(httpretty.last_request().headers[u('user-agent')]).to.contain(u('OpenTok-Python-SDK/')+__version__)
         expect(httpretty.last_request().headers[u('content-type')]).to.equal(u('application/json'))
         # TODO: test that the object is invalidated
