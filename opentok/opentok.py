@@ -453,7 +453,7 @@ class OpenTok(object):
                       'iss': self.api_key,
                       'iat': int(time.time()), # current time in unix time (seconds)
                       'exp': int(time.time()) + (60*3), # 3 minutes in the future (seconds)
-                      'jti': '{:f}'.format(random.random())
+                      'jti': '{0}'.format(0, random.random())
                   }
 
         return jwt.encode(payload, self.api_secret, algorithm='HS256')

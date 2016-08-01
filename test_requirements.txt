@@ -1,4 +1,4 @@
 nose
 httpretty
-sure
+expects
 wheel
