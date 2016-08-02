@@ -21,6 +21,7 @@ from enum import Enum
 from .version import __version__
 from .session import Session
 from .archives import Archive, ArchiveList, OutputModes
+from .callbacks import Callback, CallbackList
 from .exceptions import OpenTokException, RequestError, AuthError, NotFoundError, ArchiveError
 
 class Roles(Enum):
@@ -278,7 +279,7 @@ class OpenTok(object):
             'X-OPENTOK-AUTH': self._create_jwt_auth_header()
         }
 
-    def archive_headers(self):
+    def api_headers(self):
         """For internal use."""
         result = self.headers()
         result['Content-Type'] = 'application/json'
@@ -294,6 +295,20 @@ class OpenTok(object):
         url = self.api_url + '/v2/partner/' + self.api_key + '/archive'
         if archive_id:
             url = url + '/' + archive_id
+        return url
+
+    def callback_url(self, callback_id=None):
+        """For internal use."""
+        url = self.api_url + '/v2/partner/' + self.api_key + '/callback'
+        if callback_id:
+            url = url + '/' + callback_id
+        return url
+
+    def connection_url(self, session_id, connection_id=None):
+        """For internal use."""
+        url = self.api_url + '/v2/partner/' + self.api_key + '/session/' + session_id
+        if connection_id:
+            url = url + '/connection/' + connection_id
         return url
 
     def start_archive(self, session_id, has_audio=True, has_video=True, name=None, output_mode=OutputModes.composed):
@@ -337,7 +352,7 @@ class OpenTok(object):
                    'outputMode': output_mode.value
         }
 
-        response = requests.post(self.archive_url(), data=json.dumps(payload), headers=self.archive_headers(), proxies=self.proxies)
+        response = requests.post(self.archive_url(), data=json.dumps(payload), headers=self.api_headers(), proxies=self.proxies)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -439,8 +454,108 @@ class OpenTok(object):
             return ArchiveList(self, response.json())
         elif response.status_code == 403:
             raise AuthError()
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+    def signal(self, session_id, connection_id, payload):
+        """Sends a signal to all the connections in a session or to a specific one.  This API is the
+          server side API equivalent to the signal method in the Client SDKs:
+          https://www.tokbox.com/developer/guides/signaling/js/
+
+        :param String session_id: The session_id where you want to send the signal to.
+        :param String connection_id: The connection_id of a connection in the session.   Leave
+          it empty if you want to send a signal to all the connections in the session.
+        :param Dictionary payload: Object with optional signal type and signal data fields.ope
+        """
+        if not payload.get('data'):
+            raise OpenTokException(u('Cannot send a signal without data property in the payload'))
+
+        print self.connection_url(connection_id) + '/signal'
+
+        response = requests.post(self.connection_url(session_id, connection_id) + '/signal', data=json.dumps(payload), headers=self.api_headers(), proxies=self.proxies)
+
+        print response.text
+        if response.status_code < 300:
+            pass
+        elif response.status_code == 403:
+            raise AuthError()
         elif response.status_code == 404:
-            raise NotFoundError("Archive not found")
+            raise NotFoundError("Session or connection not found")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+    def force_disconnect(self, session_id, connection_id):
+        """Disconnects a participant from an OpenTok session.  This API is the server side API equivalent
+          to the signal method in the Client SDKs:
+          https://www.tokbox.com/developer/guides/moderation/js/#force_disconnect
+
+        :param String session_id: The session_id where the participant you want to disconnect is connected to.
+        :param String connection_id: The connection_id of the participant you want to disconnect.
+        """
+        response = requests.delete(self.connection_url(session_id, connection_id), headers=self.api_headers(), proxies=self.proxies)
+
+        if response.status_code < 300:
+            pass
+        elif response.status_code == 403:
+            raise AuthError()
+        elif response.status_code == 404:
+            raise NotFoundError("Session or connection not found")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+    def register_callback(self, group, event, callback_url):
+        """Register a callback url for a specific group and event to receive Cloud API events (webhooks)
+        for your API Key.
+
+        :param String group: The group of events you are interested in.   It can be archive,
+          connection or stream.
+        :param String event: The specific event from the group you are interested on receiving
+          callbacks for.  It can be 'status' for 'archive' and it can be 'created' or 'destroyed'
+          for the connection and stream groups.
+        :param String callback_url: The url where you want to receive the events.
+        """
+        payload = {
+            'group': group,
+            'event': event,
+            'url': callback_url
+        }
+        response = requests.post(self.callback_url(), data=json.dumps(payload), headers=self.api_headers(), proxies=self.proxies)
+
+        if response.status_code < 300:
+            pass
+        elif response.status_code == 403:
+            raise AuthError()
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+    def unregister_callback(self, callback_id):
+        """Unregister a callback url previously registered.
+
+        :param String callback_id: The callback ID of the callback to be unregistered.
+        """
+        response = requests.delete(self.callback_url(callback_id), headers=self.api_headers(), proxies=self.proxies)
+
+        if response.status_code < 300:
+            pass
+        elif response.status_code == 403:
+            raise AuthError()
+        elif response.status_code == 404:
+            raise NotFoundError("Callback not found")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+    def get_callbacks(self):
+        """Returns a CallbackList, which is an array of callbacks that are registered for
+        Cloud API events (webhooks) for your API Key.
+
+        :rtype: A CallbackList object, which is an array of Callback objects.
+        """
+        response = requests.get(self.callback_url(), headers=self.api_headers(), proxies=self.proxies)
+
+        if response.status_code < 300:
+            return CallbackList(self, response.json())
+        elif response.status_code == 403:
+            raise AuthError()
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 
