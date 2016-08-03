@@ -507,6 +507,8 @@ class OpenTok(object):
     def register_callback(self, group, event, url):
         """Register a callback URL for a specific group and event to receive OpenTok Cloud API
         events (webhooks) for your OpenTok API key.
+        
+        To unregister a callback, use the unregister_callback() method
 
         :param String group: The group of events you are interested in. It can be set to 'archive',
           'connection' or 'stream'.
@@ -535,7 +537,7 @@ class OpenTok(object):
             raise RequestError("An unexpected error occurred", response.status_code)
 
     def unregister_callback(self, callback_id):
-        """Unregister a callback url previously registered.
+        """Unregister a callback URL (see the register_callback() method).
 
         :param String callback_id: The callback ID of the callback to be unregistered.
         """
@@ -552,7 +554,7 @@ class OpenTok(object):
 
     def get_callbacks(self):
         """Returns a CallbackList, which is an array of callbacks that are registered for
-        Cloud API events (webhooks) for your API Key.
+        OpenTok Cloud API events (webhooks) for your API key.
 
         :rtype: A CallbackList object, which is an array of Callback objects.
         """
