@@ -458,14 +458,14 @@ class OpenTok(object):
             raise RequestError("An unexpected error occurred", response.status_code)
 
     def signal(self, session_id, connection_id, payload):
-        """Sends a signal to all the connections in a session or to a specific one.  This API is the
-          server side API equivalent to the signal method in the Client SDKs:
-          https://www.tokbox.com/developer/guides/signaling/js/
+        """Sends a signal to all the connections in a session or to a specific one. This is the
+          server-side equivalent to the signal() method in the OpenTok client SDKs:
+          https://www.tokbox.com/developer/guides/signaling/js/.
 
-        :param String session_id: The session_id where you want to send the signal to.
-        :param String connection_id: The connection_id of a connection in the session.   Leave
-          it empty if you want to send a signal to all the connections in the session.
-        :param Dictionary payload: Object with optional signal type and signal data fields.ope
+        :param String session_id: The session ID for the OpenTok session to send the signal to.
+        :param String connection_id: The connection ID of a client connected to the session. Leave
+          this empty if you want to send a signal to all connections in the session.
+        :param Dictionary payload: An object with optional signal type and signal data fields.
         """
         if not payload.get('data'):
             raise OpenTokException(u('Cannot send a signal without data property in the payload'))
@@ -485,12 +485,13 @@ class OpenTok(object):
             raise RequestError("An unexpected error occurred", response.status_code)
 
     def force_disconnect(self, session_id, connection_id):
-        """Disconnects a participant from an OpenTok session.  This API is the server side API equivalent
-          to the signal method in the Client SDKs:
+        """Disconnects a participant from an OpenTok session. This is the server-side equivalent
+          to the forceDisconnect() method in OpenTok.js:
           https://www.tokbox.com/developer/guides/moderation/js/#force_disconnect
 
-        :param String session_id: The session_id where the participant you want to disconnect is connected to.
-        :param String connection_id: The connection_id of the participant you want to disconnect.
+        :param String session_id: The session ID for the OpenTok session that the client you want
+          to disconnect is connected to.
+        :param String connection_id: The connection ID of the client you want to disconnect.
         """
         response = requests.delete(self.connection_url(session_id, connection_id), headers=self.api_headers(), proxies=self.proxies)
 
@@ -504,15 +505,15 @@ class OpenTok(object):
             raise RequestError("An unexpected error occurred", response.status_code)
 
     def register_callback(self, group, event, callback_url):
-        """Register a callback url for a specific group and event to receive Cloud API events (webhooks)
-        for your API Key.
+        """Register a callback URL for a specific group and event to receive OpenTok Cloud API
+        events (webhooks) for your OpenTok API key.
 
-        :param String group: The group of events you are interested in.   It can be archive,
-          connection or stream.
+        :param String group: The group of events you are interested in. It can be set to 'archive',
+          'connection' or 'stream'.
         :param String event: The specific event from the group you are interested on receiving
-          callbacks for.  It can be 'status' for 'archive' and it can be 'created' or 'destroyed'
-          for the connection and stream groups.
-        :param String callback_url: The url where you want to receive the events.
+          callbacks for.  It can be set to 'status' for 'archive', and it can be set to 'created' or
+          'destroyed' for the connection and stream groups.
+        :param String callback_url: The URL that will receive the events.
         """
         payload = {
             'group': group,

@@ -1,9 +1,13 @@
 # OpenTok Cloud API Sample Python
 
-This is a simple demo app that shows how you can use the OpenTok-Python-SDK to register
-callbacks to receive notifications for streams and connections created and destroyed with your
-API Key and also to send arbitrary messages and disconnect participants in OpenTok sessions
-from your server.
+This simple demo app shows how to use the OpenTok Python SDK to do the following:
+
+* Register callbacks to receive notifications for streams and connections created and destroyed
+  in an OpenTok session
+
+* Send arbitrary messages to clients in an OpenTok session
+
+* Disconnect participants in OpenTok sessions
 
 ## Running the App
 
@@ -21,26 +25,28 @@ current directory:
 (venv)$ pip install -r requirements.txt
 ```
 
-Then add your own API Key and API Secret to the environment variables. There are a few ways to do
-this but the simplest would be to do it right in your shell.
+Then add your OpenTok API Key and API secret to the environment variables. There are a few ways to
+do this, but the simplest way is to add them using the command line:
 
 ```
 (venv)$ export API_KEY=0000000
 (venv)$ export API_SECRET=abcdef1234567890abcdef01234567890abcdef
 ```
 
-This sample app needs to be reachable from OpenTok servers in order to receive notifications and
-usually your machine doesn't have a public address.   There are a number of public services that
-can help you overcome that limitation.    For example you can use [localtunnel](https://localtunnel.github.io).
+This sample app needs to be reachable from OpenTok servers in order to receive notifications.
+Usually, your machine doesn't have a public IP address. There are a number of public services
+that can help you overcome that limitation. For example you can use
+[localtunnel](https://localtunnel.github.io).
 
-First install localtunnel and start the process to listen for HTTP requests in the port where your
-server is listening (by default 5000 in this sample app).
+First, install localtunnel and start the process to listen for HTTP requests on the port where your
+server is listening (by default 5000 in this sample app):
+
 ```
 npm install -g localtunnel
 lt --port 5000
 ```
 
-You will get a public url from the "lt" command and you have to add it to the environment variables:
+You will get a public URL from the `lt` command. Add it to the `PUBLIC_URL` environment variable:
 
 ```
 (venv)$ export PUBLIC_URL=http://orfsvirfmv.localtunnel.me
@@ -60,13 +66,13 @@ set up a group chat.
 This demo application uses the same frameworks and libraries as the HelloWorld sample. If you have
 not already gotten familiar with the code in that project, consider doing so before continuing.
 
-The explanations below are separated by page. Each section will focus on a separate piece of functionality.
+The explanations focus on a separate piece of functionality defined by the OpenTok Cloud API.
 
 ### Registering callbacks
 
-The first thing the sample app does is to register callbacks for all the events part of Cloud API. In the
-sample app we use a single url to receive all the events but you can register a different url for each event
-if that simplifies your implementation.
+First, the sample app registers callbacks for all the events defined by the OpenTok Cloud API.
+By default, the app uses a single URL to receive all the events, but you can register a different
+URL for each event if that simplifies your implementation:
 
 ```python
 callback_url = base_url + '/callback
@@ -76,11 +82,16 @@ opentok.register_callback('stream', 'created', callback_url)
 opentok.register_callback('stream', 'destroyed', callback_url)
 ```
 
-### Listening for events
+To register a callback for an OpenTok Cloud event, call the `OpenTok.register_callback()` method
+of the OpenTok Python SDK. The first parameter, `'group'`, defining the group of events you are
+interested in, can be set to `'archive'`, `'connection'`, or `'stream'`. The second parameter,
+`'type'`, can be set to `'status'` for `'archive'` events, and it can be set to `'created'` or `'destroyed'` for the connection and stream groups. The third parameter sets the callback URL.
+This app sets callback URLs to be called when OpenTok connections or streams are created or
+destroyed.
 
 The next step is to define a route to handle the HTTP callback requests coming from OpenTok to your
-server.   In the sample app we use a single route/url to receive all the events and we store them in a
-list.
+server. The sample app we use a single route/URL to receive all events, and we store the events
+in a list.
 
 ```python
 EVENTS = []
@@ -91,13 +102,14 @@ def callback():
     return '', 201
 ```
 
-The list of events is shown in the /events test page.   That is a simple template page showing the events that
-we have stored in the EVENTS list so far.
+The list of events is displayed in the /events test page (<http://localhost:5000/events>). That is
+a simple template page showing the events that are stored in the `EVENTS` list.
 
 ### Sending signals
 
-In the sample app we register a url (/signal) to send signals to a specific connection in a session.   That url is used from
-the /events page. The content of the signal is fixed in the sample app but you can change it for your specific use case.
+In the sample app we register a URL (/signal) to send signals to a specific connection in a session.
+That URL is called from the /events (<http://localhost:5000/events>) page. The content of the signal
+is fixed in the sample app, but you can change it for your specific use case:
 
 ```python
 @app.route("/signal", methods = ['POST'])
@@ -107,14 +119,19 @@ def signal():
     return '', 201
 ```
 
-To send a signal you use the signal method in the SDK.  The first parameter is the session where the participant is connected
-to and the second parameter is the connectionId of that participant.   That second parameter is optional and you can leave
-it empty if you want to send the signal to all the people connected to the session.
+To send a signal, call the `OpenTok.signal()` method of the OpenTok Python SDK. The first parameter
+is the ID of the OpenTok session, and the second parameter is the connection ID of the client to
+receive the signal. The second parameter is optional, and you can leave it empty to send the signal
+to all clients connected to the session. The third parameter defines the `type` and `data` strings
+to send as the signal payload.
+
+This is the server-side equivalent to the signal() method in the OpenTok client SDKs. See
+<https://www.tokbox.com/developer/guides/signaling/js/>.
 
 ### Disconnecting participants
 
-In the sample app we register a url (/disconnect) to disconnect a specific connection from a session.   That url is used from
-the /events page.
+The sample app registers a URL (/disconnect) to disconnect a specific connection from a session.
+That URL is called from the /events (<http://localhost:5000/events>) page.
 
 ```python
 @app.route("/disconnect", methods = ['POST'])
@@ -124,9 +141,9 @@ def disconnect():
     return '', 201
 ```
 
-To disconnect a participant you use the force_disconnect method in the SDK.  The first parameter is the session
-where the participant is connected to and the second parameter is the connectionId of that participant.
+To disconnect a client from a session, call the `OpenTok.force_disconnect()` method of the OpenTok
+Python SDK. The first parameter is the session ID, and the second parameter is the connection ID of
+the client to disconnect.
 
-That completes the walkthrough for this Cloud API sample application. Feel free to continue to use
-this application to receive events from the sessions created for your API Key and try the signal
-and force_disconnect APIs.
+This is the server-side equivalent to the forceDisconnect() method in OpenTok.js:
+<https://www.tokbox.com/developer/guides/moderation/js/#force_disconnect>.
