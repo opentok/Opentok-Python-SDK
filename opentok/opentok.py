@@ -378,7 +378,7 @@ class OpenTok(object):
 
         :rtype: The Archive object corresponding to the archive being stopped.
         """
-        response = requests.post(self.archive_url(archive_id) + '/stop', headers=self.archive_headers(), proxies=self.proxies)
+        response = requests.post(self.archive_url(archive_id) + '/stop', headers=self.api_headers(), proxies=self.proxies)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -401,7 +401,7 @@ class OpenTok(object):
 
         :param String archive_id: The archive ID of the archive to be deleted.
         """
-        response = requests.delete(self.archive_url(archive_id), headers=self.archive_headers(), proxies=self.proxies)
+        response = requests.delete(self.archive_url(archive_id), headers=self.api_headers(), proxies=self.proxies)
 
         if response.status_code < 300:
             pass
@@ -419,7 +419,7 @@ class OpenTok(object):
 
         :rtype: The Archive object.
         """
-        response = requests.get(self.archive_url(archive_id), headers=self.archive_headers(), proxies=self.proxies)
+        response = requests.get(self.archive_url(archive_id), headers=self.api_headers(), proxies=self.proxies)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -448,7 +448,7 @@ class OpenTok(object):
         if count is not None:
             params['count'] = count
 
-        response = requests.get(self.archive_url() + "?" + urlencode(params), headers=self.archive_headers(), proxies=self.proxies)
+        response = requests.get(self.archive_url() + "?" + urlencode(params), headers=self.api_headers(), proxies=self.proxies)
 
         if response.status_code < 300:
             return ArchiveList(self, response.json())
@@ -458,23 +458,20 @@ class OpenTok(object):
             raise RequestError("An unexpected error occurred", response.status_code)
 
     def signal(self, session_id, connection_id, payload):
-        """Sends a signal to all the connections in a session or to a specific one.  This API is the
-          server side API equivalent to the signal method in the Client SDKs:
-          https://www.tokbox.com/developer/guides/signaling/js/
+        """Sends a signal to all the connections in a session or to a specific one. This is the
+          server-side equivalent to the signal() method in the OpenTok client SDKs:
+          https://www.tokbox.com/developer/guides/signaling/js/.
 
-        :param String session_id: The session_id where you want to send the signal to.
-        :param String connection_id: The connection_id of a connection in the session.   Leave
-          it empty if you want to send a signal to all the connections in the session.
-        :param Dictionary payload: Object with optional signal type and signal data fields.ope
+        :param String session_id: The session ID for the OpenTok session to send the signal to.
+        :param String connection_id: The connection ID of a client connected to the session. Leave
+          this empty if you want to send a signal to all connections in the session.
+        :param Dictionary payload: An object with optional signal type and signal data fields.
         """
-        if not payload.get('data'):
-            raise OpenTokException(u('Cannot send a signal without data property in the payload'))
-
-        print self.connection_url(connection_id) + '/signal'
+        if not session_id or not payload:
+            raise OpenTokException(u('SessionId and payload are required'))
 
         response = requests.post(self.connection_url(session_id, connection_id) + '/signal', data=json.dumps(payload), headers=self.api_headers(), proxies=self.proxies)
 
-        print response.text
         if response.status_code < 300:
             pass
         elif response.status_code == 403:
@@ -485,13 +482,17 @@ class OpenTok(object):
             raise RequestError("An unexpected error occurred", response.status_code)
 
     def force_disconnect(self, session_id, connection_id):
-        """Disconnects a participant from an OpenTok session.  This API is the server side API equivalent
-          to the signal method in the Client SDKs:
+        """Disconnects a participant from an OpenTok session. This is the server-side equivalent
+          to the forceDisconnect() method in OpenTok.js:
           https://www.tokbox.com/developer/guides/moderation/js/#force_disconnect
 
-        :param String session_id: The session_id where the participant you want to disconnect is connected to.
-        :param String connection_id: The connection_id of the participant you want to disconnect.
+        :param String session_id: The session ID for the OpenTok session that the client you want
+          to disconnect is connected to.
+        :param String connection_id: The connection ID of the client you want to disconnect.
         """
+        if not session_id or not connection_id:
+            raise OpenTokException(u('SessionId and ConnectionId are required'))
+
         response = requests.delete(self.connection_url(session_id, connection_id), headers=self.api_headers(), proxies=self.proxies)
 
         if response.status_code < 300:
@@ -503,28 +504,33 @@ class OpenTok(object):
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 
-    def register_callback(self, group, event, callback_url):
-        """Register a callback url for a specific group and event to receive Cloud API events (webhooks)
-        for your API Key.
+    def register_callback(self, group, event, url):
+        """Register a callback URL for a specific group and event to receive OpenTok Cloud API
+        events (webhooks) for your OpenTok API key.
 
-        :param String group: The group of events you are interested in.   It can be archive,
-          connection or stream.
+        :param String group: The group of events you are interested in. It can be set to 'archive',
+          'connection' or 'stream'.
         :param String event: The specific event from the group you are interested on receiving
-          callbacks for.  It can be 'status' for 'archive' and it can be 'created' or 'destroyed'
-          for the connection and stream groups.
-        :param String callback_url: The url where you want to receive the events.
+          callbacks for.  It can be set to 'status' for 'archive', and it can be set to 'created' or
+          'destroyed' for the connection and stream groups.
+        :param String callback_url: The URL that will receive the events.
         """
+        if not group or not event or not url:
+            raise OpenTokException(u('The group, event and url parameters are required'))
+
         payload = {
             'group': group,
             'event': event,
-            'url': callback_url
+            'url': url
         }
         response = requests.post(self.callback_url(), data=json.dumps(payload), headers=self.api_headers(), proxies=self.proxies)
 
         if response.status_code < 300:
-            pass
+            return Callback(self, response.json())
         elif response.status_code == 403:
             raise AuthError()
+        elif response.status_code == 404:
+            raise NotFoundError("The group or event are not valid")
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 
