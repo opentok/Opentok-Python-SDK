@@ -36,7 +36,7 @@ do this, but the simplest way is to add them using the command line:
 This sample app needs to be reachable from OpenTok servers in order to receive notifications.
 Usually, your machine doesn't have a public IP address. There are a number of public services
 that can help you overcome that limitation. For example you can use
-[localtunnel](https://localtunnel.github.io).
+[localtunnel](https://localtunnel.github.io) or ngrok(https://ngrok.com/).
 
 First, install localtunnel and start the process to listen for HTTP requests on the port where your
 server is listening (by default 5000 in this sample app):

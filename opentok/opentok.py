@@ -378,7 +378,7 @@ class OpenTok(object):
 
         :rtype: The Archive object corresponding to the archive being stopped.
         """
-        response = requests.post(self.archive_url(archive_id) + '/stop', headers=self.archive_headers(), proxies=self.proxies)
+        response = requests.post(self.archive_url(archive_id) + '/stop', headers=self.api_headers(), proxies=self.proxies)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -401,7 +401,7 @@ class OpenTok(object):
 
         :param String archive_id: The archive ID of the archive to be deleted.
         """
-        response = requests.delete(self.archive_url(archive_id), headers=self.archive_headers(), proxies=self.proxies)
+        response = requests.delete(self.archive_url(archive_id), headers=self.api_headers(), proxies=self.proxies)
 
         if response.status_code < 300:
             pass
@@ -419,7 +419,7 @@ class OpenTok(object):
 
         :rtype: The Archive object.
         """
-        response = requests.get(self.archive_url(archive_id), headers=self.archive_headers(), proxies=self.proxies)
+        response = requests.get(self.archive_url(archive_id), headers=self.api_headers(), proxies=self.proxies)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -448,7 +448,7 @@ class OpenTok(object):
         if count is not None:
             params['count'] = count
 
-        response = requests.get(self.archive_url() + "?" + urlencode(params), headers=self.archive_headers(), proxies=self.proxies)
+        response = requests.get(self.archive_url() + "?" + urlencode(params), headers=self.api_headers(), proxies=self.proxies)
 
         if response.status_code < 300:
             return ArchiveList(self, response.json())
@@ -467,14 +467,11 @@ class OpenTok(object):
           this empty if you want to send a signal to all connections in the session.
         :param Dictionary payload: An object with optional signal type and signal data fields.
         """
-        if not payload.get('data'):
-            raise OpenTokException(u('Cannot send a signal without data property in the payload'))
-
-        print self.connection_url(connection_id) + '/signal'
+        if not session_id or not payload:
+            raise OpenTokException(u('SessionId and payload are required'))
 
         response = requests.post(self.connection_url(session_id, connection_id) + '/signal', data=json.dumps(payload), headers=self.api_headers(), proxies=self.proxies)
 
-        print response.text
         if response.status_code < 300:
             pass
         elif response.status_code == 403:
@@ -493,6 +490,9 @@ class OpenTok(object):
           to disconnect is connected to.
         :param String connection_id: The connection ID of the client you want to disconnect.
         """
+        if not session_id or not connection_id:
+            raise OpenTokException(u('SessionId and ConnectionId are required'))
+
         response = requests.delete(self.connection_url(session_id, connection_id), headers=self.api_headers(), proxies=self.proxies)
 
         if response.status_code < 300:
@@ -504,9 +504,11 @@ class OpenTok(object):
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 
-    def register_callback(self, group, event, callback_url):
+    def register_callback(self, group, event, url):
         """Register a callback URL for a specific group and event to receive OpenTok Cloud API
         events (webhooks) for your OpenTok API key.
+
+        To unregister a callback, use the unregister_callback() method
 
         :param String group: The group of events you are interested in. It can be set to 'archive',
           'connection' or 'stream'.
@@ -515,22 +517,27 @@ class OpenTok(object):
           'destroyed' for the connection and stream groups.
         :param String callback_url: The URL that will receive the events.
         """
+        if not group or not event or not url:
+            raise OpenTokException(u('The group, event and url parameters are required'))
+
         payload = {
             'group': group,
             'event': event,
-            'url': callback_url
+            'url': url
         }
         response = requests.post(self.callback_url(), data=json.dumps(payload), headers=self.api_headers(), proxies=self.proxies)
 
         if response.status_code < 300:
-            pass
+            return Callback(self, response.json())
         elif response.status_code == 403:
             raise AuthError()
+        elif response.status_code == 404:
+            raise NotFoundError("The group or event are not valid")
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 
     def unregister_callback(self, callback_id):
-        """Unregister a callback url previously registered.
+        """Unregister a callback URL (see the register_callback() method).
 
         :param String callback_id: The callback ID of the callback to be unregistered.
         """
@@ -547,7 +554,7 @@ class OpenTok(object):
 
     def get_callbacks(self):
         """Returns a CallbackList, which is an array of callbacks that are registered for
-        Cloud API events (webhooks) for your API Key.
+        OpenTok Cloud API events (webhooks) for your API key.
 
         :rtype: A CallbackList object, which is an array of Callback objects.
         """
