@@ -12,7 +12,8 @@ from six.moves import map
 dthandler = lambda obj: obj.isoformat() if isinstance(obj, datetime)  or isinstance(obj, date) else None
 
 class Callback(object):
-    """Represents an callback registered in OpenTok.
+    """Represents a callback registered for an OpenTok Cloud API event.
+    See the OpenTok.register_callback() method.
 
     :ivar created_at:
        The time at which the archive was created, in milliseconds since the UNIX epoch.
@@ -50,17 +51,19 @@ class Callback(object):
 
     def attrs(self):
         """
-        Returns a dictionary of the archive's attributes.
+        Returns a dictionary of the callback's attributes.
         """
         return dict((k, v) for k, v in iteritems(self.__dict__) if k is not "sdk")
 
     def json(self):
         """
-        Returns a JSON representation of the archive.
+        Returns a JSON representation of the callback.
         """
         return json.dumps(self.attrs(), default=dthandler, indent=4)
 
 class CallbackList(object):
+    """Represents an array of Callback objects. See the OpenTok.get_callbacks() method.
+    """
 
     def __init__(self, sdk, values):
         self.items = list(map(lambda x: Callback(sdk, x), values))

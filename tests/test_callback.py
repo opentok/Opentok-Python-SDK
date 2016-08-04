@@ -37,5 +37,3 @@ class OpenTokCallbackTest(unittest.TestCase):
         self.opentok.unregister_callback = MagicMock()
         callback.unregister()
         self.opentok.unregister_callback.assert_called_with(callback_id)
-
-
