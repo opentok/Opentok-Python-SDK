@@ -271,16 +271,16 @@ class OpenTok(object):
         except Exception as e:
             raise OpenTokException('Failed to generate session: %s' % str(e))
 
-    def headers(self):
+    def headers(self, claims=None):
         """For internal use."""
         return {
             'User-Agent': 'OpenTok-Python-SDK/' + __version__ + ' ' + platform.python_version(),
-            'X-OPENTOK-AUTH': self._create_jwt_auth_header()
+            'X-OPENTOK-AUTH': self._create_jwt_auth_header(claims)
         }
 
-    def archive_headers(self):
+    def archive_headers(self, claims=None):
         """For internal use."""
-        result = self.headers()
+        result = self.headers(claims)
         result['Content-Type'] = 'application/json'
         return result
 
@@ -337,7 +337,10 @@ class OpenTok(object):
                    'outputMode': output_mode.value
         }
 
-        response = requests.post(self.archive_url(), data=json.dumps(payload), headers=self.archive_headers(), proxies=self.proxies)
+        claims = {
+          'sid': session_id
+        }
+        response = requests.post(self.archive_url(), data=json.dumps(payload), headers=self.archive_headers(claims), proxies=self.proxies)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -447,7 +450,7 @@ class OpenTok(object):
     def _sign_string(self, string, secret):
         return hmac.new(secret.encode('utf-8'), string.encode('utf-8'), hashlib.sha1).hexdigest()
 
-    def _create_jwt_auth_header(self):
+    def _create_jwt_auth_header(self, claims=None):
         payload = {
                       'ist': 'project',
                       'iss': self.api_key,
@@ -455,5 +458,9 @@ class OpenTok(object):
                       'exp': int(time.time()) + (60*3), # 3 minutes in the future (seconds)
                       'jti': '{0}'.format(0, random.random())
                   }
+
+        if (claims):
+          for key in claims:
+            payload[key] = claims[key]
 
         return jwt.encode(payload, self.api_secret, algorithm='HS256')
