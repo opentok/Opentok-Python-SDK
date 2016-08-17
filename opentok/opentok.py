@@ -21,6 +21,7 @@ from enum import Enum
 from .version import __version__
 from .session import Session
 from .archives import Archive, ArchiveList, OutputModes
+from .callbacks import Callback, CallbackList
 from .exceptions import OpenTokException, RequestError, AuthError, NotFoundError, ArchiveError
 
 class Roles(Enum):
@@ -278,7 +279,7 @@ class OpenTok(object):
             'X-OPENTOK-AUTH': self._create_jwt_auth_header()
         }
 
-    def archive_headers(self):
+    def api_headers(self):
         """For internal use."""
         result = self.headers()
         result['Content-Type'] = 'application/json'
@@ -294,6 +295,13 @@ class OpenTok(object):
         url = self.api_url + '/v2/partner/' + self.api_key + '/archive'
         if archive_id:
             url = url + '/' + archive_id
+        return url
+
+    def callback_url(self, callback_id=None):
+        """For internal use."""
+        url = self.api_url + '/v2/partner/' + self.api_key + '/callback'
+        if callback_id:
+            url = url + '/' + callback_id
         return url
 
     def start_archive(self, session_id, has_audio=True, has_video=True, name=None, output_mode=OutputModes.composed):
@@ -337,7 +345,7 @@ class OpenTok(object):
                    'outputMode': output_mode.value
         }
 
-        response = requests.post(self.archive_url(), data=json.dumps(payload), headers=self.archive_headers(), proxies=self.proxies)
+        response = requests.post(self.archive_url(), data=json.dumps(payload), headers=self.api_headers(), proxies=self.proxies)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -363,7 +371,7 @@ class OpenTok(object):
 
         :rtype: The Archive object corresponding to the archive being stopped.
         """
-        response = requests.post(self.archive_url(archive_id) + '/stop', headers=self.archive_headers(), proxies=self.proxies)
+        response = requests.post(self.archive_url(archive_id) + '/stop', headers=self.api_headers(), proxies=self.proxies)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -386,7 +394,7 @@ class OpenTok(object):
 
         :param String archive_id: The archive ID of the archive to be deleted.
         """
-        response = requests.delete(self.archive_url(archive_id), headers=self.archive_headers(), proxies=self.proxies)
+        response = requests.delete(self.archive_url(archive_id), headers=self.api_headers(), proxies=self.proxies)
 
         if response.status_code < 300:
             pass
@@ -404,7 +412,7 @@ class OpenTok(object):
 
         :rtype: The Archive object.
         """
-        response = requests.get(self.archive_url(archive_id), headers=self.archive_headers(), proxies=self.proxies)
+        response = requests.get(self.archive_url(archive_id), headers=self.api_headers(), proxies=self.proxies)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -433,7 +441,7 @@ class OpenTok(object):
         if count is not None:
             params['count'] = count
 
-        response = requests.get(self.archive_url() + "?" + urlencode(params), headers=self.archive_headers(), proxies=self.proxies)
+        response = requests.get(self.archive_url() + "?" + urlencode(params), headers=self.api_headers(), proxies=self.proxies)
 
         if response.status_code < 300:
             return ArchiveList(self, response.json())
@@ -441,6 +449,75 @@ class OpenTok(object):
             raise AuthError()
         elif response.status_code == 404:
             raise NotFoundError("Archive not found")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+
+    def register_callback(self, group, event, url):
+        """Register a callback URL for a specific group and event to receive OpenTok
+        events (webhooks) for your OpenTok API key.
+
+        To unregister a callback, use the unregister_callback() method,
+
+        :param String group: The group of events you are interested in. It can be set to 'archive',
+          'connection' or 'stream'.
+        :param String event: The specific event from the group you are interested on receiving
+          callbacks for.  It can be set to 'status' for 'archive', and it can be set to 'created' or
+          'destroyed' for the connection and stream groups.
+        :param String callback_url: The URL that will receive the events.
+
+        :rtype: A Callback object with the new callback being registered.
+        """
+        if not group or not event or not url:
+            raise OpenTokException(u('The group, event and url parameters are required'))
+
+        payload = {
+            'group': group,
+            'event': event,
+            'url': url
+        }
+        response = requests.post(self.callback_url(), data=json.dumps(payload), headers=self.api_headers(), proxies=self.proxies)
+
+        if response.status_code < 300:
+            return Callback(self, response.json())
+        elif response.status_code == 403:
+            raise AuthError()
+        elif response.status_code == 404:
+            raise NotFoundError("The group or event are not valid")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+    def unregister_callback(self, callback_id):
+        """Unregister a callback URL (see the register_callback() method).
+
+        :param String callback_id: The callback ID of the callback to be unregistered.
+        """
+        if not callback_id:
+            raise OpenTokException(u('The callback id to unregister is required'))
+
+        response = requests.delete(self.callback_url(callback_id), headers=self.api_headers(), proxies=self.proxies)
+
+        if response.status_code < 300:
+            pass
+        elif response.status_code == 403:
+            raise AuthError()
+        elif response.status_code == 404:
+            raise NotFoundError("Callback not found")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+    def get_callbacks(self):
+        """Returns a CallbackList, which is an array of callbacks that are registered for
+        OpenTok events (webhooks) for your API key.
+
+        :rtype: A CallbackList object, which is an array of Callback objects.
+        """
+        response = requests.get(self.callback_url(), headers=self.api_headers(), proxies=self.proxies)
+
+        if response.status_code < 300:
+            return CallbackList(self, response.json())
+        elif response.status_code == 403:
+            raise AuthError()
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 
