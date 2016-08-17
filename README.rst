@@ -181,6 +181,21 @@ Note that you can also create an automatically archived session, by passing in
 For more information on archiving, see the
 `OpenTok archiving <https://tokbox.com/opentok/tutorials/archiving/>`_ programming guide.
 
+Disconnecting participants
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can disconnect participants from an OpenTok Session using the
+``opentok.force_disconnect(session_id, connection_id)`` method.
+
+The sample app registers a URL (/disconnect) to disconnect a specific connection from a session.
+That URL is called from the /events (<http://localhost:5000/events>) page.
+
+.. code:: python
+
+    opentok.force_disconnect(session_id, connection_id)
+
+This is the server-side equivalent to the forceDisconnect() method in OpenTok.js:
+<https://www.tokbox.com/developer/guides/moderation/js/#force_disconnect>.
 
 Samples
 -------
