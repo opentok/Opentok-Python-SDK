@@ -24,15 +24,15 @@ class OpenTokCallbackTest(unittest.TestCase):
             u('url'): u('URL'),
         })
 
-        expect(callback).to.have.property(u('id')).being.equal(callback_id)
-        expect(callback).to.have.property(u('group')).being.equal(u('GROUP'))
-        expect(callback).to.have.property(u('event')).being.equal(u('EVENT'))
-        expect(callback).to.have.property(u('url')).being.equal(u('URL'))
+        expect(callback).to(have_property(u('id'), callback_id))
+        expect(callback).to(have_property(u('group'), u('GROUP')))
+        expect(callback).to(have_property(u('event'), u('EVENT')))
+        expect(callback).to(have_property(u('url'), u('URL')))
         if PY2:
             created_at = datetime.datetime.fromtimestamp(1395183243, pytz.UTC)
         if PY3:
             created_at = datetime.datetime.fromtimestamp(1395183243, datetime.timezone.utc)
-        expect(callback).to.have.property(u('created_at')).being.equal(created_at)
+        expect(callback).to(have_property(u('created_at'), created_at))
 
         self.opentok.unregister_callback = MagicMock()
         callback.unregister()
