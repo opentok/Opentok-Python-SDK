@@ -21,10 +21,10 @@ class OpenTokSignalTest(unittest.TestCase):
         self.opentok = OpenTok(self.api_key, self.api_secret)
 
     def register_uri(self, status, connection, payload):
-        uri = u('https://api.opentok.com/v2/partner/{}/session/{}/signal').format(
+        uri = u('https://api.opentok.com/v2/partner/{0}/session/{1}/signal').format(
             self.api_key, self.session_id)
         if connection:
-            uri = u('https://api.opentok.com/v2/partner/{}/session/{}/connection/{}/signal').format(
+            uri = u('https://api.opentok.com/v2/partner/{0}/session/{1}/connection/{2}/signal').format(
                 self.api_key, self.session_id, self.connection_id)
 
         httpretty.register_uri(httpretty.POST, uri,
