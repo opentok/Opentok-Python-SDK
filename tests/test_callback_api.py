@@ -48,7 +48,7 @@ class OpenTokCallbackApiTest(unittest.TestCase):
     # Register Callback Suite
 
     def register_register_uri(self, status):
-        url = u('https://api.opentok.com/v2/partner/{}/callback').format(self.api_key)
+        url = u('https://api.opentok.com/v2/partner/{0}/callback').format(self.api_key)
         httpretty.register_uri(httpretty.POST, url,
                                body=u(json.dumps(self.callback)),
                                content_type=u('application/json'),
@@ -108,7 +108,7 @@ class OpenTokCallbackApiTest(unittest.TestCase):
     # Unregister Callback Suite
 
     def register_unregister_uri(self, status):
-        url = u('https://api.opentok.com/v2/partner/{}/callback/{}').format(self.api_key, self.callback_id)
+        url = u('https://api.opentok.com/v2/partner/{0}/callback/{1}').format(self.api_key, self.callback_id)
         httpretty.register_uri(httpretty.DELETE, url,
                                body=u(json.dumps(self.callback)),
                                content_type=u('application/json'),
@@ -151,7 +151,7 @@ class OpenTokCallbackApiTest(unittest.TestCase):
     # Get Callbacks Suite
 
     def register_list_uri(self, status):
-        url = u('https://api.opentok.com/v2/partner/{}/callback').format(self.api_key, self.callback_id)
+        url = u('https://api.opentok.com/v2/partner/{0}/callback').format(self.api_key, self.callback_id)
         httpretty.register_uri(httpretty.GET, url,
                                body=u(json.dumps([self.callback])),
                                content_type=u('application/json'),
