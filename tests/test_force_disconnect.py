@@ -16,7 +16,7 @@ class OpenTokForceDisconnectTest(unittest.TestCase):
         self.opentok = OpenTok(self.api_key, self.api_secret)
 
     def register_uri(self, status):
-        httpretty.register_uri(httpretty.DELETE, u('https://api.opentok.com/v2/partner/{}/session/{}/connection/{}').format(self.api_key, self.session_id, self.connection_id),
+        httpretty.register_uri(httpretty.DELETE, u('https://api.opentok.com/v2/partner/{0}/session/{1}/connection/{2}').format(self.api_key, self.session_id, self.connection_id),
                                status=status)
 
     def verify_headers(self):
