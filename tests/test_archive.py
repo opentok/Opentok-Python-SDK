@@ -35,7 +35,7 @@ class OpenTokArchiveTest(unittest.TestCase):
             u('outputMode'): OutputModes.composed.value,
             u('url'): None,
         })
-        httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/partner/{0}/archive/{1}/stop').format(self.api_key, archive_id),
+        httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/project/{0}/archive/{1}/stop').format(self.api_key, archive_id),
                                body=textwrap.dedent(u("""\
                                        {
                                           "createdAt" : 1395183243556,
@@ -96,7 +96,7 @@ class OpenTokArchiveTest(unittest.TestCase):
             u('outputMode'): OutputModes.composed.value,
             u('url'): None,
         })
-        httpretty.register_uri(httpretty.DELETE, u('https://api.opentok.com/v2/partner/{0}/archive/{1}').format(self.api_key, archive_id),
+        httpretty.register_uri(httpretty.DELETE, u('https://api.opentok.com/v2/project/{0}/archive/{1}').format(self.api_key, archive_id),
                                body=u(''),
                                status=204)
 

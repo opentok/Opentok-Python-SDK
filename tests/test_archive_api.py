@@ -20,7 +20,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
     @httpretty.activate
     def test_start_archive(self):
-        httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/partner/{0}/archive').format(self.api_key),
+        httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/project/{0}/archive').format(self.api_key),
                                body=textwrap.dedent(u("""\
                                        {
                                           "createdAt" : 1395183243556,
@@ -71,7 +71,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
     @httpretty.activate
     def test_start_archive_with_name(self):
-        httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/partner/{0}/archive').format(self.api_key),
+        httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/project/{0}/archive').format(self.api_key),
                                body=textwrap.dedent(u("""\
                                        {
                                           "createdAt" : 1395183243556,
@@ -120,7 +120,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
     @httpretty.activate
     def test_start_voice_archive(self):
-        httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/partner/{0}/archive').format(self.api_key),
+        httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/project/{0}/archive').format(self.api_key),
                                body=textwrap.dedent(u("""\
                                        {
                                           "createdAt" : 1395183243556,
@@ -171,7 +171,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
     @httpretty.activate
     def test_start_individual_archive(self):
-        httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/partner/{0}/archive').format(self.api_key),
+        httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/project/{0}/archive').format(self.api_key),
                                body=textwrap.dedent(u("""\
                                        {
                                           "createdAt" : 1395183243556,
@@ -223,7 +223,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
     @httpretty.activate
     def test_start_composed_archive(self):
-        httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/partner/{0}/archive').format(self.api_key),
+        httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/project/{0}/archive').format(self.api_key),
                                body=textwrap.dedent(u("""\
                                        {
                                           "createdAt" : 1395183243556,
@@ -276,7 +276,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
     @httpretty.activate
     def test_stop_archive(self):
         archive_id = u('30b3ebf1-ba36-4f5b-8def-6f70d9986fe9')
-        httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/partner/{0}/archive/{1}/stop').format(self.api_key, archive_id),
+        httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/project/{0}/archive/{1}/stop').format(self.api_key, archive_id),
                                body=textwrap.dedent(u("""\
                                        {
                                           "createdAt" : 1395183243000,
@@ -319,7 +319,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
     @httpretty.activate
     def test_delete_archive(self):
         archive_id = u('30b3ebf1-ba36-4f5b-8def-6f70d9986fe9')
-        httpretty.register_uri(httpretty.DELETE, u('https://api.opentok.com/v2/partner/{0}/archive/{1}').format(self.api_key, archive_id),
+        httpretty.register_uri(httpretty.DELETE, u('https://api.opentok.com/v2/project/{0}/archive/{1}').format(self.api_key, archive_id),
                                body=u(''),
                                status=204)
 
@@ -332,7 +332,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
     @httpretty.activate
     def test_find_archive(self):
         archive_id = u('f6e7ee58-d6cf-4a59-896b-6d56b158ec71')
-        httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/partner/{0}/archive/{1}').format(self.api_key, archive_id),
+        httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/project/{0}/archive/{1}').format(self.api_key, archive_id),
                                body=textwrap.dedent(u("""\
                                        {
                                           "createdAt" : 1395187836000,
@@ -374,7 +374,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
     @httpretty.activate
     def test_find_archives(self):
-        httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/partner/{0}/archive').format(self.api_key),
+        httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/project/{0}/archive').format(self.api_key),
                                body=textwrap.dedent(u("""\
                                        {
                                           "count" : 6,
@@ -479,7 +479,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
     @httpretty.activate
     def test_find_archives_with_offset(self):
-        httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/partner/{0}/archive').format(self.api_key),
+        httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/project/{0}/archive').format(self.api_key),
                                body=textwrap.dedent(u("""\
                                        {
                                           "count" : 6,
@@ -542,7 +542,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
     @httpretty.activate
     def test_find_archives_with_count(self):
-        httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/partner/{0}/archive').format(self.api_key),
+        httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/project/{0}/archive').format(self.api_key),
                                body=textwrap.dedent(u("""\
                                        {
                                           "count" : 6,
@@ -592,7 +592,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
     @httpretty.activate
     def test_find_archives_with_offset_and_count(self):
-        httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/partner/{0}/archive').format(self.api_key),
+        httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/project/{0}/archive').format(self.api_key),
                                body=textwrap.dedent(u("""\
                                        {
                                           "count" : 6,
@@ -670,7 +670,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
     @httpretty.activate
     def test_find_paused_archive(self):
         archive_id = u('f6e7ee58-d6cf-4a59-896b-6d56b158ec71')
-        httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/partner/{0}/archive/{1}').format(self.api_key, archive_id),
+        httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/project/{0}/archive/{1}').format(self.api_key, archive_id),
                                body=textwrap.dedent(u("""\
                                        {
                                           "createdAt" : 1395187836000,
@@ -697,7 +697,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
     @httpretty.activate
     def test_find_expired_archive(self):
         archive_id = u('f6e7ee58-d6cf-4a59-896b-6d56b158ec71')
-        httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/partner/{0}/archive/{1}').format(self.api_key, archive_id),
+        httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/project/{0}/archive/{1}').format(self.api_key, archive_id),
                                body=textwrap.dedent(u("""\
                                        {
                                           "createdAt" : 1395187836000,
@@ -724,7 +724,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
     @httpretty.activate
     def test_find_archive_with_unknown_properties(self):
         archive_id = u('f6e7ee58-d6cf-4a59-896b-6d56b158ec71')
-        httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/partner/{0}/archive/{1}').format(self.api_key, archive_id),
+        httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/project/{0}/archive/{1}').format(self.api_key, archive_id),
                                body=textwrap.dedent(u("""\
                                        {
                                           "createdAt" : 1395187836000,
