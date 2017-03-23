@@ -130,7 +130,7 @@ class OpenTok(object):
             raise OpenTokException(u('Cannot generate token, expire_time is not in the future {0}').format(expire_time))
         if expire_time > now + (60*60*24*30):  # 30 days
             raise OpenTokException(u('Cannot generate token, expire_time is not in the next 30 days {0}').format(expire_time))
-        if (data is not None) and len(data) > 1000:
+        if data and len(data) > 1000:
             raise OpenTokException(u('Cannot generate token, data must be less than 1000 characters').format(data))
 
         # decode session id to verify api_key
@@ -150,9 +150,10 @@ class OpenTok(object):
             create_time     = now,
             expire_time     = expire_time,
             role            = role.value,
-            connection_data = (data or None),
             nonce           = random.randint(0,999999)
         )
+        if data:
+            data_params['connection_data'] = data
         data_string = urlencode(data_params, True)
 
         sig = self._sign_string(data_string, self.api_secret)
