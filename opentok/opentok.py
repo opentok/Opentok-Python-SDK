@@ -292,7 +292,7 @@ class OpenTok(object):
 
     def archive_url(self, archive_id=None):
         """For internal use."""
-        url = self.api_url + '/v2/partner/' + self.api_key + '/archive'
+        url = self.api_url + '/v2/project/' + self.api_key + '/archive'
         if archive_id:
             url = url + '/' + archive_id
         return url
