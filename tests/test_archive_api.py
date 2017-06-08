@@ -42,7 +42,9 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
         archive = self.opentok.start_archive(self.session_id)
 
-        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')], {
+          u('sid'): u('SESSIONID')
+        })
         expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
         expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
         # non-deterministic json encoding. have to decode to test it properly
@@ -93,7 +95,9 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
         archive = self.opentok.start_archive(self.session_id, name=u('ARCHIVE NAME'))
 
-        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')], {
+          u('sid'): u('SESSIONID')
+        })
         expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
         expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
         # non-deterministic json encoding. have to decode to test it properly
@@ -142,7 +146,9 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
         archive = self.opentok.start_archive(self.session_id, name=u('ARCHIVE NAME'), has_video=False)
 
-        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')], {
+          u('sid'): u('SESSIONID')
+        })
         expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
         expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
         # non-deterministic json encoding. have to decode to test it properly
@@ -193,7 +199,9 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
         archive = self.opentok.start_archive(self.session_id, name=u('ARCHIVE NAME'), output_mode=OutputModes.individual)
 
-        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')], {
+          u('sid'): u('SESSIONID')
+        })
         expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
         expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
         # non-deterministic json encoding. have to decode to test it properly
@@ -245,7 +253,9 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
         archive = self.opentok.start_archive(self.session_id, name=u('ARCHIVE NAME'), output_mode=OutputModes.composed)
 
-        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')], {
+          u('sid'): u('SESSIONID')
+        })
         expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
         expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
         # non-deterministic json encoding. have to decode to test it properly

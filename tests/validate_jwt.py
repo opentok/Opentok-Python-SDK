@@ -3,8 +3,12 @@ from expects import *
 from jose import jwt
 import time
 
-def validate_jwt_header(self, jsonwebtoken):
+def validate_jwt_header(self, jsonwebtoken, test_claims_list=None):
     claims = jwt.decode(jsonwebtoken, self.api_secret, algorithms=[u('HS256')])
+    if test_claims_list:
+      for test_claim in test_claims_list:
+        expect(claims).to(have_key(test_claim))
+        expect(claims[test_claim]).to(equal(test_claims_list[test_claim]))
     expect(claims).to(have_key(u('iss')))
     expect(claims[u('iss')]).to(equal(self.api_key))
     expect(claims).to(have_key(u('ist')))
