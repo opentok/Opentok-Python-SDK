@@ -195,11 +195,12 @@ For more information on archiving, see the
 Samples
 -------
 
-There are two sample applications included in this repository. To get going as fast as possible, clone the whole
+There are three sample applications included in this repository. To get going as fast as possible, clone the whole
 repository and follow the Walkthroughs:
 
 - `HelloWorld <sample/HelloWorld/README.md>`_
 - `Archiving <sample/Archiving/README.md>`_
+- `Cloud API <sample/Cloud/README.md>`_
 
 Documentation
 -------------

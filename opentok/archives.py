@@ -156,11 +156,5 @@ class ArchiveList(object):
     def json(self):
         return json.dumps(self.attrs(), default=dthandler, indent=4)
 
-    def __getitem__(self, key):
-        return self.items.get(key)
-
-    def __setitem__(self, key, item):
-        raise ArchiveError(u('Cannot set item {0} for key {1} in Archive object').format(item, key))
-
     def __len__(self):
         return len(self.items)

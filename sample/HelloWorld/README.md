@@ -1,8 +1,8 @@
 # OpenTok Hello World Python
 
-This is a simple demo app that shows how you can use the OpenTok-Python-SDK to create Sessions,
-generate Tokens with those Sessions, and then pass these values to a JavaScript client that can
-connect and conduct a group chat.
+This simple demo app shows how you can use the OpenTok Python SDK to create OpenTok sessions,
+generate tokens, and then pass these values to a web, Android, or iOS client so that they can
+connect to OpenTok sessions.
 
 ## Running the App
 
@@ -20,8 +20,8 @@ current directory:
 (venv)$ pip install -r requirements.txt
 ```
 
-Then add your own API Key and API Secret to the environment variables. There are a few ways to do
-this but the simplest would be to do it right in your shell.
+Then add your OpenTok API Key and API secret to the environment variables. There are a few ways to
+do this, but the simplest way is to add them using the command line:
 
 ```
 (venv)$ export API_KEY=0000000
