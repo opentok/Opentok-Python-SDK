@@ -44,10 +44,20 @@ Import the package at the top of any file where you will use it. At the very lea
 Creating Sessions
 ~~~~~~~~~~~~~~~~~
 
-The create an OpenTok Session, use the ``opentok.create_session()`` method. There are three optional
-keyword parameters for this method: ``location`` which can be set to a string containing an IP
-address, ``media_mode`` which is a String (defined by the MediaModes class) and ``archive_mode`` which
-specifies whether the session will be automatically archived (``always``) or not (``manual``).
+To create an OpenTok Session, use the ``opentok.create_session()`` method. There are three optional
+keyword parameters for this method: 
+
+* ``location`` which can be set to a string containing an IP address.
+
+* ``media_mode`` which is a String (defined by the MediaModes class).
+  This determines whether the session will use the
+  `OpenTok Media Router <https://tokbox.com/developer/guides/create-session/#media-mode>`_
+  or attempt to send streams directly between clients. A routed session is required for some 
+  OpenTok features (such as archiving).
+
+* ``archive_mode`` which specifies whether the session will be automatically archived (``always``)
+  or not (``manual``).
+
 This method returns a ``Session`` object. Its ``session_id`` attribute is useful when saving to a persistent
 store (such as a database).
 
@@ -99,7 +109,7 @@ Working with Archives
 You can start the recording of an OpenTok Session using the ``opentok.start_archive(session_id)``
 method. This method takes an optional keyword argument ``name`` to assign a name to the archive.
 This method will return an ``Archive`` instance. Note that you can only start an Archive on
-a Session that has clients connection.
+a Session that has clients connected.
 
 .. code:: python
 
@@ -196,8 +206,7 @@ repository and follow the Walkthroughs:
 Documentation
 -------------
 
-Reference documentation is available at <http://www.tokbox.com/opentok/libraries/server/python/reference/index.html> and in the
-docs directory of the SDK.
+Reference documentation is available at <http://www.tokbox.com/opentok/libraries/server/python/reference/index.html>.
 
 Requirements
 ------------

@@ -71,6 +71,12 @@ class OpenTokTokenGenerationTest(unittest.TestCase):
         assert sorted(token_decoder(token)[u('initial_layout_class_list')].split(u(' '))) == sorted(initial_layout_class_list)
         assert token_signature_validator(token, self.api_secret)
 
+    def test_generate_no_data_token(self):
+        token = self.opentok.generate_token(self.session_id)
+        assert isinstance(token, text_type)
+        assert u('connection_data') not in token_decoder(token)
+        assert token_signature_validator(token, self.api_secret)
+
     @raises(TypeError)
     def test_does_not_generate_token_without_params(self):
         token = self.opentok.generate_token()
