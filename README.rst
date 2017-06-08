@@ -19,7 +19,7 @@ http://www.pip-installer.org/en/latest/
 Add the ``opentok`` package as a dependency in your project. The most common way is to add it to your
 ``requirements.txt`` file::
 
-  opentok>=2.4.1
+  opentok>=2.5.0
 
 Next, install the dependencies::
 
@@ -85,8 +85,9 @@ Generating Tokens
 
 Once a Session is created, you can start generating Tokens for clients to use when connecting to it.
 You can generate a token either by calling the ``opentok.generate_token(session_id)`` method or by
-calling the ``session.generate_token()`` method on a ``Session`` instance after creating it. There
-is a set of optional keyword parameters: ``role``, ``expire_time``, and ``data``.
+calling the ``session.generate_token()`` method on a ``Session`` instance after creating it. Both
+have a set of optional keyword parameters: ``role``, ``expire_time``, ``data``, and
+``initial_layout_class_list``.
 
 .. code:: python
 
@@ -99,7 +100,8 @@ is a set of optional keyword parameters: ``role``, ``expire_time``, and ``data``
   # Set some options in a token
   token = session.generate_token(role=Roles.moderator,
                                  expire_time=int(time.time()) + 10,
-                                 data=u'name=Johnny')
+                                 data=u'name=Johnny'
+                                 initial_layout_class_list=[u'focus'])
 
 Working with Archives
 ~~~~~~~~~~~~~~~~~~~~~
