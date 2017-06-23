@@ -103,7 +103,11 @@ class OpenTok(object):
           end-user. The length of the string is limited to 1000 characters. This data cannot be
           updated once it is set.
 
-        :param list initial_layout_class_list:
+        :param list initial_layout_class_list: An array of class names (strings)
+          to be used as the initial layout classes for streams published by the client. Layout
+          classes are used in customizing the layout of videos in
+          `live streaming broadcasts <https://tokbox.com/developer/guides/broadcast/#live-streaming>`_
+          `composed archives <https://tokbox.com/developer/guides/archiving/layout-control.html>`_
 
         :rtype:
           The token string.
