@@ -44,16 +44,6 @@ Import the package at the top of any file where you will use it. At the very lea
 Creating Sessions
 ~~~~~~~~~~~~~~~~~
 
-<<<<<<< HEAD
-The create an OpenTok Session, use the ``opentok.create_session()`` method. There are three optional
-keyword parameters for this method:
-
-- ``location`` which can be set to a string containing an IP address
-- ``media_mode`` which is a String (defined by the MediaModes class)
-- ``archive_mode`` which specifies whether the session will be automatically archived (``always``) or not (``manual``).
-
-This method returns a ``Session`` object. Its ``session_id`` attribute is useful when saving to a persistent store (such as a database).
-=======
 To create an OpenTok Session, use the ``opentok.create_session()`` method. There are three optional
 keyword parameters for this method: 
 
@@ -70,7 +60,6 @@ keyword parameters for this method:
 
 This method returns a ``Session`` object. Its ``session_id`` attribute is useful when saving to a persistent
 store (such as a database).
->>>>>>> origin/master
 
 .. code:: python
 
