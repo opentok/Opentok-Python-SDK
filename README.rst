@@ -19,7 +19,7 @@ http://www.pip-installer.org/en/latest/
 Add the ``opentok`` package as a dependency in your project. The most common way is to add it to your
 ``requirements.txt`` file::
 
-  opentok>=2.4.1
+  opentok>=2.5.0
 
 Next, install the dependencies::
 
@@ -44,6 +44,7 @@ Import the package at the top of any file where you will use it. At the very lea
 Creating Sessions
 ~~~~~~~~~~~~~~~~~
 
+<<<<<<< HEAD
 The create an OpenTok Session, use the ``opentok.create_session()`` method. There are three optional
 keyword parameters for this method:
 
@@ -52,6 +53,24 @@ keyword parameters for this method:
 - ``archive_mode`` which specifies whether the session will be automatically archived (``always``) or not (``manual``).
 
 This method returns a ``Session`` object. Its ``session_id`` attribute is useful when saving to a persistent store (such as a database).
+=======
+To create an OpenTok Session, use the ``opentok.create_session()`` method. There are three optional
+keyword parameters for this method: 
+
+* ``location`` which can be set to a string containing an IP address.
+
+* ``media_mode`` which is a String (defined by the MediaModes class).
+  This determines whether the session will use the
+  `OpenTok Media Router <https://tokbox.com/developer/guides/create-session/#media-mode>`_
+  or attempt to send streams directly between clients. A routed session is required for some 
+  OpenTok features (such as archiving).
+
+* ``archive_mode`` which specifies whether the session will be automatically archived (``always``)
+  or not (``manual``).
+
+This method returns a ``Session`` object. Its ``session_id`` attribute is useful when saving to a persistent
+store (such as a database).
+>>>>>>> origin/master
 
 .. code:: python
 
@@ -77,8 +96,9 @@ Generating Tokens
 
 Once a Session is created, you can start generating Tokens for clients to use when connecting to it.
 You can generate a token either by calling the ``opentok.generate_token(session_id)`` method or by
-calling the ``session.generate_token()`` method on a ``Session`` instance after creating it. There
-is a set of optional keyword parameters: ``role``, ``expire_time``, and ``data``.
+calling the ``session.generate_token()`` method on a ``Session`` instance after creating it. Both
+have a set of optional keyword parameters: ``role``, ``expire_time``, ``data``, and
+``initial_layout_class_list``.
 
 .. code:: python
 
@@ -91,7 +111,8 @@ is a set of optional keyword parameters: ``role``, ``expire_time``, and ``data``
   # Set some options in a token
   token = session.generate_token(role=Roles.moderator,
                                  expire_time=int(time.time()) + 10,
-                                 data=u'name=Johnny')
+                                 data=u'name=Johnny'
+                                 initial_layout_class_list=[u'focus'])
 
 Working with Archives
 ~~~~~~~~~~~~~~~~~~~~~
@@ -102,7 +123,7 @@ Router (sessions with the media mode set to routed).
 You can start the recording of an OpenTok Session using the ``opentok.start_archive(session_id)``
 method. This method takes an optional keyword argument ``name`` to assign a name to the archive.
 This method will return an ``Archive`` instance. Note that you can only start an Archive on
-a Session that has clients connection.
+a Session that has clients connected.
 
 .. code:: python
 
@@ -199,15 +220,14 @@ repository and follow the Walkthroughs:
 Documentation
 -------------
 
-Reference documentation is available at <http://www.tokbox.com/opentok/libraries/server/python/reference/index.html> and in the
-docs directory of the SDK.
+Reference documentation is available at <http://www.tokbox.com/opentok/libraries/server/python/reference/index.html>.
 
 Requirements
 ------------
 
 You need an OpenTok API key and API secret, which you can obtain at https://dashboard.tokbox.com/
 
-The OpenTok Python SDK requires Python 2.6, 2.7, 3.2, 3.3, or 3.4
+The OpenTok Python SDK requires Python 2.6, 2.7, 3.3, 3.4, 3.5 or 3.6
 
 Release Notes
 -------------

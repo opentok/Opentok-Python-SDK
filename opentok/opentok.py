@@ -10,6 +10,8 @@ import json                    # archiving
 import platform                # user-agent
 from socket import inet_aton   # create_session
 import xml.dom.minidom as xmldom # create_session
+from jose import jwt           # _create_jwt_auth_header
+import random                  # _create_jwt_auth_header
 
 # compat
 from six.moves.urllib.parse import urlencode
@@ -71,7 +73,8 @@ class OpenTok(object):
     def proxies(self, proxies):
         self._proxies = proxies
 
-    def generate_token(self, session_id, role=Roles.publisher, expire_time=None, data=None):
+    def generate_token(self, session_id, role=Roles.publisher, expire_time=None, data=None,
+        initial_layout_class_list=[]):
         """
         Generates a token for a given session.
 
@@ -99,6 +102,12 @@ class OpenTok(object):
           end-user. For example, you can pass the user ID, name, or other data describing the
           end-user. The length of the string is limited to 1000 characters. This data cannot be
           updated once it is set.
+
+        :param list initial_layout_class_list: An array of class names (strings)
+          to be used as the initial layout classes for streams published by the client. Layout
+          classes are used in customizing the layout of videos in
+          `live streaming broadcasts <https://tokbox.com/developer/guides/broadcast/#live-streaming>`_ and
+          `composed archives <https://tokbox.com/developer/guides/archiving/layout-control.html>`_
 
         :rtype:
           The token string.
@@ -128,8 +137,13 @@ class OpenTok(object):
             raise OpenTokException(u('Cannot generate token, expire_time is not in the future {0}').format(expire_time))
         if expire_time > now + (60*60*24*30):  # 30 days
             raise OpenTokException(u('Cannot generate token, expire_time is not in the next 30 days {0}').format(expire_time))
-        if (data is not None) and len(data) > 1000:
-            raise OpenTokException(u('Cannot generate token, data must be less than 1000 characters').format(data))
+        if data and len(data) > 1000:
+            raise OpenTokException(u('Cannot generate token, data must be less than 1000 characters'))
+        if initial_layout_class_list and not all(text_type(c) for c in initial_layout_class_list):
+            raise OpenTokException(u('Cannot generate token, all items in initial_layout_class_list must be strings'))
+        initial_layout_class_list_serialized = u(' ').join(initial_layout_class_list)
+        if len(initial_layout_class_list_serialized) > 1000:
+            raise OpenTokException(u('Cannot generate token, initial_layout_class_list must be less than 1000 characters'))
 
         # decode session id to verify api_key
         sub_session_id = session_id[2:]
@@ -144,13 +158,15 @@ class OpenTok(object):
             raise OpenTokException(u('Cannot generate token, the session_id {0} does not belong to the api_key {1}').format(session_id, self.api_key))
 
         data_params = dict(
-            session_id      = session_id,
-            create_time     = now,
-            expire_time     = expire_time,
-            role            = role.value,
-            connection_data = (data or None),
-            nonce           = random.randint(0,999999)
+            session_id                = session_id,
+            create_time               = now,
+            expire_time               = expire_time,
+            role                      = role.value,
+            nonce                     = random.randint(0,999999),
+            initial_layout_class_list = initial_layout_class_list_serialized
         )
+        if data:
+            data_params['connection_data'] = data
         data_string = urlencode(data_params, True)
 
         sig = self._sign_string(data_string, self.api_secret)
@@ -273,7 +289,7 @@ class OpenTok(object):
         """For internal use."""
         return {
             'User-Agent': 'OpenTok-Python-SDK/' + __version__ + ' ' + platform.python_version(),
-            'X-TB-PARTNER-AUTH': self.api_key + ':' + self.api_secret
+            'X-OPENTOK-AUTH': self._create_jwt_auth_header()
         }
 
     def archive_headers(self):
@@ -289,7 +305,7 @@ class OpenTok(object):
 
     def archive_url(self, archive_id=None):
         """For internal use."""
-        url = self.api_url + '/v2/partner/' + self.api_key + '/archive'
+        url = self.api_url + '/v2/project/' + self.api_key + '/archive'
         if archive_id:
             url = url + '/' + archive_id
         return url
@@ -444,3 +460,14 @@ class OpenTok(object):
 
     def _sign_string(self, string, secret):
         return hmac.new(secret.encode('utf-8'), string.encode('utf-8'), hashlib.sha1).hexdigest()
+
+    def _create_jwt_auth_header(self):
+        payload = {
+                      'ist': 'project',
+                      'iss': self.api_key,
+                      'iat': int(time.time()), # current time in unix time (seconds)
+                      'exp': int(time.time()) + (60*3), # 3 minutes in the future (seconds)
+                      'jti': '{0}'.format(0, random.random())
+                  }
+
+        return jwt.encode(payload, self.api_secret, algorithm='HS256')

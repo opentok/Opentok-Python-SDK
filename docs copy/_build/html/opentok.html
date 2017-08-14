@@ -6,36 +6,36 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>opentok package &mdash; OpenTok Python SDK 2.2 2.2.0 documentation</title>
+    <title>opentok package &mdash; OpenTok Python SDK 2.5.0 documentation</title>
     
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '2.2.0',
+        URL_ROOT:    './',
+        VERSION:     '2.5.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="OpenTok Python SDK 2.2 2.2.0 documentation" href="../index.html" /> 
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="OpenTok Python SDK 2.5.0 documentation" href="index.html" /> 
   </head>
   <body>
     <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
+          <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
+          <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">OpenTok Python SDK 2.2 2.2.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">OpenTok Python SDK 2.5.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -73,9 +73,8 @@ to null.</li>
 <li><strong>output_mode</strong> &#8211; Whether all streams in the archive are recorded to a single file
 (OutputModes.composed) or to individual files (OutputModes.individual).</li>
 <li><strong>partnerId</strong> &#8211; The API key associated with the archive.</li>
-<li><strong>reason</strong> &#8211; For archives with the status &#8220;stopped&#8221;, this can be set to &#8220;90 mins exceeded&#8221;, &#8220;failure&#8221;,
-&#8220;session ended&#8221;, or &#8220;user initiated&#8221;. For archives with the status &#8220;failed&#8221;, this can be set
-to &#8220;system failure&#8221;.</li>
+<li><strong>reason</strong> &#8211; For archives with the status &#8220;stopped&#8221; or &#8220;failed&#8221;, this string describes the
+reason the archive stopped (such as &#8220;maximum duration exceeded&#8221;) or failed.</li>
 <li><strong>sessionId</strong> &#8211; The session ID of the OpenTok session associated with this archive.</li>
 <li><strong>size</strong> &#8211; The size of the MP4 file. For archives that have not been generated, this value is set to 0.</li>
 <li><strong>status</strong> &#8211; <p>The status of the archive, which can be one of the following:</p>
@@ -311,7 +310,7 @@ Check the error message for details.</p>
 OpenTok Media Router (MediaMode.routed) or not (MediaMode.relayed). By default,
 the setting is MediaMode.relayed.</p>
 <p>With the media_mode property set to MediaMode.relayed, the session
-will attempt to transmit streams directly between clients. If clients cannot connect 
+will attempt to transmit streams directly between clients. If clients cannot connect
 due to firewall restrictions, the session uses the OpenTok TURN server to relay
 audio-video streams.</p>
 <p>The <a class="reference external" href="https://tokbox.com/opentok/tutorials/create-session/#media-mode">OpenTok Media
@@ -374,7 +373,7 @@ removes the archive file, making it unavailable for download.</p>
 
 <dl class="method">
 <dt id="opentok.opentok.OpenTok.generate_token">
-<tt class="descname">generate_token</tt><big>(</big><em>session_id</em>, <em>role=&lt;Roles.publisher: u'publisher'&gt;</em>, <em>expire_time=None</em>, <em>data=None</em><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.generate_token" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">generate_token</tt><big>(</big><em>session_id</em>, <em>role=&lt;Roles.publisher: u'publisher'&gt;</em>, <em>expire_time=None</em>, <em>data=None</em>, <em>initial_layout_class_list=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.generate_token" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates a token for a given session.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -402,6 +401,11 @@ time is 24 hours after the token creation time.</li>
 end-user. For example, you can pass the user ID, name, or other data describing the
 end-user. The length of the string is limited to 1000 characters. This data cannot be
 updated once it is set.</li>
+<li><strong>initial_layout_class_list</strong> (<em>list</em>) &#8211; An array of class names (strings)
+to be used as the initial layout classes for streams published by the client. Layout
+classes are used in customizing the layout of videos in
+<a class="reference external" href="https://tokbox.com/developer/guides/broadcast/#live-streaming">live streaming broadcasts</a>
+<a class="reference external" href="https://tokbox.com/developer/guides/archiving/layout-control.html">composed archives</a></li>
 </ul>
 </td>
 </tr>
@@ -458,6 +462,11 @@ number of archives returned is 1000.</li>
 <tt class="descname">headers</tt><big>(</big><big>)</big><a class="headerlink" href="#opentok.opentok.OpenTok.headers" title="Permalink to this definition">¶</a></dt>
 <dd><p>For internal use.</p>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="opentok.opentok.OpenTok.proxies">
+<tt class="descname">proxies</tt><a class="headerlink" href="#opentok.opentok.OpenTok.proxies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="opentok.opentok.OpenTok.session_url">
@@ -624,7 +633,7 @@ updated once it is set.</li>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">opentok package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
@@ -640,12 +649,12 @@ updated once it is set.</li>
 
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="../_sources/docs/opentok.txt"
+    <li><a href="_sources/opentok.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
-    <form class="search" action="../search.html" method="get">
+    <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
@@ -664,16 +673,16 @@ updated once it is set.</li>
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
+          <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
+          <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">OpenTok Python SDK 2.2 2.2.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">OpenTok Python SDK 2.5.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2014, TokBox, Inc..
+        &copy; Copyright 2017, TokBox, Inc..
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
     </div>
   </body>

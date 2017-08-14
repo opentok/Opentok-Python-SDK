@@ -31,6 +31,7 @@ install_requires = [
     'requests',
     'six',
     'pytz',
+    'python-jose'
 ]
 
 if sys.version_info[0] < 3 or sys.version_info[1] < 4:
@@ -60,9 +61,10 @@ setup(
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
 
         'Topic :: Communications',
         'Topic :: Communications :: Chat',
