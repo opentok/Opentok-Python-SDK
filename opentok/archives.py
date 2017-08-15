@@ -107,8 +107,8 @@ class Archive(object):
         """
         Stops an OpenTok archive that is being recorded.
 
-        Archives automatically stop recording after 90 minutes or when all clients have disconnected
-        from the session being archived.
+        Archives automatically stop recording after 120 minutes or when all clients have
+        disconnected from the session being archived.
         """
         temp_archive = self.sdk.stop_archive(self.id)
         for k,v in iteritems(temp_archive.attrs()):
