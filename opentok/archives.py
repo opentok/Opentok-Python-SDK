@@ -54,7 +54,7 @@ class Archive(object):
        For archives with the status "stopped" or "failed", this string describes the
        reason the archive stopped (such as "maximum duration exceeded") or failed.
 
-    :ivar sessionId:
+    :ivar session_id:
        The session ID of the OpenTok session associated with this archive.
 
     :ivar size:
