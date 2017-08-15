@@ -47,7 +47,7 @@ class Archive(object):
         Whether all streams in the archive are recorded to a single file
         (OutputModes.composed) or to individual files (OutputModes.individual).
 
-    :ivar partnerId:
+    :ivar partner_id:
        The API key associated with the archive.
 
     :ivar reason:
