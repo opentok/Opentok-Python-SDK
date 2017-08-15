@@ -28,12 +28,14 @@ session.connect(token, function(error) {
   // This function runs when session.connect() asynchronously completes
   if (error) {
     console.error('Failed to connect', error);
+    // Handle connection errors
   } else {
     // Publish the publisher we initialzed earlier (this will trigger 'streamCreated' on other
     // clients)
     session.publish(publisher, function(error) {
       if (error) {
         console.error('Failed to publish', error);
+        // Handle publish errors
       }
     });
   }
