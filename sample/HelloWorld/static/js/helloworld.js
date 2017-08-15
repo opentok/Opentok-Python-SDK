@@ -6,10 +6,22 @@ var publisher = OT.initPublisher('publisher');
 
 // Attach event handlers
 session.on({
-  // This function runs when another client publishes a stream (by calling Session.publish())
+
+  // This function runs when session.connect() asynchronously completes
+  sessionConnected: function(event) {
+    // Publish the publisher we initialzed earlier (this will trigger 'streamCreated' on other
+    // clients)
+    session.publish(publisher, function(error) {
+      if (error) {
+        console.error('Failed to publish', error);
+      }
+    });
+  },
+
+  // This function runs when another client publishes a stream (eg. session.publish())
   streamCreated: function(event) {
-    // Create a container for a new Subscriber, assign it an ID using the stream ID, put it inside
-    // the DOM element with the ID "subscribers"
+    // Create a container for a new Subscriber, assign it an id using the streamId, put it inside
+    // the element with id="subscribers"
     var subContainer = document.createElement('div');
     subContainer.id = 'stream-' + event.stream.streamId;
     document.getElementById('subscribers').appendChild(subContainer);
@@ -21,22 +33,12 @@ session.on({
       }
     });
   }
+
 });
 
-// Connect to the Session using the OpenTok token for permission
+// Connect to the Session using the 'apiKey' of the application and a 'token' for permission
 session.connect(token, function(error) {
-  // This function runs when session.connect() asynchronously completes
   if (error) {
     console.error('Failed to connect', error);
-    // Handle connection errors
-  } else {
-    // Publish the publisher we initialzed earlier (this will trigger 'streamCreated' on other
-    // clients)
-    session.publish(publisher, function(error) {
-      if (error) {
-        console.error('Failed to publish', error);
-        // Handle publish errors
-      }
-    });
   }
 });
