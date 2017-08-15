@@ -6,18 +6,6 @@ var publisher = OT.initPublisher('publisher');
 
 // Attach event handlers
 session.on({
-
-  // This function runs when session.connect() asynchronously completes
-  sessionConnected: function(event) {
-    // Publish the publisher we initialzed earlier (this will trigger 'streamCreated' on other
-    // clients)
-    session.publish(publisher, function(error) {
-      if (error) {
-        console.error('Failed to publish', error);
-      }
-    });
-  },
-
   // This function runs when another client publishes a stream (by calling Session.publish())
   streamCreated: function(event) {
     // Create a container for a new Subscriber, assign it an ID using the stream ID, put it inside
@@ -37,7 +25,16 @@ session.on({
 
 // Connect to the Session using the OpenTok token for permission
 session.connect(token, function(error) {
+  // This function runs when session.connect() asynchronously completes
   if (error) {
     console.error('Failed to connect', error);
+  } else {
+    // Publish the publisher we initialzed earlier (this will trigger 'streamCreated' on other
+    // clients)
+    session.publish(publisher, function(error) {
+      if (error) {
+        console.error('Failed to publish', error);
+      }
+    });
   }
 });
