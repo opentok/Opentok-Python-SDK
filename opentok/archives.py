@@ -47,15 +47,14 @@ class Archive(object):
         Whether all streams in the archive are recorded to a single file
         (OutputModes.composed) or to individual files (OutputModes.individual).
 
-    :ivar partnerId:
+    :ivar partner_id:
        The API key associated with the archive.
 
     :ivar reason:
-       For archives with the status "stopped", this can be set to "90 mins exceeded", "failure",
-       "session ended", or "user initiated". For archives with the status "failed", this can be set
-       to "system failure".
+       For archives with the status "stopped" or "failed", this string describes the
+       reason the archive stopped (such as "maximum duration exceeded") or failed.
 
-    :ivar sessionId:
+    :ivar session_id:
        The session ID of the OpenTok session associated with this archive.
 
     :ivar size:
@@ -108,8 +107,8 @@ class Archive(object):
         """
         Stops an OpenTok archive that is being recorded.
 
-        Archives automatically stop recording after 90 minutes or when all clients have disconnected
-        from the session being archived.
+        Archives automatically stop recording after 120 minutes or when all clients have
+        disconnected from the session being archived.
         """
         temp_archive = self.sdk.stop_archive(self.id)
         for k,v in iteritems(temp_archive.attrs()):
