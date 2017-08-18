@@ -196,6 +196,18 @@ Note that you can also create an automatically archived session, by passing in
 For more information on archiving, see the
 `OpenTok archiving <https://tokbox.com/opentok/tutorials/archiving/>`_ programming guide.
 
+Sending signals
+~~~~~~~~~~~~~~~~~~~~~
+
+You can send a signal to all the participants in an OpenTok Session using the
+``opentok.signal(session_id, payload)`` method or send it to a specific participant in the session using the
+``opentok.signal(session_id, connection_id, payload)`` method.
+
+.. code:: python
+   opentok.signal(session_id, connection_id, { 'type': 'chat', 'data': 'Hello!' })
+
+This is the server-side equivalent to the signal() method in the OpenTok client SDKs. See
+<https://www.tokbox.com/developer/guides/signaling/js/>.
 
 Samples
 -------
