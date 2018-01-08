@@ -19,7 +19,7 @@ http://www.pip-installer.org/en/latest/
 Add the ``opentok`` package as a dependency in your project. The most common way is to add it to your
 ``requirements.txt`` file::
 
-  opentok>=2.5.1
+  opentok>=2.6.0
 
 Next, install the dependencies::
 
