@@ -2,4 +2,3 @@ nose
 httpretty
 expects
 wheel
-sure

@@ -1,4 +1,5 @@
 import unittest
+from six import u
 from nose.tools import raises
 import httpretty
 import requests
