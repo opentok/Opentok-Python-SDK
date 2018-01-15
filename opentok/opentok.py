@@ -248,9 +248,9 @@ class OpenTok(object):
         # build options
         options = {}
         if not isinstance(media_mode, MediaModes):
-            raise OpenTokException(u('Cannot create session, {0} is not a valid media mode').format(role))
+            raise OpenTokException(u('Cannot create session, {0} is not a valid media mode').format(media_mode))
         if not isinstance(archive_mode, ArchiveModes):
-            raise OpenTokException(u('Cannot create session, {0} is not a valid archive mode').format(role))
+            raise OpenTokException(u('Cannot create session, {0} is not a valid archive mode').format(archive_mode))
         if archive_mode == ArchiveModes.always and media_mode != MediaModes.routed:
             raise OpenTokException(u('A session with always archive mode must also have the routed media mode.'))
         options[u('p2p.preference')] = media_mode.value
