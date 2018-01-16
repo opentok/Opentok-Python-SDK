@@ -1,3 +1,6 @@
+from six import text_type
+from .exceptions import OpenTokException
+
 class Session(object):
     """
     Represents an OpenTok session.
@@ -8,6 +11,8 @@ class Session(object):
     :ivar String session_id: The session ID.
     """
     def __init__(self, sdk, session_id, **kwargs):
+        if not text_type(session_id):
+            raise OpenTokException(u('Cannot instantiate Session, session_id was not valid {0}').format(session_id))
         self.session_id = session_id
         self.sdk = sdk
         for key, value in kwargs.items():
