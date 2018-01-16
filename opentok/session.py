@@ -1,4 +1,4 @@
-from six import text_type
+from six import text_type, u
 from .exceptions import OpenTokException
 
 class Session(object):
