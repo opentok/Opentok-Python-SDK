@@ -311,7 +311,7 @@ class OpenTok(object):
             url = url + '/' + archive_id
         return url
 
-    def start_archive(self, session_id, has_audio=True, has_video=True, name=None, output_mode=OutputModes.composed):
+    def start_archive(self, session_id, has_audio=True, has_video=True, name=None, output_mode=OutputModes.composed,resolution="640x480"):
         """
         Starts archiving an OpenTok session.
 
@@ -338,6 +338,10 @@ class OpenTok(object):
         :param OutputModes output_mode: Whether all streams in the archive are recorded
           to a single file (OutputModes.composed, the default) or to individual files
           (OutputModes.individual).
+        :param String resolution: The resolution of the archive, either "640x480" (SD, the default)
+          or "1280x720" (HD). This parameter only applies to composed archives. If you set this 
+          parameter and set the output_mode parameter to OutputModes.individual, the call to the 
+          start_archive() method results in an error.
 
         :rtype: The Archive object, which includes properties defining the archive,
           including the archive ID.
@@ -349,7 +353,8 @@ class OpenTok(object):
                    'sessionId': session_id,
                    'hasAudio': has_audio,
                    'hasVideo': has_video,
-                   'outputMode': output_mode.value
+                   'outputMode': output_mode.value,
+                   'resolution': resolution
         }
 
         response = requests.post(self.archive_url(), data=json.dumps(payload), headers=self.archive_headers(), proxies=self.proxies, timeout=self.timeout)
@@ -359,7 +364,7 @@ class OpenTok(object):
         elif response.status_code == 403:
             raise AuthError()
         elif response.status_code == 400:
-            raise RequestError("Session ID is invalid")
+            raise RequestError("Session ID is invalid or resolution error")
         elif response.status_code == 404:
             raise NotFoundError("Session not found")
         elif response.status_code == 409:
