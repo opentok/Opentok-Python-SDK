@@ -40,10 +40,33 @@ session.on('archiveStopped', function(event) {
   enableForm();
 });
 
+function addModeRadioOnClicks() {
+  var toggleResolution = function(enable) {
+    return function () {
+      var resolutionFieldset = $('#resolution-fieldset');
+      if (enable) {
+        resolutionFieldset.removeAttr('disabled');
+        resolutionFieldset.find(':input').removeAttr('disabled')
+      } else {
+        resolutionFieldset.attr('disabled', 'disabled')
+        resolutionFieldset.find(':input').attr('disabled', 'disabled')
+
+      }
+    }
+  }
+
+  $('#composedModeRadio').click(toggleResolution(true));
+  $('#individualModeRadio').click(toggleResolution(false));
+
+}
+
 $(document).ready(function() {
+  addModeRadioOnClicks()
+
   $('.start').click(function (event) {
     var options = $('.archive-options').serialize();
     disableForm();
+
     $.post('/start', options).fail(enableForm);
   }).show();
   $('.stop').click(function(event){

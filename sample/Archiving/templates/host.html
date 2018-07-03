@@ -30,12 +30,22 @@
                   <div class="form-group">
                       <p class="help-block">Output Mode:</p>
                       <label class="radio-inline">
-                          <input type="radio" name="outputMode" value="composed" checked> Composed
+                          <input type="radio" id="composedModeRadio" name="outputMode" value="composed" checked> Composed
                       </label>
                       <label class="radio-inline">
-                          <input type="radio" name="outputMode" value="individual"> Individual
+                          <input type="radio" id="individualModeRadio" name="outputMode" value="individual"> Individual
                       </label>
                   </div>
+
+                  <fieldset id="resolution-fieldset" class="form-group">
+                    <p class="help-block">Resolution</p>
+                    <label class="radio-inline">
+                        <input type="radio" name="resolution" value="SD" checked> SD (640x480)
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="resolution" value="HD"> HD (1280x720)
+                    </label>
+                </fieldset>
               </fieldset>
           </form>
           <button class="btn btn-danger start">Start archiving</button>
