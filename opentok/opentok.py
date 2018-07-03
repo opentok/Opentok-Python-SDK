@@ -20,7 +20,7 @@ from enum import Enum
 
 from .version import __version__
 from .session import Session
-from .archives import Archive, ArchiveList, OutputModes
+from .archives import Archive, ArchiveList, OutputModes, ArchiveResolution
 from .exceptions import OpenTokException, RequestError, AuthError, NotFoundError, ArchiveError
 
 class Roles(Enum):
@@ -311,7 +311,7 @@ class OpenTok(object):
             url = url + '/' + archive_id
         return url
 
-    def start_archive(self, session_id, has_audio=True, has_video=True, name=None, output_mode=OutputModes.composed,resolution="640x480"):
+    def start_archive(self, session_id, has_audio=True, has_video=True, name=None, output_mode=OutputModes.composed, resolution=None):
         """
         Starts archiving an OpenTok session.
 
@@ -338,9 +338,9 @@ class OpenTok(object):
         :param OutputModes output_mode: Whether all streams in the archive are recorded
           to a single file (OutputModes.composed, the default) or to individual files
           (OutputModes.individual).
-        :param String resolution: The resolution of the archive, either "640x480" (SD, the default)
-          or "1280x720" (HD). This parameter only applies to composed archives. If you set this 
-          parameter and set the output_mode parameter to OutputModes.individual, the call to the 
+        :param ArchiveResolution resolution (Optional): The resolution of the archive, either ArchiveResolution.SD ("640x480" SD, the default)
+          or ArchiveResolution.HD ("1280x720" HD). This parameter only applies to composed archives. If you set this
+          parameter and set the output_mode parameter to OutputModes.individual, the call to the
           start_archive() method results in an error.
 
         :rtype: The Archive object, which includes properties defining the archive,
@@ -354,8 +354,14 @@ class OpenTok(object):
                    'hasAudio': has_audio,
                    'hasVideo': has_video,
                    'outputMode': output_mode.value,
-                   'resolution': resolution
         }
+
+        if resolution:
+            if output_mode == OutputModes.individual:
+                raise OpenTokException(u('Invalid parameters: Resolution cannot be supplied for individual output mode.'))
+            if not isinstance(resolution, ArchiveResolution):
+                raise OpenTokException(u('Cannot start archive, {0} is not a valid archive resolution value').format(resolution))
+            payload['resolution'] = resolution.value
 
         response = requests.post(self.archive_url(), data=json.dumps(payload), headers=self.archive_headers(), proxies=self.proxies, timeout=self.timeout)
 
