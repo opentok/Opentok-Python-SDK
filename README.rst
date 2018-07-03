@@ -160,7 +160,7 @@ The ``ArchiveResolution`` Enum provides two helper methods to get the desired En
 - ``get(key)``
   takes keys ``'SD'`` or ``'HD'`` and returns ``ArchiveResolution.SD`` or ``ArhiveResolution.HD`` while safely handling other values and returning None.
 - ``fromValue(value)``
-  takes value ``'640x480'`` or ``'1280x720'`` and returns ``ArchiveResolution.SD`` or ``ArhiveResolution.HD`` while safely handling other values and returning None.
+  takes value ``'640x480'`` or ``'1280x720'`` and returns ``ArchiveResolution.SD`` or ``ArchiveResolution.HD`` while safely handling other values and returning None.
 
 You can stop the recording of a started Archive using the ``opentok.stop_archive(archive_id)``
 method. You can also do this using the ``archive.stop()`` method of an ``Archive`` instance.
