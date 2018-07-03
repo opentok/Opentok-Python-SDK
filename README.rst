@@ -142,6 +142,19 @@ streams in the session to individual files (instead of a single composed file) b
   # Store this archive_id in the database
   archive_id = archive.id
 
+Composed archives (output_mode=OutputModes.composed) have an optional ``resolution`` paramter, which defaults to ``ArchiveResolution.SD`` (Resolution of '640x480').
+You can set this to ``ArchiveResolution.HD`` (resolution of '1280x720') by settings the
+``resolution`` parameter of the ``opentok.start_archive()`` method.
+
+Warning: This value cannot be set for Individual output mode, an error will be thrown.
+
+.. code:: python
+
+  archive = opentok.start_archive(session_id, name=u'Important Presentation', resolution=ArchiveResolution.HD)
+
+  # Store this archive_id in the database
+  archive_id = archive.id
+
 You can stop the recording of a started Archive using the ``opentok.stop_archive(archive_id)``
 method. You can also do this using the ``archive.stop()`` method of an ``Archive`` instance.
 
