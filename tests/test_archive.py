@@ -12,14 +12,24 @@ from .validate_jwt import validate_jwt_header
 from opentok import OpenTok, Archive, __version__, OutputModes, ArchiveResolution
 
 class OpenTokArchiveResolutionTest(unittest.TestCase):
-    def test_parse_SD(self):
+    def test_fromValue_SD(self):
         self.assertEqual(ArchiveResolution.fromValue("640x480"), ArchiveResolution.SD)
 
-    def test_parse_HD(self):
+    def test_fromValue_HD(self):
         self.assertEqual(ArchiveResolution.fromValue("1280x720"), ArchiveResolution.HD)
 
-    def test_parse_None(self):
+    def test_fromValue_None(self):
         self.assertEqual(ArchiveResolution.fromValue(None), None)
+
+
+    def test_get_SD_key(self):
+        self.assertEqual(ArchiveResolution.get('SD'), ArchiveResolution.SD)
+
+    def test_get_HD(self):
+        self.assertEqual(ArchiveResolution.get('HD'), ArchiveResolution.HD)
+
+    def test_get_None(self):
+        self.assertEqual(ArchiveResolution.get(None), None)
 
 class OpenTokArchiveTest(unittest.TestCase):
     def setUp(self):

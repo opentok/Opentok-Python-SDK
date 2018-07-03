@@ -28,6 +28,13 @@ class ArchiveResolution(Enum):
     """ High Definition 1280x720 """
 
     @classmethod
+    def get(cls, key):
+        try:
+            return cls[key]
+        except (KeyError):
+            return None
+
+    @classmethod
     def fromValue(cls, resolution):
         if (resolution == '640x480'):
             return cls.SD
