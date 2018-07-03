@@ -9,7 +9,7 @@ import datetime
 import pytz
 from .validate_jwt import validate_jwt_header
 
-from opentok import OpenTok, Archive, ArchiveList, OutputModes, __version__
+from opentok import OpenTok, Archive, ArchiveList, OutputModes, ArchiveResolution, OpenTokException, __version__
 
 class OpenTokArchiveApiTest(unittest.TestCase):
     def setUp(self):
@@ -117,6 +117,119 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(archive).to(have_property(u('size'), equal(0)))
         expect(archive).to(have_property(u('duration'), equal(0)))
         expect(archive).to(have_property(u('url'), equal(None)))
+
+    @httpretty.activate
+    def test_start_archive_with_standard_resolution(self):
+        httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/project/{0}/archive').format(self.api_key),
+                               body=textwrap.dedent(u("""\
+                                       {
+                                          "createdAt" : 1395183243556,
+                                          "duration" : 0,
+                                          "id" : "30b3ebf1-ba36-4f5b-8def-6f70d9986fe9",
+                                          "name" : "ARCHIVE NAME",
+                                          "partnerId" : 123456,
+                                          "reason" : "",
+                                          "sessionId" : "SESSIONID",
+                                          "size" : 0,
+                                          "status" : "started",
+                                          "hasAudio": true,
+                                          "hasVideo": true,
+                                          "outputMode": "composed",
+                                          "url" : null,
+                                          "resolution": "640x480"
+                                        }""")),
+                               status=200,
+                               content_type=u('application/json'))
+
+        archive = self.opentok.start_archive(self.session_id, resolution=ArchiveResolution.SD)
+
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
+        # non-deterministic json encoding. have to decode to test it properly
+        if PY2:
+            body = json.loads(httpretty.last_request().body)
+        if PY3:
+            body = json.loads(httpretty.last_request().body.decode('utf-8'))
+        expect(body).to(have_key(u('sessionId'), u('SESSIONID')))
+        expect(body).to(have_key(u('resolution'), u('640x480')))
+        expect(archive).to(be_an(Archive))
+        expect(archive).to(have_property(u('id'), u('30b3ebf1-ba36-4f5b-8def-6f70d9986fe9')))
+        expect(archive).to(have_property(u('resolution'), ArchiveResolution.SD))
+        expect(archive).to(have_property(u('status'), u('started')))
+        expect(archive).to(have_property(u('session_id'), u('SESSIONID')))
+        expect(archive).to(have_property(u('partner_id'), 123456))
+        if PY2:
+            created_at = datetime.datetime.fromtimestamp(1395183243, pytz.UTC)
+        if PY3:
+            created_at = datetime.datetime.fromtimestamp(1395183243, datetime.timezone.utc)
+        expect(archive).to(have_property(u('created_at'), equal(created_at)))
+        expect(archive).to(have_property(u('size'), equal(0)))
+        expect(archive).to(have_property(u('duration'), equal(0)))
+        expect(archive).to(have_property(u('url'), equal(None)))
+
+    @httpretty.activate
+    def test_start_archive_with_hd_resolution(self):
+        httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/project/{0}/archive').format(self.api_key),
+                               body=textwrap.dedent(u("""\
+                                       {
+                                          "createdAt" : 1395183243556,
+                                          "duration" : 0,
+                                          "id" : "30b3ebf1-ba36-4f5b-8def-6f70d9986fe9",
+                                          "name" : "ARCHIVE NAME",
+                                          "partnerId" : 123456,
+                                          "reason" : "",
+                                          "sessionId" : "SESSIONID",
+                                          "size" : 0,
+                                          "status" : "started",
+                                          "hasAudio": true,
+                                          "hasVideo": true,
+                                          "outputMode": "composed",
+                                          "url" : null,
+                                          "resolution": "1280x720"
+                                        }""")),
+                               status=200,
+                               content_type=u('application/json'))
+
+        archive = self.opentok.start_archive(self.session_id, resolution=ArchiveResolution.HD)
+
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
+        # non-deterministic json encoding. have to decode to test it properly
+        if PY2:
+            body = json.loads(httpretty.last_request().body)
+        if PY3:
+            body = json.loads(httpretty.last_request().body.decode('utf-8'))
+        expect(body).to(have_key(u('sessionId'), u('SESSIONID')))
+        expect(body).to(have_key(u('resolution'), u('1280x720')))
+        expect(archive).to(be_an(Archive))
+        expect(archive).to(have_property(u('id'), u('30b3ebf1-ba36-4f5b-8def-6f70d9986fe9')))
+        expect(archive).to(have_property(u('resolution'), ArchiveResolution.HD))
+        expect(archive).to(have_property(u('status'), u('started')))
+        expect(archive).to(have_property(u('session_id'), u('SESSIONID')))
+        expect(archive).to(have_property(u('partner_id'), 123456))
+        if PY2:
+            created_at = datetime.datetime.fromtimestamp(1395183243, pytz.UTC)
+        if PY3:
+            created_at = datetime.datetime.fromtimestamp(1395183243, datetime.timezone.utc)
+        expect(archive).to(have_property(u('created_at'), equal(created_at)))
+        expect(archive).to(have_property(u('size'), equal(0)))
+        expect(archive).to(have_property(u('duration'), equal(0)))
+        expect(archive).to(have_property(u('url'), equal(None)))
+
+    def test_start_archive_individual_and_resolution_throws_error(self):
+        self.assertRaises(OpenTokException,
+            self.opentok.start_archive,
+            session_id=self.session_id,
+            output_mode=OutputModes.individual,
+            resolution=ArchiveResolution.SD)
+
+        self.assertRaises(OpenTokException,
+            self.opentok.start_archive,
+            session_id=self.session_id,
+            output_mode=OutputModes.individual,
+            resolution=ArchiveResolution.HD)
 
     @httpretty.activate
     def test_start_voice_archive(self):

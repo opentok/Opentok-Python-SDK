@@ -9,7 +9,17 @@ import datetime
 import pytz
 from .validate_jwt import validate_jwt_header
 
-from opentok import OpenTok, Archive, __version__, OutputModes
+from opentok import OpenTok, Archive, __version__, OutputModes, ArchiveResolution
+
+class OpenTokArchiveResolutionTest(unittest.TestCase):
+    def test_parse_SD(self):
+        self.assertEqual(ArchiveResolution.fromValue("640x480"), ArchiveResolution.SD)
+
+    def test_parse_HD(self):
+        self.assertEqual(ArchiveResolution.fromValue("1280x720"), ArchiveResolution.HD)
+
+    def test_parse_None(self):
+        self.assertEqual(ArchiveResolution.fromValue(None), None)
 
 class OpenTokArchiveTest(unittest.TestCase):
     def setUp(self):
