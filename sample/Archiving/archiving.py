@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-from opentok import OpenTok, MediaModes, OutputModes, ArchiveResolution
+from opentok import OpenTok, MediaModes, OutputModes
 from email.utils import formatdate
 import os, time
 
@@ -57,7 +57,7 @@ def start():
     has_audio = 'hasAudio' in request.form.keys()
     has_video = 'hasVideo' in request.form.keys()
     output_mode = OutputModes[request.form.get('outputMode')]
-    resolution = ArchiveResolution.get(request.form.get('resolution'))
+    resolution = request.form.get('resolution')
     archive = opentok.start_archive(session.session_id, name="Python Archiving Sample App",
                                     has_audio=has_audio, has_video=has_video,
                                     output_mode=output_mode, resolution=resolution)

@@ -45,14 +45,14 @@ Creating Sessions
 ~~~~~~~~~~~~~~~~~
 
 To create an OpenTok Session, use the ``opentok.create_session()`` method. There are three optional
-keyword parameters for this method: 
+keyword parameters for this method:
 
 * ``location`` which can be set to a string containing an IP address.
 
 * ``media_mode`` which is a String (defined by the MediaModes class).
   This determines whether the session will use the
   `OpenTok Media Router <https://tokbox.com/developer/guides/create-session/#media-mode>`_
-  or attempt to send streams directly between clients. A routed session is required for some 
+  or attempt to send streams directly between clients. A routed session is required for some
   OpenTok features (such as archiving).
 
 * ``archive_mode`` which specifies whether the session will be automatically archived (``always``)
@@ -142,25 +142,19 @@ streams in the session to individual files (instead of a single composed file) b
   # Store this archive_id in the database
   archive_id = archive.id
 
-Composed archives (output_mode=OutputModes.composed) have an optional ``resolution`` paramter, which defaults to ``ArchiveResolution.SD`` (Resolution of '640x480').
-You can set this to ``ArchiveResolution.HD`` (resolution of '1280x720') by settings the
+Composed archives (output_mode=OutputModes.composed) have an optional ``resolution`` paramter.
+If no value is supplied the opentok platform will use the default resolution "640x480".
+You can set this to "1280x720" by setting the
 ``resolution`` parameter of the ``opentok.start_archive()`` method.
 
 Warning: This value cannot be set for Individual output mode, an error will be thrown.
 
 .. code:: python
 
-  archive = opentok.start_archive(session_id, name=u'Important Presentation', resolution=ArchiveResolution.HD)
+  archive = opentok.start_archive(session_id, name=u'Important Presentation', resolution="1280x720")
 
   # Store this archive_id in the database
   archive_id = archive.id
-
-The ``ArchiveResolution`` Enum provides two helper methods to get the desired Enum value:
-
-- ``get(key)``
-  takes keys ``'SD'`` or ``'HD'`` and returns ``ArchiveResolution.SD`` or ``ArhiveResolution.HD`` while safely handling other values and returning None.
-- ``fromValue(value)``
-  takes value ``'640x480'`` or ``'1280x720'`` and returns ``ArchiveResolution.SD`` or ``ArchiveResolution.HD`` while safely handling other values and returning None.
 
 You can stop the recording of a started Archive using the ``opentok.stop_archive(archive_id)``
 method. You can also do this using the ``archive.stop()`` method of an ``Archive`` instance.

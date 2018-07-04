@@ -9,7 +9,7 @@ import datetime
 import pytz
 from .validate_jwt import validate_jwt_header
 
-from opentok import OpenTok, Archive, ArchiveList, OutputModes, ArchiveResolution, OpenTokException, __version__
+from opentok import OpenTok, Archive, ArchiveList, OutputModes, OpenTokException, __version__
 
 class OpenTokArchiveApiTest(unittest.TestCase):
     def setUp(self):
@@ -141,7 +141,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                status=200,
                                content_type=u('application/json'))
 
-        archive = self.opentok.start_archive(self.session_id, resolution=ArchiveResolution.SD)
+        archive = self.opentok.start_archive(self.session_id, resolution="640x480")
 
         validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
         expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
@@ -155,7 +155,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(body).to(have_key(u('resolution'), u('640x480')))
         expect(archive).to(be_an(Archive))
         expect(archive).to(have_property(u('id'), u('30b3ebf1-ba36-4f5b-8def-6f70d9986fe9')))
-        expect(archive).to(have_property(u('resolution'), ArchiveResolution.SD))
+        expect(archive).to(have_property(u('resolution'), "640x480"))
         expect(archive).to(have_property(u('status'), u('started')))
         expect(archive).to(have_property(u('session_id'), u('SESSIONID')))
         expect(archive).to(have_property(u('partner_id'), 123456))
@@ -191,7 +191,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                                status=200,
                                content_type=u('application/json'))
 
-        archive = self.opentok.start_archive(self.session_id, resolution=ArchiveResolution.HD)
+        archive = self.opentok.start_archive(self.session_id, resolution="1280x720")
 
         validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
         expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
@@ -205,7 +205,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(body).to(have_key(u('resolution'), u('1280x720')))
         expect(archive).to(be_an(Archive))
         expect(archive).to(have_property(u('id'), u('30b3ebf1-ba36-4f5b-8def-6f70d9986fe9')))
-        expect(archive).to(have_property(u('resolution'), ArchiveResolution.HD))
+        expect(archive).to(have_property(u('resolution'), "1280x720"))
         expect(archive).to(have_property(u('status'), u('started')))
         expect(archive).to(have_property(u('session_id'), u('SESSIONID')))
         expect(archive).to(have_property(u('partner_id'), 123456))
@@ -223,13 +223,13 @@ class OpenTokArchiveApiTest(unittest.TestCase):
             self.opentok.start_archive,
             session_id=self.session_id,
             output_mode=OutputModes.individual,
-            resolution=ArchiveResolution.SD)
+            resolution="640x480")
 
         self.assertRaises(OpenTokException,
             self.opentok.start_archive,
             session_id=self.session_id,
             output_mode=OutputModes.individual,
-            resolution=ArchiveResolution.HD)
+            resolution="1280x720")
 
     @httpretty.activate
     def test_start_voice_archive(self):

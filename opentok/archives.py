@@ -19,30 +19,6 @@ class OutputModes(Enum):
     individual = u('individual')
     """Each stream in the archive is recorded to an individual file."""
 
-class ArchiveResolution(Enum):
-    """List of valid settings for the resolution parameter of the OpenTok.start_archive()
-    method."""
-    SD = u('640x480')
-    """ Default Standard Definition 640x480 """
-    HD = u('1280x720')
-    """ High Definition 1280x720 """
-
-    @classmethod
-    def get(cls, key):
-        try:
-            return cls[key]
-        except (KeyError):
-            return None
-
-    @classmethod
-    def fromValue(cls, resolution):
-        if (resolution == '640x480'):
-            return cls.SD
-        elif (resolution == '1280x720'):
-            return cls.HD
-        else:
-            return None
-
 class Archive(object):
     """Represents an archive of an OpenTok session.
 
@@ -126,7 +102,7 @@ class Archive(object):
         self.has_video = values.get('hasVideo')
         self.output_mode = OutputModes[values.get('outputMode', 'composed')]
         self.url = values.get('url')
-        self.resolution = ArchiveResolution.fromValue(values.get('resolution'))
+        self.resolution = values.get('resolution')
 
     def stop(self):
         """
