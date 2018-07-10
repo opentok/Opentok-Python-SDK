@@ -119,7 +119,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(archive).to(have_property(u('url'), equal(None)))
 
     @httpretty.activate
-    def test_start_archive_with_standard_resolution(self):
+    def test_start_archive_with_640x480_resolution(self):
         httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/project/{0}/archive').format(self.api_key),
                                body=textwrap.dedent(u("""\
                                        {
@@ -169,7 +169,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(archive).to(have_property(u('url'), equal(None)))
 
     @httpretty.activate
-    def test_start_archive_with_hd_resolution(self):
+    def test_start_archive_with_1280x720_resolution(self):
         httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/v2/project/{0}/archive').format(self.api_key),
                                body=textwrap.dedent(u("""\
                                        {

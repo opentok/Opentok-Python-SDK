@@ -350,11 +350,8 @@ class OpenTok(object):
             raise OpenTokException(u('Cannot start archive, {0} is not a valid output mode').format(output_mode))
 
 
-        if resolution:
-            if output_mode == OutputModes.individual:
-                raise OpenTokException(u('Invalid parameters: Resolution cannot be supplied for individual output mode.'))
-            if resolution != "640x480" and resolution != "1280x720":
-                raise OpenTokException(u('Cannot start archive, {0} is not a valid archive resolution value').format(resolution))
+        if resolution and output_mode == OutputModes.individual:
+            raise OpenTokException(u('Invalid parameters: Resolution cannot be supplied for individual output mode.'))
 
         payload = {'name': name,
                    'sessionId': session_id,
