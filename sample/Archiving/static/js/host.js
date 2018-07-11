@@ -50,7 +50,6 @@ function addModeRadioOnClicks() {
       } else {
         resolutionFieldset.attr('disabled', 'disabled')
         resolutionFieldset.find(':input').attr('disabled', 'disabled')
-
       }
     }
   }
