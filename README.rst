@@ -142,7 +142,7 @@ streams in the session to individual files (instead of a single composed file) b
   # Store this archive_id in the database
   archive_id = archive.id
 
-Composed archives (output_mode=OutputModes.composed) have an optional ``resolution`` paramter.
+Composed archives (output_mode=OutputModes.composed) have an optional ``resolution`` parameter.
 If no value is supplied the opentok platform will use the default resolution "640x480".
 You can set this to "1280x720" by setting the
 ``resolution`` parameter of the ``opentok.start_archive()`` method.

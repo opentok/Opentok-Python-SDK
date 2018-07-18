@@ -338,8 +338,8 @@ class OpenTok(object):
         :param OutputModes output_mode: Whether all streams in the archive are recorded
           to a single file (OutputModes.composed, the default) or to individual files
           (OutputModes.individual).
-        :param String resolution (Optional): The resolution of the archive, either "640x480" (SD, the default)
-          or "1280x720" (HD). This parameter only applies to composed archives. If you set this
+        :param String resolution (Optional): The resolution of the archive, either "640x480" (the default)
+          or "1280x720". This parameter only applies to composed archives. If you set this
           parameter and set the output_mode parameter to OutputModes.individual, the call to the
           start_archive() method results in an error.
 
