@@ -30,3 +30,8 @@ class ArchiveError(OpenTokException):
     of the requested archive is invalid.
     """
     pass
+
+class SignalingError(OpenTokException):
+    """Indicates that there was a signaling specific problem, one of the parameter
+    is invalid or the type|data string doesn't have a correct size"""
+    pass
