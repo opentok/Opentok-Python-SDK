@@ -196,6 +196,38 @@ Note that you can also create an automatically archived session, by passing in
 For more information on archiving, see the
 `OpenTok archiving <https://tokbox.com/opentok/tutorials/archiving/>`_ programming guide.
 
+Sending Signals
+~~~~~~~~~~~~~~~~~~~~~
+
+Once a Session is created, you can send signals to everyone in the session or to a specific connection. You can send a signal by calling the ``signal(session_id, data)`` method of the ``OpenTok`` class. The ``data`` parameter is a dictionary used to set the ``type``, ``data`` fields. Ỳou can also call the method with the parameter ``connection_id`` to send a signal to a specific connection ``signal(session_id, data, connection_id)``.
+
+.. code:: python
+  # data structure
+  data = {
+      'type': 'signal type', #optional
+      'data': 'signal data' #required
+  }
+
+  connection_id = '2a84cd30-3a33-917f-9150-49e454e01572'
+
+  # To send a signal to everyone in the session:
+  opentok.signal(session_id, data)
+
+  # To send a signal to a specific connection in the session:
+  opentok.signal(session_id, data, connection_id)
+
+  # Calling the signal method on the Session object that is returned by create_session method.
+  # The session instance will have the session_id so the developer can simply pass in the signal
+  # data and the connection_id (optional)
+
+  session = opentok.create_session()
+
+  # To send a signal to everyone from a session instance:
+  session.signal(data)
+
+  # To send a signal to a specific connection from a session instance:
+  session.signal(data, connection_id)
+
 
 Samples
 -------

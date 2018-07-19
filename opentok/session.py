@@ -49,7 +49,7 @@ class Session(object):
         """
         return self.sdk.generate_token(self.session_id, **kwargs)
 
-    def signal(self, **kwargs):
+    def signal(self, *kwargs):
       """
       Send signals to all participants in an active OpenTok session or to a specific client
       connected to that session.
@@ -62,4 +62,4 @@ class Session(object):
       :param connection_id String Optional: If it's present the signal is just send to that
       connection_id
       """
-      return self.sdk.signal(self.session_id, **kwargs)
+      return self.sdk.signal(self.session_id, *kwargs)

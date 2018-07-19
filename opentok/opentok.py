@@ -485,7 +485,9 @@ class OpenTok(object):
         """
         response = requests.post(self.signaling_url(session_id, connection_id), data=json.dumps(data), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
 
-        if response.status_code == 400:
+        if response.status_code < 300:
+            pass
+        elif response.status_code == 400:
             raise SignalingError("Invalid signal properties")
         elif response.status_code == 403:
             raise AuthError()
