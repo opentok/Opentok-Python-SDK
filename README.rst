@@ -202,6 +202,7 @@ Sending Signals
 Once a Session is created, you can send signals to everyone in the session or to a specific connection. You can send a signal by calling the ``signal(session_id, data)`` method of the ``OpenTok`` class. The ``data`` parameter is a dictionary used to set the ``type``, ``data`` fields. Ỳou can also call the method with the parameter ``connection_id`` to send a signal to a specific connection ``signal(session_id, data, connection_id)``.
 
 .. code:: python
+
   # data structure
   data = {
       'type': 'signal type', #optional
