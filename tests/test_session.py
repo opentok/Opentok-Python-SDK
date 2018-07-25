@@ -7,7 +7,7 @@ import json
 from expects import *
 
 from .validate_jwt import validate_jwt_header
-from opentok import OpenTok, Session, Roles, MediaModes, __version__
+from opentok import OpenTok, Session, Roles, MediaModes, __version__, Stream
 from .helpers import token_decoder, token_signature_validator
 
 class SessionTest(unittest.TestCase):
@@ -94,3 +94,39 @@ class SessionTest(unittest.TestCase):
             body = json.loads(httpretty.last_request().body.decode('utf-8'))
         expect(body).to(have_key(u('type'), u('type test')))
         expect(body).to(have_key(u('data'), u('test data')))
+
+    @httpretty.activate
+    def test_get_stream_from_session(self):
+        stream_id = u('8b732909-0a06-46a2-8ea8-074e64d43422')
+        session = Session(self.opentok, self.session_id, media_mode=MediaModes.routed, location=None)
+        stream = Stream({
+            u('id'): stream_id,
+            u('videoType'): u('camera'),
+            u('name'): u('stream name'),
+            u('layoutClassList'): ['full']
+        })
+
+        httpretty.register_uri(
+            httpretty.GET,
+            u('https://api.opentok.com/v2/project/{0}/session/{1}/stream/{2}').format(self.api_key, session.session_id, stream_id),
+            body=textwrap.dedent(u("""\
+                   {
+                      "id": "8b732909-0a06-46a2-8ea8-074e64d43422",
+                      "videoType": "camera",
+                      "name": "stream name",
+                      "layoutClassList": ["full"]
+                    }""")),
+            status=200,
+            content_type=u('application/json')
+        )
+
+        stream_response = session.get_stream(stream_id)
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
+        expect(stream_response).to(be_an(Stream))
+        expect(stream_response).to(have_property(u('id'), stream.id))
+        expect(stream_response).to(have_property(u('videoType'), stream.videoType))
+        expect(stream_response).to(have_property(u('name'), stream.name))
+        expect(stream_response).to(have_property(u('layoutClassList'), stream.layoutClassList))
+        expect(list(stream_response.layoutClassList)).to(have_length(1))

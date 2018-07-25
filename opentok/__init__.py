@@ -3,3 +3,4 @@ from .session import Session
 from .archives import Archive, ArchiveList, OutputModes
 from .exceptions import OpenTokException
 from .version import __version__
+from .stream import Stream

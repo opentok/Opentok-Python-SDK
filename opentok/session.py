@@ -63,3 +63,14 @@ class Session(object):
       connection_id
       """
       return self.sdk.signal(self.session_id, *kwargs)
+
+    def get_stream(self, *kwargs):
+      """
+      Returns an Stream object that contains information of an OpenTok stream:
+      
+      -id: The stream ID
+      -videoType: "camera" or "screen"
+      -name: The stream name (if one was set when the client published the stream)
+      -layoutClassList: It's an array of the layout classes for the stream
+      """
+      return self.sdk.get_stream(self.session_id, *kwargs)
