@@ -57,8 +57,10 @@ def start():
     has_audio = 'hasAudio' in request.form.keys()
     has_video = 'hasVideo' in request.form.keys()
     output_mode = OutputModes[request.form.get('outputMode')]
+    resolution = request.form.get('resolution')
     archive = opentok.start_archive(session.session_id, name="Python Archiving Sample App",
-                                    has_audio=has_audio, has_video=has_video, output_mode=output_mode)
+                                    has_audio=has_audio, has_video=has_video,
+                                    output_mode=output_mode, resolution=resolution)
     return archive.json()
 
 @app.route("/stop/<archive_id>")
