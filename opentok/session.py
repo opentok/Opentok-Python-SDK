@@ -74,3 +74,11 @@ class Session(object):
       -layoutClassList: It's an array of the layout classes for the stream
       """
       return self.sdk.get_stream(self.session_id, *kwargs)
+
+    def force_disconnect(self, *kwargs):
+        """
+        This method returns the force disconnect url endpoint
+
+        :param String connection_id: The connection ID of the client that will be disconnected
+        """
+        return self.sdk.force_disconnect(self.session_id, *kwargs)

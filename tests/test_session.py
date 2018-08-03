@@ -130,3 +130,26 @@ class SessionTest(unittest.TestCase):
         expect(stream_response).to(have_property(u('name'), stream.name))
         expect(stream_response).to(have_property(u('layoutClassList'), stream.layoutClassList))
         expect(list(stream_response.layoutClassList)).to(have_length(1))
+
+    @httpretty.activate
+    def test_force_disconnect_from_session(self):
+        """ Method to test force disconnect functionality using a Session instance """
+        session = Session(self.opentok, self.session_id, media_mode=MediaModes.routed, location=None)
+        connection_id = u('CONNECTIONID')
+
+        httpretty.register_uri(
+            httpretty.DELETE,
+            u('https://api.opentok.com/v2/project/{0}/session/{1}/connection/{2}').format(
+                self.api_key,
+                self.session_id,
+                connection_id
+            ),
+            status=200,
+            content_type=u('application/json')
+        )
+
+        session.force_disconnect(connection_id)
+
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))

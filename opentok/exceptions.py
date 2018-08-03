@@ -40,3 +40,11 @@ class GetStreamError(OpenTokException):
     """Indicates that the data in the request is invalid, or the session_id or stream_id
     are invalid"""
     pass
+
+class ForceDisconnectError(OpenTokException):
+    """
+    Indicates that there was a force disconnect specific problem:
+    One of the arguments is invalid or the client specified by the connectionId property
+    is not connected to the session
+    """
+    pass

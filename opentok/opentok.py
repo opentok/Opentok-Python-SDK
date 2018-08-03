@@ -30,7 +30,8 @@ from .exceptions import (
     NotFoundError,
     ArchiveError,
     SignalingError,
-    GetStreamError
+    GetStreamError,
+    ForceDisconnectError
 )
 
 class Roles(Enum):
@@ -508,6 +509,30 @@ class OpenTok(object):
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 
+    def force_disconnect(self, session_id, connection_id):
+        """
+        Sends a request to disconnect a client from an OpenTok session
+
+        :param String session_id: The session ID of the OpenTok session from which the
+        client will be disconnected
+
+        :param String connection_id: The connection ID of the client that will be disconnected
+        """
+        endpoint = self.endpoint.force_disconnect_url(session_id, connection_id)
+        response = requests.delete(
+            endpoint, headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout
+        )
+
+        if response.status_code < 300:
+            pass
+        elif response.status_code == 400:
+            raise ForceDisconnectError("One of the arguments sessionId or connectionId is invalid")
+        elif response.status_code == 403:
+            raise AuthError()
+        elif response.status_code == 404:
+            raise ForceDisconnectError("The client is not connected to the session")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
 
     def _sign_string(self, string, secret):
         return hmac.new(secret.encode('utf-8'), string.encode('utf-8'), hashlib.sha1).hexdigest()

@@ -30,3 +30,10 @@ class Endpoint(object):
         url = self.api_url + '/v2/project/' + self.api_key + '/session/' + session_id + '/stream/' + stream_id
         return url
 
+    def force_disconnect_url(self, session_id, connection_id):
+        """ this method returns the force disconnect url endpoint """
+        url = (
+            self.api_url + '/v2/project/' + self.api_key + '/session/' +
+            session_id + '/connection/' + connection_id
+        )
+        return url
