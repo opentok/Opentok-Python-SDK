@@ -260,6 +260,22 @@ The method return a Stream object that contains information of an OpenTok stream
   print stream.name #stream name
   print stream.layoutClassList #['full']
 
+Force Disconnect
+~~~~~~~~~~~~~~~~~~~~~
+
+Your application server can disconnect a client from an OpenTok session by calling the force_disconnect(session_id, connection_id) method of the OpenTok class, or the force_disconnect(connection_id) method of the Session class.
+
+.. code:: python
+
+  session_id = 'SESSIONID'
+  connection_id = 'CONNECTIONID'
+
+  # To send a request to disconnect a client:
+  opentok.force_disconnect(session_id, connection_id)
+
+  # To send a request to disconnect a client using a Session instance:
+  session.get_stream(connection_id)
+
 Samples
 -------
 
