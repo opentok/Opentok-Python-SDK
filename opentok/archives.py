@@ -102,6 +102,7 @@ class Archive(object):
         self.has_video = values.get('hasVideo')
         self.output_mode = OutputModes[values.get('outputMode', 'composed')]
         self.url = values.get('url')
+        self.resolution = values.get('resolution')
 
     def stop(self):
         """
