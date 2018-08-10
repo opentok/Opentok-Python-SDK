@@ -231,18 +231,6 @@ Once a Session is created, you can send signals to everyone in the session or to
   # To send a signal to a specific connection in the session:
   opentok.signal(session_id, data, connection_id)
 
-  # Calling the signal method on the Session object that is returned by create_session method.
-  # The session instance will have the session_id so the developer can simply pass in the signal
-  # data and the connection_id (optional)
-
-  session = opentok.create_session()
-
-  # To send a signal to everyone from a session instance:
-  session.signal(data)
-
-  # To send a signal to a specific connection from a session instance:
-  session.signal(data, connection_id)
-
 
 Samples
 -------
