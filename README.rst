@@ -231,18 +231,6 @@ Once a Session is created, you can send signals to everyone in the session or to
   # To send a signal to a specific connection in the session:
   opentok.signal(session_id, data, connection_id)
 
-  # Calling the signal method on the Session object that is returned by create_session method.
-  # The session instance will have the session_id so the developer can simply pass in the signal
-  # data and the connection_id (optional)
-
-  session = opentok.create_session()
-
-  # To send a signal to everyone from a session instance:
-  session.signal(data)
-
-  # To send a signal to a specific connection from a session instance:
-  session.signal(data, connection_id)
-
 Get Stream
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -265,9 +253,6 @@ The method return a Stream object that contains information of an OpenTok stream
   # To get stream info:
   stream = opentok.get_stream(session_id, stream_id)
 
-  # To get stream info from a Session instance:
-  stream = session.get_stream(stream_id)
-
   # Stream properties:
   print stream.id #8b732909-0a06-46a2-8ea8-074e64d43422
   print stream.videoType #camera
@@ -286,9 +271,6 @@ Your application server can disconnect a client from an OpenTok session by calli
 
   # To send a request to disconnect a client:
   opentok.force_disconnect(session_id, connection_id)
-
-  # To send a request to disconnect a client using a Session instance:
-  session.get_stream(connection_id)
 
 Samples
 -------

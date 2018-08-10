@@ -48,37 +48,3 @@ class Session(object):
             The token string.
         """
         return self.sdk.generate_token(self.session_id, **kwargs)
-
-    def signal(self, *kwargs):
-      """
-      Send signals to all participants in an active OpenTok session or to a specific client
-      connected to that session.
-      
-      :param String session_id: The session ID of the OpenTok session that receives the signal
-
-      :param Dictionary: Structure that contains both the type and data fields. These correspond
-      to the type and data parameters passed in the client signal received handlers
-
-      :param connection_id String Optional: If it's present the signal is just send to that
-      connection_id
-      """
-      return self.sdk.signal(self.session_id, *kwargs)
-
-    def get_stream(self, *kwargs):
-      """
-      Returns an Stream object that contains information of an OpenTok stream:
-      
-      -id: The stream ID
-      -videoType: "camera" or "screen"
-      -name: The stream name (if one was set when the client published the stream)
-      -layoutClassList: It's an array of the layout classes for the stream
-      """
-      return self.sdk.get_stream(self.session_id, *kwargs)
-
-    def force_disconnect(self, *kwargs):
-        """
-        This method returns the force disconnect url endpoint
-
-        :param String connection_id: The connection ID of the client that will be disconnected
-        """
-        return self.sdk.force_disconnect(self.session_id, *kwargs)
