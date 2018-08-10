@@ -309,7 +309,7 @@ class OpenTok(object):
         result['Content-Type'] = 'application/json'
         return result
 
-    def start_archive(self, session_id, has_audio=True, has_video=True, name=None, output_mode=OutputModes.composed):
+    def start_archive(self, session_id, has_audio=True, has_video=True, name=None, output_mode=OutputModes.composed, resolution=None):
         """
         Starts archiving an OpenTok session.
 
@@ -336,6 +336,10 @@ class OpenTok(object):
         :param OutputModes output_mode: Whether all streams in the archive are recorded
           to a single file (OutputModes.composed, the default) or to individual files
           (OutputModes.individual).
+        :param String resolution (Optional): The resolution of the archive, either "640x480" (the default)
+          or "1280x720". This parameter only applies to composed archives. If you set this
+          parameter and set the output_mode parameter to OutputModes.individual, the call to the
+          start_archive() method results in an error.
 
         :rtype: The Archive object, which includes properties defining the archive,
           including the archive ID.
@@ -343,11 +347,16 @@ class OpenTok(object):
         if not isinstance(output_mode, OutputModes):
             raise OpenTokException(u('Cannot start archive, {0} is not a valid output mode').format(output_mode))
 
+
+        if resolution and output_mode == OutputModes.individual:
+            raise OpenTokException(u('Invalid parameters: Resolution cannot be supplied for individual output mode.'))
+
         payload = {'name': name,
                    'sessionId': session_id,
                    'hasAudio': has_audio,
                    'hasVideo': has_video,
-                   'outputMode': output_mode.value
+                   'outputMode': output_mode.value,
+                   'resolution': resolution,
         }
 
         response = requests.post(self.endpoint.archive_url(), data=json.dumps(payload), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
@@ -357,7 +366,14 @@ class OpenTok(object):
         elif response.status_code == 403:
             raise AuthError()
         elif response.status_code == 400:
-            raise RequestError("Session ID is invalid")
+            """
+            The HTTP response has a 400 status code in the following cases:
+            You do not pass in a session ID or you pass in an invalid session ID.
+            No clients are actively connected to the OpenTok session.
+            You specify an invalid resolution value.
+            The outputMode property is set to "individual" and you set the resolution property and (which is not supported in individual stream archives).
+            """
+            raise RequestError(response.json().get("message"))
         elif response.status_code == 404:
             raise NotFoundError("Session not found")
         elif response.status_code == 409:

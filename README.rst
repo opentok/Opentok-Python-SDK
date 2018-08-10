@@ -45,14 +45,14 @@ Creating Sessions
 ~~~~~~~~~~~~~~~~~
 
 To create an OpenTok Session, use the ``opentok.create_session()`` method. There are three optional
-keyword parameters for this method: 
+keyword parameters for this method:
 
 * ``location`` which can be set to a string containing an IP address.
 
 * ``media_mode`` which is a String (defined by the MediaModes class).
   This determines whether the session will use the
   `OpenTok Media Router <https://tokbox.com/developer/guides/create-session/#media-mode>`_
-  or attempt to send streams directly between clients. A routed session is required for some 
+  or attempt to send streams directly between clients. A routed session is required for some
   OpenTok features (such as archiving).
 
 * ``archive_mode`` which specifies whether the session will be automatically archived (``always``)
@@ -142,6 +142,20 @@ streams in the session to individual files (instead of a single composed file) b
   # Store this archive_id in the database
   archive_id = archive.id
 
+Composed archives (output_mode=OutputModes.composed) have an optional ``resolution`` parameter.
+If no value is supplied the opentok platform will use the default resolution "640x480".
+You can set this to "1280x720" by setting the
+``resolution`` parameter of the ``opentok.start_archive()`` method.
+
+Warning: This value cannot be set for Individual output mode, an error will be thrown.
+
+.. code:: python
+
+  archive = opentok.start_archive(session_id, name=u'Important Presentation', resolution="1280x720")
+
+  # Store this archive_id in the database
+  archive_id = archive.id
+
 You can stop the recording of a started Archive using the ``opentok.stop_archive(archive_id)``
 method. You can also do this using the ``archive.stop()`` method of an ``Archive`` instance.
 
@@ -217,18 +231,6 @@ Once a Session is created, you can send signals to everyone in the session or to
   # To send a signal to a specific connection in the session:
   opentok.signal(session_id, data, connection_id)
 
-  # Calling the signal method on the Session object that is returned by create_session method.
-  # The session instance will have the session_id so the developer can simply pass in the signal
-  # data and the connection_id (optional)
-
-  session = opentok.create_session()
-
-  # To send a signal to everyone from a session instance:
-  session.signal(data)
-
-  # To send a signal to a specific connection from a session instance:
-  session.signal(data, connection_id)
-
 Get Stream
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -250,9 +252,6 @@ The method return a Stream object that contains information of an OpenTok stream
 
   # To get stream info:
   stream = opentok.get_stream(session_id, stream_id)
-
-  # To get stream info from a Session instance:
-  stream = session.get_stream(stream_id)
 
   # Stream properties:
   print stream.id #8b732909-0a06-46a2-8ea8-074e64d43422
