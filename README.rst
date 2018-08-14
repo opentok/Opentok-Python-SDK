@@ -217,8 +217,8 @@ Once a Session is created, you can send signals to everyone in the session or to
 
 .. code:: python
 
-  # data structure
-  data = {
+  # payload structure
+  payload = {
       'type': 'signal type', #optional
       'data': 'signal data' #required
   }

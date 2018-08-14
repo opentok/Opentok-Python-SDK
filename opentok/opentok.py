@@ -490,18 +490,26 @@ class OpenTok(object):
         """
         Send signals to all participants in an active OpenTok session or to a specific client
         connected to that session.
-        
+
         :param String session_id: The session ID of the OpenTok session that receives the signal
 
         :param Dictionary: Structure that contains both the type and data fields. These correspond
         to the type and data parameters passed in the client signal received handlers
 
-        :param connection_id String Optional: If it's present the signal is just send to that
-        connection_id
+        :param connection_id String: The connection_id parameter is an optional string used to
+        specify the connection ID of a client connected to the session. If you specify this value,
+        the signal is sent to the specified client. Otherwise, the signal is sent to all clients
+        connected to the session
         """
-        response = requests.post(self.signaling_url(session_id, connection_id), data=json.dumps(data), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.post(
+            self.signaling_url(session_id, connection_id),
+            data=json.dumps(data),
+            headers=self.json_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout
+        )
 
-        if response.status_code < 300:
+        if response.status_code == 200:
             pass
         elif response.status_code == 400:
             raise SignalingError("Invalid signal properties")
