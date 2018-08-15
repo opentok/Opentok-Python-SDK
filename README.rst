@@ -231,6 +231,33 @@ Once a Session is created, you can send signals to everyone in the session or to
   # To send a signal to a specific connection in the session:
   opentok.signal(session_id, payload, connection_id)
 
+Get Stream
+~~~~~~~~~~~~~~~~~~~~~
+
+Use this method to get information on an OpenTok stream (or all streams in a session).
+
+You can get information about a stream by calling the `get_stream(session_id, stream_id)` method of the `OpenTok` class, or by calling the `get_stream(stream_id)` method on the `Session` class.
+
+The method return a Stream object that contains information of an OpenTok stream:
+
+* ``id``: The stream ID
+* ``videoType``: "camera" or "screen"
+* ``name``: The stream name (if one was set when the client published the stream)
+* ``layoutClassList``: It's an array of the layout classes for the stream
+
+.. code:: python
+
+  session_id = 'SESSIONID'
+  stream_id = '8b732909-0a06-46a2-8ea8-074e64d43422'
+
+  # To get stream info:
+  stream = opentok.get_stream(session_id, stream_id)
+
+  # Stream properties:
+  print stream.id #8b732909-0a06-46a2-8ea8-074e64d43422
+  print stream.videoType #camera
+  print stream.name #stream name
+  print stream.layoutClassList #['full']
 
 Samples
 -------

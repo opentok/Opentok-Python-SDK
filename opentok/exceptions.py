@@ -35,3 +35,8 @@ class SignalingError(OpenTokException):
     """Indicates that there was a signaling specific problem, one of the parameter
     is invalid or the type|data string doesn't have a correct size"""
     pass
+
+class GetStreamError(OpenTokException):
+    """Indicates that the data in the request is invalid, or the session_id or stream_id
+    are invalid"""
+    pass
