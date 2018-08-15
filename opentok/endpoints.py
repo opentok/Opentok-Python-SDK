@@ -1,4 +1,4 @@
-class Endpoint(object):
+class Endpoints(object):
     """
     For internal use.
     Class that provides the endpoint urls
