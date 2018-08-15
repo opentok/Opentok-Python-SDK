@@ -21,7 +21,7 @@ from enum import Enum
 from .version import __version__
 from .session import Session
 from .archives import Archive, ArchiveList, OutputModes
-from .exceptions import OpenTokException, RequestError, AuthError, NotFoundError, ArchiveError
+from .exceptions import OpenTokException, RequestError, AuthError, NotFoundError, ArchiveError, SignalingError
 
 class Roles(Enum):
     """List of valid roles for a token."""
@@ -293,7 +293,7 @@ class OpenTok(object):
             'X-OPENTOK-AUTH': self._create_jwt_auth_header()
         }
 
-    def archive_headers(self):
+    def json_headers(self):
         """For internal use."""
         result = self.headers()
         result['Content-Type'] = 'application/json'
@@ -309,6 +309,17 @@ class OpenTok(object):
         url = self.api_url + '/v2/project/' + self.api_key + '/archive'
         if archive_id:
             url = url + '/' + archive_id
+        return url
+
+    def signaling_url(self, session_id, connection_id=None):
+        """For internal use."""
+        url = self.api_url + '/v2/project/' + self.api_key + '/session/' + session_id
+
+        if connection_id:
+            url += '/connection/' + connection_id
+
+        url += '/signal'
+
         return url
 
     def start_archive(self, session_id, has_audio=True, has_video=True, name=None, output_mode=OutputModes.composed, resolution=None):
@@ -361,7 +372,7 @@ class OpenTok(object):
                    'resolution': resolution,
         }
 
-        response = requests.post(self.archive_url(), data=json.dumps(payload), headers=self.archive_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.post(self.archive_url(), data=json.dumps(payload), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -394,7 +405,7 @@ class OpenTok(object):
 
         :rtype: The Archive object corresponding to the archive being stopped.
         """
-        response = requests.post(self.archive_url(archive_id) + '/stop', headers=self.archive_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.post(self.archive_url(archive_id) + '/stop', headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -417,7 +428,7 @@ class OpenTok(object):
 
         :param String archive_id: The archive ID of the archive to be deleted.
         """
-        response = requests.delete(self.archive_url(archive_id), headers=self.archive_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.delete(self.archive_url(archive_id), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
 
         if response.status_code < 300:
             pass
@@ -435,7 +446,7 @@ class OpenTok(object):
 
         :rtype: The Archive object.
         """
-        response = requests.get(self.archive_url(archive_id), headers=self.archive_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.get(self.archive_url(archive_id), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -464,7 +475,7 @@ class OpenTok(object):
         if count is not None:
             params['count'] = count
 
-        response = requests.get(self.archive_url() + "?" + urlencode(params), headers=self.archive_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.get(self.archive_url() + "?" + urlencode(params), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
 
         if response.status_code < 300:
             return ArchiveList(self, response.json())
@@ -472,6 +483,42 @@ class OpenTok(object):
             raise AuthError()
         elif response.status_code == 404:
             raise NotFoundError("Archive not found")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+    def signal(self, session_id, payload, connection_id=None):
+        """
+        Send signals to all participants in an active OpenTok session or to a specific client
+        connected to that session.
+
+        :param String session_id: The session ID of the OpenTok session that receives the signal
+
+        :param Dictionary payload: Structure that contains both the type and data fields. These
+        correspond to the type and data parameters passed in the client signal received handlers
+
+        :param String connection_id: The connection_id parameter is an optional string used to
+        specify the connection ID of a client connected to the session. If you specify this value,
+        the signal is sent to the specified client. Otherwise, the signal is sent to all clients
+        connected to the session
+        """
+        response = requests.post(
+            self.signaling_url(session_id, connection_id),
+            data=json.dumps(payload),
+            headers=self.json_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout
+        )
+
+        if response.status_code == 204:
+            pass
+        elif response.status_code == 400:
+            raise SignalingError('One of the signal properties - data, type, sessionId or connectionId - is invalid.')
+        elif response.status_code == 403:
+            raise AuthError('You are not authorized to send the signal. Check your authentication credentials.')
+        elif response.status_code == 404:
+            raise SignalingError('The client specified by the connectionId property is not connected to the session.')
+        elif response.status_code == 413:
+            raise SignalingError('The type string exceeds the maximum length (128 bytes), or the data string exceeds the maximum size (8 kB).')
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 
