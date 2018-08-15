@@ -19,7 +19,7 @@ from six import text_type, u, b, PY3
 from enum import Enum
 
 from .version import __version__
-from .endpoints import Endpoint
+from .endpoints import Endpoints
 from .session import Session
 from .archives import Archive, ArchiveList, OutputModes
 from .stream import Stream
@@ -74,7 +74,7 @@ class OpenTok(object):
         self.api_secret = api_secret
         self.timeout = timeout
         self._proxies = None
-        self.endpoint = Endpoint(api_url, self.api_key)
+        self.endpoints = Endpoints(api_url, self.api_key)
 
     @property
     def proxies(self):
@@ -274,7 +274,7 @@ class OpenTok(object):
             options[u('location')] = location
 
         try:
-            response = requests.post(self.endpoint.session_url(), data=options, headers=self.headers(), proxies=self.proxies, timeout=self.timeout)
+            response = requests.post(self.endpoints.session_url(), data=options, headers=self.headers(), proxies=self.proxies, timeout=self.timeout)
             response.encoding = 'utf-8'
 
             if response.status_code == 403:
@@ -359,7 +359,7 @@ class OpenTok(object):
                    'resolution': resolution,
         }
 
-        response = requests.post(self.endpoint.archive_url(), data=json.dumps(payload), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.post(self.endpoints.archive_url(), data=json.dumps(payload), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -392,7 +392,7 @@ class OpenTok(object):
 
         :rtype: The Archive object corresponding to the archive being stopped.
         """
-        response = requests.post(self.endpoint.archive_url(archive_id) + '/stop', headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.post(self.endpoints.archive_url(archive_id) + '/stop', headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -415,7 +415,7 @@ class OpenTok(object):
 
         :param String archive_id: The archive ID of the archive to be deleted.
         """
-        response = requests.delete(self.endpoint.archive_url(archive_id), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.delete(self.endpoints.archive_url(archive_id), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
 
         if response.status_code < 300:
             pass
@@ -433,7 +433,7 @@ class OpenTok(object):
 
         :rtype: The Archive object.
         """
-        response = requests.get(self.endpoint.archive_url(archive_id), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.get(self.endpoints.archive_url(archive_id), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -462,7 +462,7 @@ class OpenTok(object):
         if count is not None:
             params['count'] = count
 
-        response = requests.get(self.endpoint.archive_url() + "?" + urlencode(params), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.get(self.endpoints.archive_url() + "?" + urlencode(params), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
 
         if response.status_code < 300:
             return ArchiveList(self, response.json())
@@ -489,7 +489,7 @@ class OpenTok(object):
         connected to the session
         """
         response = requests.post(
-            self.endpoint.signaling_url(session_id, connection_id),
+            self.endpoints.signaling_url(session_id, connection_id),
             data=json.dumps(payload),
             headers=self.json_headers(),
             proxies=self.proxies,
@@ -518,7 +518,7 @@ class OpenTok(object):
         -name: The stream name (if one was set when the client published the stream)
         -layoutClassList: It's an array of the layout classes for the stream
         """
-        endpoint = self.endpoint.get_stream_url(session_id, stream_id)
+        endpoint = self.endpoints.get_stream_url(session_id, stream_id)
         response = requests.get(
             endpoint, headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout
         )
@@ -526,7 +526,7 @@ class OpenTok(object):
         if response.status_code == 200:
             return Stream(response.json())
         elif response.status_code == 400:
-            raise GetStreamError('Invalid request.')
+            raise GetStreamError('Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.')
         elif response.status_code == 403:
             raise AuthError('You passed in an invalid OpenTok API key or JWT token.')
         elif response.status_code == 408:
