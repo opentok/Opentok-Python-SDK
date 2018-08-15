@@ -28,7 +28,7 @@ class OpenTokSignalTest(unittest.TestCase):
                                           "type": "type test",
                                           "data": "test data"
                                         }""")),
-                               status=200,
+                               status=204,
                                content_type=u('application/json'))
 
         self.opentok.signal(self.session_id, data)
@@ -59,7 +59,7 @@ class OpenTokSignalTest(unittest.TestCase):
                                           "type": "type test",
                                           "data": "test data"
                                         }""")),
-                               status=200,
+                               status=204,
                                content_type=u('application/json'))
 
         self.opentok.signal(self.session_id, data, connection_id)
@@ -73,4 +73,4 @@ class OpenTokSignalTest(unittest.TestCase):
         if PY3:
             body = json.loads(httpretty.last_request().body.decode('utf-8'))
         expect(body).to(have_key(u('type'), u('type test')))
-        expect(body).to(have_key(u('data'), u('test data')))    
+        expect(body).to(have_key(u('data'), u('test data')))

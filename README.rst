@@ -213,23 +213,23 @@ For more information on archiving, see the
 Sending Signals
 ~~~~~~~~~~~~~~~~~~~~~
 
-Once a Session is created, you can send signals to everyone in the session or to a specific connection. You can send a signal by calling the ``signal(session_id, data)`` method of the ``OpenTok`` class. The ``data`` parameter is a dictionary used to set the ``type``, ``data`` fields. Ỳou can also call the method with the parameter ``connection_id`` to send a signal to a specific connection ``signal(session_id, data, connection_id)``.
+Once a Session is created, you can send signals to everyone in the session or to a specific connection. You can send a signal by calling the ``signal(session_id, payload)`` method of the ``OpenTok`` class. The ``payload`` parameter is a dictionary used to set the ``type``, ``data`` fields. Ỳou can also call the method with the parameter ``connection_id`` to send a signal to a specific connection ``signal(session_id, data, connection_id)``.
 
 .. code:: python
 
   # payload structure
   payload = {
-      'type': 'signal type', #optional
+      'type': 'type', #optional
       'data': 'signal data' #required
   }
 
   connection_id = '2a84cd30-3a33-917f-9150-49e454e01572'
 
   # To send a signal to everyone in the session:
-  opentok.signal(session_id, data)
+  opentok.signal(session_id, payload)
 
   # To send a signal to a specific connection in the session:
-  opentok.signal(session_id, data, connection_id)
+  opentok.signal(session_id, payload, connection_id)
 
 
 Samples
