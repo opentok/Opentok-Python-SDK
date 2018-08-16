@@ -22,7 +22,7 @@ from .version import __version__
 from .endpoints import Endpoint
 from .session import Session
 from .archives import Archive, ArchiveList, OutputModes
-from .stream import Stream
+from .stream import Stream, StreamList
 from .exceptions import (
     OpenTokException,
     RequestError,
@@ -522,6 +522,22 @@ class OpenTok(object):
             raise AuthError()
         elif response.status_code == 408:
             raise GetStreamError("You passed in an invalid stream ID")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+    def get_streams(self, session_id):
+        """ """
+        endpoint = self.endpoint.get_stream_url(session_id)
+        response = requests.get(
+            endpoint, headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout
+        )
+
+        if response.status_code < 300:
+            return StreamList(response.json())
+        elif response.status_code == 400:
+            raise GetStreamError("Invalid request")
+        elif response.status_code == 403:
+            raise AuthError()
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 

@@ -26,8 +26,11 @@ class Endpoint(object):
         url += '/signal'
         return url
 
-    def get_stream_url(self, session_id, stream_id):
-        url = self.api_url + '/v2/project/' + self.api_key + '/session/' + session_id + '/stream/' + stream_id
+    def get_stream_url(self, session_id, stream_id=None):
+        """ this method returns the url to get streams information """
+        url = self.api_url + '/v2/project/' + self.api_key + '/session/' + session_id + '/stream'
+        if stream_id:
+            url = url + '/' + stream_id
         return url
 
     def force_disconnect_url(self, session_id, connection_id):
