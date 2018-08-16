@@ -22,7 +22,8 @@ from .version import __version__
 from .endpoints import Endpoints
 from .session import Session
 from .archives import Archive, ArchiveList, OutputModes
-from .stream import Stream, StreamList
+from .stream import Stream
+from .streamlist import StreamList
 from .exceptions import (
     OpenTokException,
     RequestError,
@@ -535,7 +536,7 @@ class OpenTok(object):
         else:
             raise RequestError('An unexpected error occurred', response.status_code)
 
-    def get_streams(self, session_id):
+    def list_streams(self, session_id):
         """
         Returns a list of Stream objects that contains information of all
         the streams in a OpenTok session, with the following attributes:
