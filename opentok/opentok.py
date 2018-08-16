@@ -19,7 +19,7 @@ from six import text_type, u, b, PY3
 from enum import Enum
 
 from .version import __version__
-from .endpoints import Endpoint
+from .endpoints import Endpoints
 from .session import Session
 from .archives import Archive, ArchiveList, OutputModes
 from .stream import Stream, StreamList
@@ -75,7 +75,7 @@ class OpenTok(object):
         self.api_secret = api_secret
         self.timeout = timeout
         self._proxies = None
-        self.endpoint = Endpoint(api_url, self.api_key)
+        self.endpoints = Endpoints(api_url, self.api_key)
 
     @property
     def proxies(self):
@@ -275,7 +275,7 @@ class OpenTok(object):
             options[u('location')] = location
 
         try:
-            response = requests.post(self.endpoint.session_url(), data=options, headers=self.headers(), proxies=self.proxies, timeout=self.timeout)
+            response = requests.post(self.endpoints.session_url(), data=options, headers=self.headers(), proxies=self.proxies, timeout=self.timeout)
             response.encoding = 'utf-8'
 
             if response.status_code == 403:
@@ -360,7 +360,7 @@ class OpenTok(object):
                    'resolution': resolution,
         }
 
-        response = requests.post(self.endpoint.archive_url(), data=json.dumps(payload), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.post(self.endpoints.archive_url(), data=json.dumps(payload), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -393,7 +393,7 @@ class OpenTok(object):
 
         :rtype: The Archive object corresponding to the archive being stopped.
         """
-        response = requests.post(self.endpoint.archive_url(archive_id) + '/stop', headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.post(self.endpoints.archive_url(archive_id) + '/stop', headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -416,7 +416,7 @@ class OpenTok(object):
 
         :param String archive_id: The archive ID of the archive to be deleted.
         """
-        response = requests.delete(self.endpoint.archive_url(archive_id), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.delete(self.endpoints.archive_url(archive_id), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
 
         if response.status_code < 300:
             pass
@@ -434,7 +434,7 @@ class OpenTok(object):
 
         :rtype: The Archive object.
         """
-        response = requests.get(self.endpoint.archive_url(archive_id), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.get(self.endpoints.archive_url(archive_id), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -463,7 +463,7 @@ class OpenTok(object):
         if count is not None:
             params['count'] = count
 
-        response = requests.get(self.endpoint.archive_url() + "?" + urlencode(params), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.get(self.endpoints.archive_url() + "?" + urlencode(params), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
 
         if response.status_code < 300:
             return ArchiveList(self, response.json())
@@ -474,33 +474,41 @@ class OpenTok(object):
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 
-    def signal(self, session_id, data, connection_id=None):
+    def signal(self, session_id, payload, connection_id=None):
         """
         Send signals to all participants in an active OpenTok session or to a specific client
         connected to that session.
-        
+
         :param String session_id: The session ID of the OpenTok session that receives the signal
 
-        :param Dictionary: Structure that contains both the type and data fields. These correspond
-        to the type and data parameters passed in the client signal received handlers
+        :param Dictionary payload: Structure that contains both the type and data fields. These
+        correspond to the type and data parameters passed in the client signal received handlers
 
-        :param connection_id String Optional: If it's present the signal is just send to that
-        connection_id
+        :param String connection_id: The connection_id parameter is an optional string used to
+        specify the connection ID of a client connected to the session. If you specify this value,
+        the signal is sent to the specified client. Otherwise, the signal is sent to all clients
+        connected to the session
         """
-        response = requests.post(self.endpoint.signaling_url(session_id, connection_id), data=json.dumps(data), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.post(
+            self.endpoints.signaling_url(session_id, connection_id),
+            data=json.dumps(payload),
+            headers=self.json_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout
+        )
 
-        if response.status_code < 300:
+        if response.status_code == 204:
             pass
         elif response.status_code == 400:
-            raise SignalingError("Invalid signal properties")
+            raise SignalingError('One of the signal properties - data, type, sessionId or connectionId - is invalid.')
         elif response.status_code == 403:
-            raise AuthError()
+            raise AuthError('You are not authorized to send the signal. Check your authentication credentials.')
         elif response.status_code == 404:
-            raise SignalingError("connectionId property is not connected to the session")
+            raise SignalingError('The client specified by the connectionId property is not connected to the session.')
         elif response.status_code == 413:
-            raise SignalingError("Type string or Data string exceeds the maximum size")
+            raise SignalingError('The type string exceeds the maximum length (128 bytes), or the data string exceeds the maximum size (8 kB).')
         else:
-            raise RequestError("An unexpected error occurred", response.status_code)
+            raise RequestError('An unexpected error occurred', response.status_code)
 
     def get_stream(self, session_id, stream_id):
         """
@@ -511,23 +519,24 @@ class OpenTok(object):
         -name: The stream name (if one was set when the client published the stream)
         -layoutClassList: It's an array of the layout classes for the stream
         """
-        endpoint = self.endpoint.get_stream_url(session_id, stream_id)
+        endpoint = self.endpoints.get_stream_url(session_id, stream_id)
         response = requests.get(endpoint, headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
 
-        if response.status_code < 300:
+        if response.status_code == 200:
             return Stream(response.json())
         elif response.status_code == 400:
-            raise GetStreamError("Invalid request")
+            raise GetStreamError('Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.')
         elif response.status_code == 403:
-            raise AuthError()
+            raise AuthError('You passed in an invalid OpenTok API key or JWT token.')
         elif response.status_code == 408:
-            raise GetStreamError("You passed in an invalid stream ID")
+            raise GetStreamError('You passed in an invalid stream ID.')
         else:
-            raise RequestError("An unexpected error occurred", response.status_code)
+            raise RequestError('An unexpected error occurred', response.status_code)
 
     def get_streams(self, session_id):
         """ """
-        endpoint = self.endpoint.get_stream_url(session_id)
+        endpoint = self.endpoints.get_stream_url(session_id)
+
         response = requests.get(
             endpoint, headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout
         )
@@ -550,21 +559,21 @@ class OpenTok(object):
 
         :param String connection_id: The connection ID of the client that will be disconnected
         """
-        endpoint = self.endpoint.force_disconnect_url(session_id, connection_id)
+        endpoint = self.endpoints.force_disconnect_url(session_id, connection_id)
         response = requests.delete(
             endpoint, headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout
         )
 
-        if response.status_code < 300:
+        if response.status_code == 204:
             pass
         elif response.status_code == 400:
-            raise ForceDisconnectError("One of the arguments sessionId or connectionId is invalid")
+            raise ForceDisconnectError('One of the arguments - sessionId or connectionId - is invalid.')
         elif response.status_code == 403:
-            raise AuthError()
+            raise AuthError('You are not authorized to forceDisconnect, check your authentication credentials.')
         elif response.status_code == 404:
-            raise ForceDisconnectError("The client is not connected to the session")
+            raise ForceDisconnectError('The client specified by the connectionId property is not connected to the session.')
         else:
-            raise RequestError("An unexpected error occurred", response.status_code)
+            raise RequestError('An unexpected error occurred', response.status_code)
 
     def _sign_string(self, string, secret):
         return hmac.new(secret.encode('utf-8'), string.encode('utf-8'), hashlib.sha1).hexdigest()
