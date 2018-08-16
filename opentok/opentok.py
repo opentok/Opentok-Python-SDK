@@ -534,21 +534,27 @@ class OpenTok(object):
             raise RequestError('An unexpected error occurred', response.status_code)
 
     def get_streams(self, session_id):
-        """ """
+        """
+        Returns a list of Stream objects that contains information of all
+        the streams in a OpenTok session, with the following attributes:
+
+        -count: An integer that indicates the number of streams in the session
+        -items: List of the Stream objects
+        """
         endpoint = self.endpoints.get_stream_url(session_id)
 
         response = requests.get(
             endpoint, headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout
         )
 
-        if response.status_code < 300:
+        if response.status_code == 200:
             return StreamList(response.json())
         elif response.status_code == 400:
-            raise GetStreamError("Invalid request")
+            raise GetStreamError('Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.')
         elif response.status_code == 403:
-            raise AuthError()
+            raise AuthError('You passed in an invalid OpenTok API key or JWT token.')
         else:
-            raise RequestError("An unexpected error occurred", response.status_code)
+            raise RequestError('An unexpected error occurred', response.status_code)
 
     def force_disconnect(self, session_id, connection_id):
         """

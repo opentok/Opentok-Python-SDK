@@ -12,8 +12,10 @@ class Stream(object):
     """
 
     def __init__(self, kwargs):
-        for key, value in kwargs.items():
-            setattr(self, key, value)
+        self.id = kwargs.get('id')
+        self.videoType = kwargs.get('videoType')
+        self.name = kwargs.get('name')
+        self.layoutClassList = kwargs.get('layoutClassList')
 
     def attrs(self):
         """
@@ -34,20 +36,14 @@ class StreamList(object):
 
     def __init__(self, values):
         self.count = values.get('count')
-        self.items = [Stream(x) for x in values.get('items', [])]
+        self.items = list(map(lambda x: Stream(x), values.get('items', [])))
 
     def __iter__(self):
         for x in self.items:
             yield x
 
-    def attrs(self):
-        return {
-            'count': self.count,
-            'items': map(Stream.attrs, self.items)
-        }
-
     def json(self):
-        return json.dumps(self.attrs(), default=dthandler, indent=4)
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
     def __getitem__(self, key):
         return self.items.get(key)
