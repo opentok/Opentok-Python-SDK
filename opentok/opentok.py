@@ -520,7 +520,9 @@ class OpenTok(object):
         -layoutClassList: It's an array of the layout classes for the stream
         """
         endpoint = self.endpoints.get_stream_url(session_id, stream_id)
-        response = requests.get(endpoint, headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.get(
+            endpoint, headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout
+        )
 
         if response.status_code == 200:
             return Stream(response.json())
