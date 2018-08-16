@@ -30,7 +30,8 @@ from .exceptions import (
     NotFoundError,
     ArchiveError,
     SignalingError,
-    GetStreamError
+    GetStreamError,
+    ForceDisconnectError
 )
 
 class Roles(Enum):
@@ -531,6 +532,31 @@ class OpenTok(object):
             raise AuthError('You passed in an invalid OpenTok API key or JWT token.')
         elif response.status_code == 408:
             raise GetStreamError('You passed in an invalid stream ID.')
+        else:
+            raise RequestError('An unexpected error occurred', response.status_code)
+
+    def force_disconnect(self, session_id, connection_id):
+        """
+        Sends a request to disconnect a client from an OpenTok session
+
+        :param String session_id: The session ID of the OpenTok session from which the
+        client will be disconnected
+
+        :param String connection_id: The connection ID of the client that will be disconnected
+        """
+        endpoint = self.endpoints.force_disconnect_url(session_id, connection_id)
+        response = requests.delete(
+            endpoint, headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout
+        )
+
+        if response.status_code == 204:
+            pass
+        elif response.status_code == 400:
+            raise ForceDisconnectError('One of the arguments - sessionId or connectionId - is invalid.')
+        elif response.status_code == 403:
+            raise AuthError('You are not authorized to forceDisconnect, check your authentication credentials.')
+        elif response.status_code == 404:
+            raise ForceDisconnectError('The client specified by the connectionId property is not connected to the session.')
         else:
             raise RequestError('An unexpected error occurred', response.status_code)
 
