@@ -552,7 +552,7 @@ class OpenTok(object):
         if response.status_code < 300:
             pass
         elif response.status_code == 400:
-            raise ForceDisconnectError("One of the arguments - sessionId or connectionId - is invalid.")
+            raise ForceDisconnectError('One of the arguments - sessionId or connectionId - is invalid.')
         elif response.status_code == 403:
             raise AuthError('You are not authorized to forceDisconnect, check your authentication credentials.')
         elif response.status_code == 404:
