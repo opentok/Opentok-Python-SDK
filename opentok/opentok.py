@@ -549,7 +549,7 @@ class OpenTok(object):
             endpoint, headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout
         )
 
-        if response.status_code < 300:
+        if response.status_code == 204:
             pass
         elif response.status_code == 400:
             raise ForceDisconnectError('One of the arguments - sessionId or connectionId - is invalid.')

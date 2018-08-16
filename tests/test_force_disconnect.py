@@ -27,7 +27,7 @@ class OpenTokForceDisconnectTest(unittest.TestCase):
                 self.session_id,
                 self.connection_id
             ),
-            status=200,
+            status=204,
             content_type=u('application/json')
         )
 
