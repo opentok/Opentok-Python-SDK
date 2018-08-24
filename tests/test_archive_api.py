@@ -9,7 +9,15 @@ import datetime
 import pytz
 from .validate_jwt import validate_jwt_header
 
-from opentok import OpenTok, Archive, ArchiveList, OutputModes, OpenTokException, __version__
+from opentok import (
+    OpenTok,
+    Archive,
+    ArchiveList,
+    OutputModes,
+    OpenTokException,
+    __version__,
+    ArchiveError
+)
 
 class OpenTokArchiveApiTest(unittest.TestCase):
     def setUp(self):
@@ -860,3 +868,73 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         archive = self.opentok.get_archive(archive_id)
 
         expect(archive).to(be_an(Archive))
+
+    @httpretty.activate
+    def test_set_archive_layout(self):
+        """ Test set archive layout functionality """
+        archive_id = u('f6e7ee58-d6cf-4a59-896b-6d56b158ec71')
+
+        httpretty.register_uri(
+            httpretty.PUT,
+            u('https://api.opentok.com/v2/project/{0}/archive/{1}/layout').format(
+                self.api_key,
+                archive_id
+            ),
+            status=200,
+            content_type=u('application/json')
+        )
+
+        self.opentok.set_archive_layout(archive_id, 'horizontalPresentation')
+
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(
+            u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
+
+    @httpretty.activate
+    def test_set_custom_archive_layout(self):
+        """ Test set a custom archive layout specifying the 'stylesheet' parameter """
+        archive_id = u('f6e7ee58-d6cf-4a59-896b-6d56b158ec71')
+
+        httpretty.register_uri(
+            httpretty.PUT,
+            u('https://api.opentok.com/v2/project/{0}/archive/{1}/layout').format(
+                self.api_key,
+                archive_id
+            ),
+            status=200,
+            content_type=u('application/json')
+        )
+
+        self.opentok.set_archive_layout(
+            archive_id,
+            'custom',
+            'stream.instructor {position: absolute; width: 100%;  height:50%;}'
+        )
+
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(
+            u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
+
+    @httpretty.activate
+    def test_set_archive_layout_throws_exception(self):
+        """ Test invalid request in set archive layout """
+        archive_id = u('f6e7ee58-d6cf-4a59-896b-6d56b158ec71')
+
+        httpretty.register_uri(
+            httpretty.PUT,
+            u('https://api.opentok.com/v2/project/{0}/archive/{1}/layout').format(
+                self.api_key,
+                archive_id
+            ),
+            status=400,
+            content_type=u('application/json')
+        )
+
+        self.assertRaises(
+            ArchiveError,
+            self.opentok.set_archive_layout,
+            archive_id,
+            'horizontalPresentation'
+        )
