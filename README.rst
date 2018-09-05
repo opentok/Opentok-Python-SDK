@@ -186,7 +186,7 @@ To delete an Archive, you can call the ``opentok.delete_archive(archive_id)`` me
 
 You can also get a list of all the Archives you've created (up to 1000) with your API Key. This is
 done using the ``opentok.list_archives()`` method. There are three optional keyword parameters:
-``count``, ``offset`` and ``session_id``; they can help you paginate through the results and also
+``count``, ``offset`` and ``session_id``; they can help you paginate through the results and
 filter by session ID. This method returns an instance of the ``ArchiveList`` class.
 
 .. code:: python

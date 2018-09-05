@@ -482,6 +482,13 @@ class OpenTok(object):
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 
+    def list_archives(self, offset=None, count=None, session_id=None):
+        """
+        New method to get archive list, it's alternative to 'get_archives()',
+        both methods exist to have backwards compatible
+        """
+        return self.get_archives(offset, count, session_id)
+
     def signal(self, session_id, payload, connection_id=None):
         """
         Send signals to all participants in an active OpenTok session or to a specific client
