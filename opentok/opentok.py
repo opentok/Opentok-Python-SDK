@@ -584,23 +584,23 @@ class OpenTok(object):
         else:
             raise RequestError('An unexpected error occurred', response.status_code)
 
-    def set_archive_layout(self, archive_id, l_type, stylesheet=None):
+    def set_archive_layout(self, archive_id, layout_type, stylesheet=None):
         """
         Use this method to change the layout of videos in an OpenTok archive
 
         :param String archive_id: The ID of the archive that will be updated
 
-        :param String l_type: The layout type for the archive. Valid values are:
+        :param String layout_type: The layout type for the archive. Valid values are:
         'bestFit', 'custom', 'horizontalPresentation', 'pip' and 'verticalPresentation'
 
         :param String stylesheet optional: CSS used to style the custom layout.
         Specify this only if you set the type property to 'custom'
         """
         payload = {
-            'type':  l_type,
+            'type':  layout_type,
         }
 
-        if l_type == 'custom':
+        if layout_type == 'custom':
             if stylesheet is not None:
                 payload['stylesheet'] = stylesheet
 
