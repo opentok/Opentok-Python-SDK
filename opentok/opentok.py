@@ -446,7 +446,7 @@ class OpenTok(object):
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 
-    def get_archives(self, offset=None, count=None):
+    def get_archives(self, offset=None, count=None, session_id=None):
         """Returns an ArchiveList, which is an array of archives that are completed and in-progress,
         for your API key.
 
@@ -455,6 +455,7 @@ class OpenTok(object):
           the most recent archive. If you do not specify an offset, 0 is used.
         :param int: count Optional. The number of archives to be returned. The maximum
           number of archives returned is 1000.
+        :param string: session_id Optional. Used to list archives for a specific session ID.
 
         :rtype: An ArchiveList object, which is an array of Archive objects.
         """
@@ -463,8 +464,14 @@ class OpenTok(object):
             params['offset'] = offset
         if count is not None:
             params['count'] = count
+        if session_id is not None:
+            params['sessionId'] = session_id
 
-        response = requests.get(self.endpoints.archive_url() + "?" + urlencode(params), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
+        endpoint = self.endpoints.archive_url() + "?" + urlencode(params)
+
+        response = requests.get(
+            endpoint, headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout
+        )
 
         if response.status_code < 300:
             return ArchiveList(self, response.json())
@@ -474,6 +481,13 @@ class OpenTok(object):
             raise NotFoundError("Archive not found")
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
+
+    def list_archives(self, offset=None, count=None, session_id=None):
+        """
+        New method to get archive list, it's alternative to 'get_archives()',
+        both methods exist to have backwards compatible
+        """
+        return self.get_archives(offset, count, session_id)
 
     def signal(self, session_id, payload, connection_id=None):
         """
