@@ -207,6 +207,25 @@ Note that you can also create an automatically archived session, by passing in
 ``ArchiveModes.always`` as the ``archive_mode`` parameter when you call the
 ``opentok.create_session()`` method (see "Creating Sessions," above).
 
+For composed archives, you can change the layout dynamically, using the `opentok.set_archive_layout(archive_id, type, stylesheet)` method:
+
+.. code:: python
+
+  opentok.set_archive_layout('ARCHIVEID', 'horizontalPresentation')
+
+Setting the layout of composed archives is optional. By default, composed archives use the `best fit` layout.  Other valid values are: `custom`, `horizontalPresentation`, `pip` and `verticalPresentation`. If you specify a `custom` layout type, set the stylesheet parameter:
+
+.. code:: python
+
+  opentok.set_archive_layout(
+      'ARCHIVEID',
+      'custom',
+      'stream.instructor {position: absolute; width: 100%;  height:50%;}'
+  )
+
+For other layout types, do not set the stylesheet property. For more information see
+`Customizing the video layout for composed archives <https://tokbox.com/developer/guides/archiving/layout-control.html>`_.
+
 For more information on archiving, see the
 `OpenTok archiving <https://tokbox.com/opentok/tutorials/archiving/>`_ programming guide.
 

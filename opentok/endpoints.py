@@ -40,3 +40,8 @@ class Endpoints(object):
             session_id + '/connection/' + connection_id
         )
         return url
+
+    def set_archive_layout_url(self, archive_id):
+        """ this method returns the url to set the archive layout """
+        url = self.api_url + '/v2/project/' + self.api_key + '/archive/' + archive_id + '/layout'
+        return url
