@@ -789,6 +789,195 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         # TODO: we could inspect each item in the list
 
     @httpretty.activate
+    def test_find_archives_with_sessionid(self):
+        """ Test get_archives method using session_id parameter """
+        httpretty.register_uri(
+            httpretty.GET,
+            u('https://api.opentok.com/v2/project/{0}/archive').format(self.api_key),
+            body=textwrap.dedent(u("""\
+                {
+                  "count" : 4,
+                  "items" : [ {
+                    "createdAt" : 1395187836000,
+                    "duration" : 62,
+                    "id" : "f6e7ee58-d6cf-4a59-896b-6d56b158ec71",
+                    "name" : "",
+                    "partnerId" : 123456,
+                    "reason" : "",
+                    "sessionId" : "SESSIONID",
+                    "size" : 8347554,
+                    "status" : "available",
+                    "hasAudio": true,
+                    "hasVideo": true,
+                    "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2Ff6e7ee58-d6cf-4a59-896b-6d56b158ec71%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                  }, {
+                    "createdAt" : 1395183243000,
+                    "duration" : 544,
+                    "id" : "30b3ebf1-ba36-4f5b-8def-6f70d9986fe9",
+                    "name" : "",
+                    "partnerId" : 123456,
+                    "reason" : "",
+                    "sessionId" : "SESSIONID",
+                    "size" : 78499758,
+                    "status" : "available",
+                    "hasAudio": true,
+                    "hasVideo": true,
+                    "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2F30b3ebf1-ba36-4f5b-8def-6f70d9986fe9%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                  }, {
+                    "createdAt" : 1394396753000,
+                    "duration" : 24,
+                    "id" : "b8f64de1-e218-4091-9544-4cbf369fc238",
+                    "name" : "showtime again",
+                    "partnerId" : 123456,
+                    "reason" : "",
+                    "sessionId" : "SESSIONID",
+                    "size" : 2227849,
+                    "status" : "available",
+                    "hasAudio": true,
+                    "hasVideo": true,
+                    "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2Fb8f64de1-e218-4091-9544-4cbf369fc238%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                  }, {
+                    "createdAt" : 1394321113000,
+                    "duration" : 1294,
+                    "id" : "832641bf-5dbf-41a1-ad94-fea213e59a92",
+                    "name" : "showtime",
+                    "partnerId" : 123456,
+                    "reason" : "",
+                    "sessionId" : "SESSIONID",
+                    "size" : 42165242,
+                    "status" : "available",
+                    "hasAudio": true,
+                    "hasVideo": true,
+                    "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2F832641bf-5dbf-41a1-ad94-fea213e59a92%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                  }]
+                }""")),
+            status=200,
+            content_type=u('application/json'))
+
+        archive_list = self.opentok.get_archives(session_id='SESSIONID')
+
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(
+            u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
+        expect(httpretty.last_request()).to(have_property(u('querystring'), {
+            u('sessionId'): [u('SESSIONID')]
+        }))
+        expect(archive_list).to(be_an(ArchiveList))
+        expect(archive_list).to(have_property(u('count'), 4))
+        expect(list(archive_list.items)).to(have_length(4))
+
+    @httpretty.activate
+    def test_find_archives_with_offset_count_sessionId(self):
+        """ Test get_archives method using all parameters: offset, count and sessionId """
+        httpretty.register_uri(
+            httpretty.GET,
+            u('https://api.opentok.com/v2/project/{0}/archive').format(self.api_key),
+            body=textwrap.dedent(u("""\
+                {
+                  "count" : 2,
+                  "items" : [ {
+                    "createdAt" : 1394396753000,
+                    "duration" : 24,
+                    "id" : "b8f64de1-e218-4091-9544-4cbf369fc238",
+                    "name" : "showtime again",
+                    "partnerId" : 123456,
+                    "reason" : "",
+                    "sessionId" : "SESSIONID",
+                    "size" : 2227849,
+                    "status" : "available",
+                    "hasAudio": true,
+                    "hasVideo": true,
+                    "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2Fb8f64de1-e218-4091-9544-4cbf369fc238%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                  }, {
+                    "createdAt" : 1394321113000,
+                    "duration" : 1294,
+                    "id" : "832641bf-5dbf-41a1-ad94-fea213e59a92",
+                    "name" : "showtime",
+                    "partnerId" : 123456,
+                    "reason" : "",
+                    "sessionId" : "SESSIONID",
+                    "size" : 42165242,
+                    "status" : "available",
+                    "hasAudio": true,
+                    "hasVideo": true,
+                    "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2F832641bf-5dbf-41a1-ad94-fea213e59a92%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                  }]
+                }""")),
+            status=200,
+            content_type=u('application/json'))
+
+        archive_list = self.opentok.get_archives(offset=2, count=2, session_id='SESSIONID')
+
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(
+            u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
+        expect(httpretty.last_request()).to(have_property(u('querystring'), {
+            u('offset'): [u('2')],
+            u('count'): [u('2')],
+            u('sessionId'): [u('SESSIONID')]
+        }))
+        expect(archive_list).to(be_an(ArchiveList))
+        expect(archive_list).to(have_property(u('count'), 2))
+        expect(list(archive_list.items)).to(have_length(2))
+
+    @httpretty.activate
+    def test_find_archives_alternative_method(self):
+        """ Test list_archives method using all parameters: offset, count and sessionId """
+        httpretty.register_uri(
+            httpretty.GET,
+            u('https://api.opentok.com/v2/project/{0}/archive').format(self.api_key),
+            body=textwrap.dedent(u("""\
+                {
+                  "count" : 2,
+                  "items" : [ {
+                    "createdAt" : 1394396753000,
+                    "duration" : 24,
+                    "id" : "b8f64de1-e218-4091-9544-4cbf369fc238",
+                    "name" : "showtime again",
+                    "partnerId" : 123456,
+                    "reason" : "",
+                    "sessionId" : "SESSIONID",
+                    "size" : 2227849,
+                    "status" : "available",
+                    "hasAudio": true,
+                    "hasVideo": true,
+                    "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2Fb8f64de1-e218-4091-9544-4cbf369fc238%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                  }, {
+                    "createdAt" : 1394321113000,
+                    "duration" : 1294,
+                    "id" : "832641bf-5dbf-41a1-ad94-fea213e59a92",
+                    "name" : "showtime",
+                    "partnerId" : 123456,
+                    "reason" : "",
+                    "sessionId" : "SESSIONID",
+                    "size" : 42165242,
+                    "status" : "available",
+                    "hasAudio": true,
+                    "hasVideo": true,
+                    "url" : "http://tokbox.com.archive2.s3.amazonaws.com/123456%2F832641bf-5dbf-41a1-ad94-fea213e59a92%2Farchive.mp4?Expires=1395188695&AWSAccessKeyId=AKIAI6LQCPIXYVWCQV6Q&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                  }]
+                }""")),
+            status=200,
+            content_type=u('application/json'))
+
+        archive_list = self.opentok.list_archives(offset=2, count=2, session_id='SESSIONID')
+
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(
+            u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
+        expect(httpretty.last_request()).to(have_property(u('querystring'), {
+            u('offset'): [u('2')],
+            u('count'): [u('2')],
+            u('sessionId'): [u('SESSIONID')]
+        }))
+        expect(archive_list).to(be_an(ArchiveList))
+        expect(archive_list).to(have_property(u('count'), 2))
+        expect(list(archive_list.items)).to(have_length(2))
+
+    @httpretty.activate
     def test_find_paused_archive(self):
         archive_id = u('f6e7ee58-d6cf-4a59-896b-6d56b158ec71')
         httpretty.register_uri(httpretty.GET, u('https://api.opentok.com/v2/project/{0}/archive/{1}').format(self.api_key, archive_id),
