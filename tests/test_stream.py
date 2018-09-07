@@ -1,6 +1,6 @@
 import unittest
 from six import text_type, u, b, PY2, PY3
-from opentok import OpenTok, Stream, StreamList, __version__
+from opentok import OpenTok, Stream, StreamList, __version__, SetStreamClassError
 import httpretty
 import json
 import textwrap
@@ -8,7 +8,7 @@ from expects import *
 
 from .validate_jwt import validate_jwt_header
 
-class OpenTokGetStreamTest(unittest.TestCase):
+class OpenTokStreamTest(unittest.TestCase):
     def setUp(self):
         self.api_key = u('123456')
         self.api_secret = u('1234567890abcdef1234567890abcdef1234567890')
@@ -118,3 +118,55 @@ class OpenTokGetStreamTest(unittest.TestCase):
         expect(stream_list).to(be_an(StreamList))
         expect(stream_list).to(have_property(u('count'), 2))
         expect(list(stream_list.items)).to(have_length(2))
+
+    @httpretty.activate
+    def test_set_stream_class_list(self):
+        """ Test set stream class functionality """
+        payload = [
+            {'id': '7b09ec3c-26f9-43d7-8197-f608f13d4fb6', 'layoutClassList': ['focus']},
+            {'id': '567bc941-6ea0-4c69-97fc-70a740b68976', 'layoutClassList': ['top']},
+            {'id': '307dc941-0450-4c09-975c-705740d08970', 'layoutClassList': ['bottom']}
+        ]
+
+        httpretty.register_uri(
+            httpretty.PUT,
+            u('https://api.opentok.com/v2/project/{0}/session/{1}/stream').format(
+                self.api_key,
+                self.session_id
+            ),
+            status=200,
+            content_type=u('application/json')
+        )
+
+        self.opentok.set_stream_class_list(self.session_id, payload)
+
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(
+            u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
+
+    @httpretty.activate
+    def test_set_stream_class_list_throws_exception(self):
+        """ Test invalid request in set stream class list """
+        
+        #invalid payload
+        payload = [
+            {'id': '7b09ec3c-26f9-43d7-8197-f608f13d4fb6'}
+        ]
+
+        httpretty.register_uri(
+            httpretty.PUT,
+            u('https://api.opentok.com/v2/project/{0}/session/{1}/stream').format(
+                self.api_key,
+                self.session_id
+            ),
+            status=400,
+            content_type=u('application/json')
+        )
+
+        self.assertRaises(
+            SetStreamClassError,
+            self.opentok.set_stream_class_list,
+            self.session_id,
+            payload
+        )

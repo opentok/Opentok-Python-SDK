@@ -32,7 +32,8 @@ from .exceptions import (
     ArchiveError,
     SignalingError,
     GetStreamError,
-    ForceDisconnectError
+    ForceDisconnectError,
+    SetStreamClassError
 )
 
 class Roles(Enum):
@@ -528,7 +529,7 @@ class OpenTok(object):
     def get_stream(self, session_id, stream_id):
         """
         Returns an Stream object that contains information of an OpenTok stream:
-        
+
         -id: The stream ID
         -videoType: "camera" or "screen"
         -name: The stream name (if one was set when the client published the stream)
@@ -631,6 +632,45 @@ class OpenTok(object):
             pass
         elif response.status_code == 400:
             raise ArchiveError('Invalid request. This response may indicate that data in your request data is invalid JSON. It may also indicate that you passed in invalid layout options.')
+        elif response.status_code == 403:
+            raise AuthError('Authentication error.')
+        else:
+            raise RequestError('OpenTok server error.', response.status_code)
+
+    def set_stream_class_list(self, session_id, payload):
+        """
+        Use this method to change layout classes for OpenTok streams. The layout classes
+        define how the streams are displayed in the layout of a composed OpenTok archive
+
+        :param String session_id: The ID of the session of the streams that will be updated
+
+        :param List payload: A list defining the class lists to apply to the streams.
+        Each element in the list is a dictionary with two properties: 'id' and 'layoutClassList'.
+        The 'id' property is the stream ID (a String), and the 'layoutClassList' is an array of
+        class names (Strings) to apply to the stream. For example:
+
+            payload = [
+                {'id': '7b09ec3c-26f9-43d7-8197-f608f13d4fb6', 'layoutClassList': ['focus']},
+                {'id': '567bc941-6ea0-4c69-97fc-70a740b68976', 'layoutClassList': ['top']},
+                {'id': '307dc941-0450-4c09-975c-705740d08970', 'layoutClassList': ['bottom']}
+            ]
+        """
+        endpoint = self.endpoints.set_stream_class_list_url(session_id)
+        response = requests.put(
+            endpoint,
+            data=json.dumps(payload),
+            headers=self.json_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout
+        )
+
+        if response.status_code == 200:
+            pass
+        elif response.status_code == 400:
+            raise SetStreamClassError(
+                'Invalid request. This response may indicate that data in your request data '
+                'is invalid JSON. It may also indicate that you passed in invalid layout options.'
+            )
         elif response.status_code == 403:
             raise AuthError('Authentication error.')
         else:
