@@ -294,6 +294,10 @@ The method returns a StreamList object that contains a list of all the streams
   print stream.name #stream name
   print stream.layoutClassList #['full']
 
+You can change the layout classes for streams in a session by calling the `set_stream_class_list(session_id, stream_list)` method of the `OpenTok` class.
+
+
+
 Force Disconnect
 ~~~~~~~~~~~~~~~~~~~~~
 

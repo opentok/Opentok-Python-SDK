@@ -655,10 +655,12 @@ class OpenTok(object):
                 {'id': '307dc941-0450-4c09-975c-705740d08970', 'layoutClassList': ['bottom']}
             ]
         """
+        items_payload = {'items': payload}
+
         endpoint = self.endpoints.set_stream_class_list_url(session_id)
         response = requests.put(
             endpoint,
-            data=json.dumps(payload),
+            data=json.dumps(items_payload),
             headers=self.json_headers(),
             proxies=self.proxies,
             timeout=self.timeout
