@@ -5,3 +5,4 @@ from .exceptions import OpenTokException, AuthError, ForceDisconnectError, Archi
 from .version import __version__
 from .stream import Stream
 from .streamlist import StreamList
+from .sip_call import SipCall

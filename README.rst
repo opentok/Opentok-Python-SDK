@@ -307,6 +307,37 @@ Your application server can disconnect a client from an OpenTok session by calli
   # To send a request to disconnect a client:
   opentok.force_disconnect(session_id, connection_id)
 
+Working with SIP Interconnect
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can connect your SIP platform to an OpenTok session, the audio from your end of the SIP call is added to the OpenTok session as an audio-only stream. The OpenTok Media Router mixes audio from other streams in the session and sends the mixed audio to your SIP endpoint.
+
+.. code:: python
+
+  session_id = u('SESSIONID')
+  token = u('TOKEN')
+  sip_uri = u('sip:user@sip.partner.com;transport=tls')
+
+  # call the method with the required parameters
+  sip_call = opentok.dial(session_id, token, sip_uri)
+
+  # the method also support aditional options to establish the sip call
+
+  options = {
+      'from': 'from@example.com',
+      'headers': {
+          'headerKey': 'headerValue'
+      },
+      'auth': {
+          'username': 'username',
+          'password': 'password'
+      },
+      'secure': True
+  }
+
+  # call the method with aditional options
+  sip_call = opentok.dial(session_id, token, sip_uri, options)
+
 Samples
 -------
 
