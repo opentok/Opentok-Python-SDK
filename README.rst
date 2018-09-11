@@ -338,6 +338,9 @@ You can connect your SIP platform to an OpenTok session, the audio from your end
   # call the method with aditional options
   sip_call = opentok.dial(session_id, token, sip_uri, options)
 
+For more information, including technical details and security considerations, see the
+`OpenTok SIP interconnect <https://tokbox.com/developer/guides/sip/>`_ developer guide.
+
 Samples
 -------
 
