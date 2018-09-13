@@ -364,33 +364,31 @@ You can get details on a broadcast that is in-progress using the method ``opento
 
   print broadcast.json()
 
-  """
-  print result
-  {
-    "createdAt": 1437676551000,
-    "id": "1748b707-0a81-464c-9759-c46ad10d3734",
-    "projectId": 100,
-    "resolution": "640x480",
-    "sessionId": "2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4",
-    "status": "started",
-    "updatedAt": 1437676551000,
-    "broadcastUrls": {
-        "hls": "http://server/fakepath/playlist.m3u8",
-        "rtmp": {
-            "bar": {
-                "serverUrl": "rtmp://mybarserver/mybarapp",
-                "status": "live",
-                "streamName": "mybarstream"
-            },
-            "foo": {
-                "serverUrl": "rtmp://myfooserver/myfooapp",
-                "status": "live",
-                "streamName": "myfoostream"
-            }
-        }
-    }
-  }
-  """
+  # print result
+  # {
+  #   "createdAt": 1437676551000,
+  #   "id": "1748b707-0a81-464c-9759-c46ad10d3734",
+  #   "projectId": 100,
+  #   "resolution": "640x480",
+  #   "sessionId": "2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4",
+  #   "status": "started",
+  #   "updatedAt": 1437676551000,
+  #   "broadcastUrls": {
+  #       "hls": "http://server/fakepath/playlist.m3u8",
+  #       "rtmp": {
+  #           "bar": {
+  #               "serverUrl": "rtmp://mybarserver/mybarapp",
+  #               "status": "live",
+  #               "streamName": "mybarstream"
+  #           },
+  #           "foo": {
+  #               "serverUrl": "rtmp://myfooserver/myfooapp",
+  #               "status": "live",
+  #               "streamName": "myfoostream"
+  #           }
+  #       }
+  #   }
+  # }
 
 Samples
 -------
