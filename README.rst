@@ -354,6 +354,44 @@ You can stop a started Broadcast using the ``opentok.stop_broadcast(broadcast_id
   # stop a broadcast
   broadcast = opentok.stop_broadcast(broadcast_id)
 
+You can get details on a broadcast that is in-progress using the method ``opentok.get_broadcast(broadcast_id)``.
+
+.. code:: python
+  broadcast_id = '1748b7070a81464c9759c46ad10d3734'
+
+  # get broadcast details
+  broadcast = opentok.get_broadcast(broadcast_id)
+
+  print broadcast.json()
+
+  """
+  print result
+  {
+    "createdAt": 1437676551000,
+    "id": "1748b707-0a81-464c-9759-c46ad10d3734",
+    "projectId": 100,
+    "resolution": "640x480",
+    "sessionId": "2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4",
+    "status": "started",
+    "updatedAt": 1437676551000,
+    "broadcastUrls": {
+        "hls": "http://server/fakepath/playlist.m3u8",
+        "rtmp": {
+            "bar": {
+                "serverUrl": "rtmp://mybarserver/mybarapp",
+                "status": "live",
+                "streamName": "mybarstream"
+            },
+            "foo": {
+                "serverUrl": "rtmp://myfooserver/myfooapp",
+                "status": "live",
+                "streamName": "myfoostream"
+            }
+        }
+    }
+  }
+  """
+
 Samples
 -------
 

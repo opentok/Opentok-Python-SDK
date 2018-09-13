@@ -47,7 +47,7 @@ class Endpoints(object):
         return url
 
     def broadcast_url(self, broadcast_id=None, stop=False):
-        """ this method returns the url to start broadcast """
+        """ this method returns urls for working with broadcast """
         url = self.api_url + '/v2/project/' + self.api_key + '/broadcast'
 
         if broadcast_id:
