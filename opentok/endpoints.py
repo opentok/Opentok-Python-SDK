@@ -45,3 +45,8 @@ class Endpoints(object):
         """ this method returns the url to set the archive layout """
         url = self.api_url + '/v2/project/' + self.api_key + '/archive/' + archive_id + '/layout'
         return url
+
+    def broadcast_url(self):
+        """ this method returns the url to start broadcast """
+        url = self.api_url + '/v2/project/' + self.api_key + '/broadcast'
+        return url

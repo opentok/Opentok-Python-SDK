@@ -24,6 +24,7 @@ from .session import Session
 from .archives import Archive, ArchiveList, OutputModes
 from .stream import Stream
 from .streamlist import StreamList
+from .broadcast import Broadcast
 from .exceptions import (
     OpenTokException,
     RequestError,
@@ -32,7 +33,8 @@ from .exceptions import (
     ArchiveError,
     SignalingError,
     GetStreamError,
-    ForceDisconnectError
+    ForceDisconnectError,
+    BroadcastError
 )
 
 class Roles(Enum):
@@ -633,6 +635,74 @@ class OpenTok(object):
             raise ArchiveError('Invalid request. This response may indicate that data in your request data is invalid JSON. It may also indicate that you passed in invalid layout options.')
         elif response.status_code == 403:
             raise AuthError('Authentication error.')
+        else:
+            raise RequestError('OpenTok server error.', response.status_code)
+
+    def start_broadcast(self, session_id, options):
+        """
+        Use this method to start a live streaming for an OpenTok session. This broadcasts the
+        session to an HLS (HTTP live streaming) or to RTMP streams. To successfully start
+        broadcasting a session, at least one client must be connected to the session. You can only
+        start live streaming for sessions that use the OpenTok Media Router (with the media mode set
+        to routed); you cannot use live streaming with sessions that have the media mode set to
+        relayed
+
+        :param String session_id: The session ID of the OpenTok session you want to broadcast
+
+        :param Dictionary options, with the following properties:
+
+            Dictionary 'layout' optional: Specify this to assign the initial layout type for the
+            broadcast. Valid values for the layout property are "bestFit", "custom",
+            "horizontalPresentation", "pip" and "verticalPresentation". If you specify a "custom"
+            layout type, set the stylesheet property of the layout object to the stylesheet.
+            If you do not specify an initial layout type, the broadcast stream uses the Best Fit
+            layout type
+
+            Integer 'maxDuration' optional: The maximum duration for the broadcast, in seconds.
+            The broadcast will automatically stop when the maximum duration is reached. You can
+            set the maximum duration to a value from 60 (60 seconds) to 36000 (10 hours). The
+            default maximum duration is 2 hours (7200 seconds)
+
+            Dictionary 'outputs': This object defines the types of broadcast streams you want to
+            start (both HLS and RTMP). You can include HLS, RTMP, or both as broadcast streams.
+            If you include RTMP streaming, you can specify up to five target RTMP streams. For
+            each RTMP stream, specify 'serverUrl' (the RTMP server URL), 'streamName' (the stream
+            name, such as the YouTube Live stream name or the Facebook stream key), and
+            (optionally) 'id' (a unique ID for the stream)
+
+            String 'resolution' optional: The resolution of the broadcast, either "640x480"
+            (SD, the default) or "1280x720" (HD)
+
+        rtype: A Broadcast object, which contains information of the broadcast: id, sessionId
+        projectId, createdAt, updatedAt, resolution, status and broadcastUrls
+        """
+        payload = {
+            'sessionId': session_id
+        }
+
+        payload.update(options)
+
+        endpoint = self.endpoints.broadcast_url()
+        response = requests.post(
+            endpoint,
+            data=json.dumps(payload),
+            headers=self.json_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout
+        )
+
+        if response.status_code == 200:
+            return Broadcast(response.json())
+        elif response.status_code == 400:
+            raise BroadcastError(
+                'Invalid request. This response may indicate that data in your request data is '
+                'invalid JSON. It may also indicate that you passed in invalid layout options. '
+                'Or you have exceeded the limit of five simultaneous RTMP streams for an OpenTok '
+                'session. Or you specified and invalid resolution.')
+        elif response.status_code == 403:
+            raise AuthError('Authentication error.')
+        elif response.status_code == 409:
+            raise BroadcastError('The broadcast has already started for the session.')
         else:
             raise RequestError('OpenTok server error.', response.status_code)
 

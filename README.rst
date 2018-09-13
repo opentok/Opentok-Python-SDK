@@ -307,6 +307,44 @@ Your application server can disconnect a client from an OpenTok session by calli
   # To send a request to disconnect a client:
   opentok.force_disconnect(session_id, connection_id)
 
+Working with Broadcasts
+~~~~~~~~~~~~~~~~~~~~~~~
+
+OpenTok broadcast lets you share live OpenTok sessions with many viewers.
+
+You can use the `start_broadcast()` method to start a live streaming for an OpenTok session. This broadcasts the session to an HLS (HTTP live streaming) or to RTMP streams.
+
+To successfully start broadcasting a session, at least one client must be connected to the session.
+
+The live streaming broadcast can target one HLS endpoint and up to five RTMP servers simulteneously for a session. You can only start live streaming for sessions that use the OpenTok Media Router; you cannot use live streaming with sessions that have the media mode set to relayed.
+
+
+.. code:: python
+
+  session_id = 'SESSIONID'
+  options = {
+    'layout': {
+      'type': 'custom',
+      'stylesheet': 'the layout stylesheet (only used with type == custom)'
+    },
+    'maxDuration': 5400,
+    'outputs': {
+      'hls': {},
+      'rtmp': [{
+        'id': 'foo',
+        'serverUrl': 'rtmp://myfooserver/myfooapp',
+        'streamName': 'myfoostream'
+      }, {
+        'id': 'bar',
+        'serverUrl': 'rtmp://mybarserver/mybarapp',
+        'streamName': 'mybarstream'
+      }]
+    },
+    'resolution': '640x480'
+  }
+
+  broadcast = opentok.start_broadcast(session_id, options)
+
 Samples
 -------
 
