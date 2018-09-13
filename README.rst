@@ -312,7 +312,7 @@ Working with Broadcasts
 
 OpenTok broadcast lets you share live OpenTok sessions with many viewers.
 
-You can use the ``start_broadcast()`` method to start a live streaming for an OpenTok session. This broadcasts the session to an HLS (HTTP live streaming) or to RTMP streams.
+You can use the ``opentok.start_broadcast()`` method to start a live streaming for an OpenTok session. This broadcasts the session to an HLS (HTTP live streaming) or to RTMP streams.
 
 To successfully start broadcasting a session, at least one client must be connected to the session.
 
@@ -344,6 +344,15 @@ The live streaming broadcast can target one HLS endpoint and up to five RTMP ser
   }
 
   broadcast = opentok.start_broadcast(session_id, options)
+
+You can stop a started Broadcast using the ``opentok.stop_broadcast(broadcast_id)`` method.
+
+.. code:: python
+  # getting the ID from a broadcast object
+  broadcast_id = broadcast.id
+
+  # stop a broadcast
+  broadcast = opentok.stop_broadcast(broadcast_id)
 
 Samples
 -------

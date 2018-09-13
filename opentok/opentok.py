@@ -706,6 +706,35 @@ class OpenTok(object):
         else:
             raise RequestError('OpenTok server error.', response.status_code)
 
+    def stop_broadcast(self, broadcast_id):
+        """
+        Use this method to stop a live broadcast of an OpenTok session
+
+        :param String broadcast_id: The ID of the broadcast you want to stop
+        """
+        endpoint = self.endpoints.broadcast_url(broadcast_id, stop=True)
+        response = requests.post(
+            endpoint,
+            headers=self.json_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout
+        )
+
+        if response.status_code == 200:
+            return Broadcast(response.json())
+        elif response.status_code == 400:
+            raise BroadcastError(
+                'Invalid request. This response may indicate that data in your request '
+                'data is invalid JSON.')
+        elif response.status_code == 403:
+            raise AuthError('Authentication error.')
+        elif response.status_code == 409:
+            raise BroadcastError(
+                'The broadcast (with the specified ID) was not found or it has already '
+                'stopped.')
+        else:
+            raise RequestError('OpenTok server error.', response.status_code)    
+
     def _sign_string(self, string, secret):
         return hmac.new(secret.encode('utf-8'), string.encode('utf-8'), hashlib.sha1).hexdigest()
 

@@ -153,3 +153,43 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(broadcast).to(have_property(u('status'), u('started')))
         expect(list(broadcast.broadcastUrls)).to(have_length(2))
         expect(list(broadcast.broadcastUrls['rtmp'])).to(have_length(2))
+
+    @httpretty.activate
+    def test_stop_broadcast(self):
+        """
+        Test stop_broadcast() method
+        """
+        broadcast_id = u('1748b7070a81464c9759c46ad10d3734')
+
+        httpretty.register_uri(
+            httpretty.POST,
+            u('https://api.opentok.com/v2/project/{0}/broadcast/{1}/stop').format(
+                self.api_key,
+                broadcast_id
+            ),
+            body=textwrap.dedent(u("""\
+                {
+                    "id": "1748b7070a81464c9759c46ad10d3734",
+                    "sessionId": "2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4",
+                    "projectId": 100,
+                    "createdAt": 1437676551000,
+                    "updatedAt": 1437676551000,
+                    "resolution": "640x480",
+                    "broadcastUrls": null
+                }""")),
+            status=200,
+            content_type=u('application/json')
+        )
+
+        broadcast = self.opentok.stop_broadcast(broadcast_id)
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(
+            u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
+        expect(broadcast).to(be_an(Broadcast))
+        expect(broadcast).to(have_property(u('id'), u('1748b7070a81464c9759c46ad10d3734')))
+        expect(broadcast).to(have_property(u('sessionId'), u('2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4')))
+        expect(broadcast).to(have_property(u('projectId'), 100))
+        expect(broadcast).to(have_property(u('createdAt'), 1437676551000))
+        expect(broadcast).to(have_property(u('updatedAt'), 1437676551000))
+        expect(broadcast).to(have_property(u('resolution'), u('640x480')))
