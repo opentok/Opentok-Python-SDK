@@ -4,7 +4,7 @@ import httpretty
 
 from six import u
 from expects import *
-from opentok import OpenTok, Broadcast, __version__
+from opentok import OpenTok, Broadcast, __version__, BroadcastError
 from .validate_jwt import validate_jwt_header
 
 class OpenTokBroadcastTest(unittest.TestCase):
@@ -251,3 +251,73 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(broadcast).to(have_property(u('status'), u('started')))
         expect(list(broadcast.broadcastUrls)).to(have_length(2))
         expect(list(broadcast.broadcastUrls['rtmp'])).to(have_length(2))
+
+    @httpretty.activate
+    def test_set_broadcast_layout(self):
+        """ Test set_broadcast_layout() functionality """
+        broadcast_id = u('1748b707-0a81-464c-9759-c46ad10d3734')
+
+        httpretty.register_uri(
+            httpretty.PUT,
+            u('https://api.opentok.com/v2/project/{0}/broadcast/{1}/layout').format(
+                self.api_key,
+                broadcast_id
+            ),
+            status=200,
+            content_type=u('application/json')
+        )
+
+        self.opentok.set_broadcast_layout(broadcast_id, 'horizontalPresentation')
+
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(
+            u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
+
+    @httpretty.activate
+    def test_set_custom_broadcast_layout(self):
+        """ Test set a custom broadcast layout specifying the 'stylesheet' parameter """
+        broadcast_id = u('1748b707-0a81-464c-9759-c46ad10d3734')
+
+        httpretty.register_uri(
+            httpretty.PUT,
+            u('https://api.opentok.com/v2/project/{0}/broadcast/{1}/layout').format(
+                self.api_key,
+                broadcast_id
+            ),
+            status=200,
+            content_type=u('application/json')
+        )
+
+        self.opentok.set_broadcast_layout(
+            broadcast_id,
+            'custom',
+            'stream.instructor {position: absolute; width: 100%;  height:50%;}'
+        )
+
+        validate_jwt_header(self, httpretty.last_request().headers[u('x-opentok-auth')])
+        expect(httpretty.last_request().headers[u('user-agent')]).to(contain(
+            u('OpenTok-Python-SDK/')+__version__))
+        expect(httpretty.last_request().headers[u('content-type')]).to(equal(u('application/json')))
+
+    @httpretty.activate
+    def test_set_broadcast_layout_throws_exception(self):
+        """ Test invalid request in set broadcast layout """
+        broadcast_id = u('1748b707-0a81-464c-9759-c46ad10d3734')
+
+        httpretty.register_uri(
+            httpretty.PUT,
+            u('https://api.opentok.com/v2/project/{0}/broadcast/{1}/layout').format(
+                self.api_key,
+                broadcast_id
+            ),
+            status=400,
+            content_type=u('application/json')
+        )
+
+        self.assertRaises(
+            BroadcastError,
+            self.opentok.set_broadcast_layout,
+            broadcast_id,
+            'horizontalPresentation'
+        )

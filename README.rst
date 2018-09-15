@@ -391,6 +391,24 @@ You can get details on a broadcast that is in-progress using the method ``opento
   #   }
   # }
 
+You can dynamically change the layout type of a live streaming broadcast.
+
+.. code:: python
+
+  # Valid values to 'layout_type' are: 'custom', 'horizontalPresentation',
+  # 'pip' and 'verticalPresentation' 
+  opentok.set_broadcast_layout('BROADCASTID', 'horizontalPresentation')
+
+  # if you specify a 'custom' layout type, set the stylesheet parameter:
+  opentok.set_archive_layout(
+      'BROADCASTID',
+      'custom',
+      'stream.instructor {position: absolute; width: 100%;  height:50%;}'
+  )
+
+For more information about OpenTok live streaming broadcasts, see the
+`Broadcast developer guide <https://tokbox.com/developer/guides/broadcast/>`_ .
+
 Samples
 -------
 

@@ -768,6 +768,46 @@ class OpenTok(object):
         else:
             raise RequestError('OpenTok server error.', response.status_code)
 
+    def set_broadcast_layout(self, broadcast_id, layout_type, stylesheet=None):
+        """
+        Use this method to change the layout type of a live streaming broadcast
+
+        :param String broadcast_id: The ID of the broadcast that will be updated
+
+        :param String layout_type: The layout type for the broadcast. Valid values are:
+        'bestFit', 'custom', 'horizontalPresentation', 'pip' and 'verticalPresentation'
+
+        :param String stylesheet optional: CSS used to style the custom layout.
+        Specify this only if you set the type property to 'custom'
+        """
+        payload = {
+            'type': layout_type,
+        }
+
+        if layout_type == 'custom':
+            if stylesheet is not None:
+                payload['stylesheet'] = stylesheet
+
+        endpoint = self.endpoints.broadcast_url(broadcast_id, layout=True)
+        response = requests.put(
+            endpoint,
+            data=json.dumps(payload),
+            headers=self.json_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout
+        )
+
+        if response.status_code == 200:
+            pass
+        elif response.status_code == 400:
+            raise BroadcastError(
+                'Invalid request. This response may indicate that data in your request data is '
+                'invalid JSON. It may also indicate that you passed in invalid layout options.')
+        elif response.status_code == 403:
+            raise AuthError('Authentication error.')
+        else:
+            raise RequestError('OpenTok server error.', response.status_code)
+
     def _sign_string(self, string, secret):
         return hmac.new(secret.encode('utf-8'), string.encode('utf-8'), hashlib.sha1).hexdigest()
 
