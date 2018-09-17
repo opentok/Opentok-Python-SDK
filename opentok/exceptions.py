@@ -49,6 +49,21 @@ class ForceDisconnectError(OpenTokException):
     """
     pass
 
+class SipDialError(OpenTokException):
+    """
+    Indicates that there was a SIP dial specific problem:
+    The Session ID passed in is invalid or you attempt to start a SIP call for a session
+    that does not use the OpenTok Media Router.
+    """
+    pass
+
+class SetStreamClassError(OpenTokException):
+    """
+    Indicates that there is invalid data in the JSON request.
+    It may also indicate that invalid layout options have been passed
+    """
+    pass
+
 class BroadcastError(OpenTokException):
     """
     Indicates that data in your request data is invalid JSON. It may also indicate

@@ -19,7 +19,7 @@ http://www.pip-installer.org/en/latest/
 Add the ``opentok`` package as a dependency in your project. The most common way is to add it to your
 ``requirements.txt`` file::
 
-  opentok>=2.7.0
+  opentok>=2.9.0
 
 Next, install the dependencies::
 
@@ -294,6 +294,27 @@ The method returns a StreamList object that contains a list of all the streams
   print stream.name #stream name
   print stream.layoutClassList #['full']
 
+You can change the layout classes for streams in a session by calling the `set_stream_class_lists(session_id, stream_list)` method of the `OpenTok` class.
+
+The layout classes define how the stream is displayed in the layout of a composed OpenTok archive.
+
+.. code:: python
+
+  # This list contains the information of the streams that will be updated. Each element
+  # in the list is a dictionary with two properties: 'id' and 'layoutClassList'. The 'id'
+  # property is the stream ID (a String), and the 'layoutClassList' is an array of class
+  # names (Strings) to apply to the stream.
+  payload = [
+      {'id': '7b09ec3c-26f9-43d7-8197-f608f13d4fb6', 'layoutClassList': ['focus']},
+      {'id': '567bc941-6ea0-4c69-97fc-70a740b68976', 'layoutClassList': ['top']},
+      {'id': '307dc941-0450-4c09-975c-705740d08970', 'layoutClassList': ['bottom']}
+  ]
+
+  opentok.set_stream_class_lists('SESSIONID', payload)
+
+For more information see
+`Changing the composed archive layout classes for an OpenTok stream <https://tokbox.com/developer/rest/#change-stream-layout-classes-composed>`_.
+
 Force Disconnect
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -306,6 +327,40 @@ Your application server can disconnect a client from an OpenTok session by calli
 
   # To send a request to disconnect a client:
   opentok.force_disconnect(session_id, connection_id)
+
+Working with SIP Interconnect
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can connect your SIP platform to an OpenTok session, the audio from your end of the SIP call is added to the OpenTok session as an audio-only stream. The OpenTok Media Router mixes audio from other streams in the session and sends the mixed audio to your SIP endpoint.
+
+.. code:: python
+
+  session_id = u('SESSIONID')
+  token = u('TOKEN')
+  sip_uri = u('sip:user@sip.partner.com;transport=tls')
+
+  # call the method with the required parameters
+  sip_call = opentok.dial(session_id, token, sip_uri)
+
+  # the method also support aditional options to establish the sip call
+
+  options = {
+      'from': 'from@example.com',
+      'headers': {
+          'headerKey': 'headerValue'
+      },
+      'auth': {
+          'username': 'username',
+          'password': 'password'
+      },
+      'secure': True
+  }
+
+  # call the method with aditional options
+  sip_call = opentok.dial(session_id, token, sip_uri, options)
+
+For more information, including technical details and security considerations, see the
+`OpenTok SIP interconnect <https://tokbox.com/developer/guides/sip/>`_ developer guide.
 
 Working with Broadcasts
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -407,7 +462,7 @@ You can dynamically change the layout type of a live streaming broadcast.
   )
 
 For more information about OpenTok live streaming broadcasts, see the
-`Broadcast developer guide <https://tokbox.com/developer/guides/broadcast/>`_ .
+`Broadcast developer guide <https://tokbox.com/developer/guides/broadcast/>`_.
 
 Samples
 -------
