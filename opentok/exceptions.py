@@ -48,3 +48,11 @@ class ForceDisconnectError(OpenTokException):
     is not connected to the session
     """
     pass
+
+class SipDialError(OpenTokException):
+    """
+    Indicates that there was a SIP dial specific problem:
+    The Session ID passed in is invalid or you attempt to start a SIP call for a session
+    that does not use the OpenTok Media Router.
+    """
+    pass

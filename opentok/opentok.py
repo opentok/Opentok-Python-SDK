@@ -24,6 +24,7 @@ from .session import Session
 from .archives import Archive, ArchiveList, OutputModes
 from .stream import Stream
 from .streamlist import StreamList
+from .sip_call import SipCall
 from .exceptions import (
     OpenTokException,
     RequestError,
@@ -32,7 +33,8 @@ from .exceptions import (
     ArchiveError,
     SignalingError,
     GetStreamError,
-    ForceDisconnectError
+    ForceDisconnectError,
+    SipDialError
 )
 
 class Roles(Enum):
@@ -633,6 +635,88 @@ class OpenTok(object):
             raise ArchiveError('Invalid request. This response may indicate that data in your request data is invalid JSON. It may also indicate that you passed in invalid layout options.')
         elif response.status_code == 403:
             raise AuthError('Authentication error.')
+        else:
+            raise RequestError('OpenTok server error.', response.status_code)
+
+
+    def dial(self, session_id, token, sip_uri, options=[]):
+        """
+        Use this method to connect a SIP platform to an OpenTok session. The audio from the end
+        of the SIP call is added to the OpenTok session as an audio-only stream. The OpenTok Media
+        Router mixes audio from other streams in the session and sends the mixed audio to the SIP
+        endpoint
+
+        :param String session_id: The OpenTok session ID for the SIP call to join
+
+        :param String token: The OpenTok token to be used for the participant being called
+
+        :param String sip_uri: The SIP URI to be used as destination of the SIP call initiated from
+        OpenTok to the SIP platform
+
+        :param Dictionary options optional: Aditional options with the following properties:
+
+            String 'from': The number or string that will be sent to the final SIP number
+            as the caller
+
+            Dictionary 'headers': Defines custom headers to be added to the SIP INVITE request
+            initiated from OpenTok to the SIP platform. Each of the custom headers must
+            start with the "X-" prefix, or the call will result in a Bad Request (400) response
+
+            Dictionary 'auth': Contains the username and password to be used in the the SIP
+            INVITE request for HTTP digest authentication, if it is required by the SIP platform
+            For example:
+
+                'auth': {
+                    'username': 'username',
+                    'password': 'password'
+                }
+
+            Boolean 'secure': A Boolean flag that indicates whether the media must be transmitted
+            encrypted (true) or not (false, the default)
+
+        :rtype: A SipCall object, which contains data of the SIP call: id, connectionId and streamId
+        """
+        payload = {
+            'sessionId': session_id,
+            'token': token,
+            'sip': {
+                'uri': sip_uri
+            }
+        }
+
+        if 'from' in options:
+            payload['sip']['from'] = options['from']
+
+        if 'headers' in options:
+            payload['sip']['headers'] = options['headers']
+
+        if 'auth' in options:
+            payload['sip']['auth'] = options['auth']
+
+        if 'secure' in options:
+            payload['sip']['secure'] = options['secure']
+
+        endpoint = self.endpoints.dial_url()
+        response = requests.post(
+            endpoint,
+            data=json.dumps(payload),
+            headers=self.json_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout
+        )
+
+        if response.status_code == 200:
+            return SipCall(response.json())
+        elif response.status_code == 400:
+            raise SipDialError('Invalid request. Invalid session ID.')
+        elif response.status_code == 403:
+            raise AuthError('Authentication error.')
+        elif response.status_code == 404:
+            raise SipDialError('The session does not exist.')
+        elif response.status_code == 409:
+            raise SipDialError(
+                'You attempted to start a SIP call for a session that '
+                'does not use the OpenTok Media Router.')
         else:
             raise RequestError('OpenTok server error.', response.status_code)
 
