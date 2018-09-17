@@ -455,7 +455,7 @@ You can dynamically change the layout type of a live streaming broadcast.
   opentok.set_broadcast_layout('BROADCASTID', 'horizontalPresentation')
 
   # if you specify a 'custom' layout type, set the stylesheet parameter:
-  opentok.set_archive_layout(
+  opentok.set_broadcast_layout(
       'BROADCASTID',
       'custom',
       'stream.instructor {position: absolute; width: 100%;  height:50%;}'
