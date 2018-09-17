@@ -715,7 +715,7 @@ class OpenTok(object):
             raise SipDialError('The session does not exist.')
         elif response.status_code == 409:
             raise SipDialError(
-                'You attempt to start a SIP call for a session that '
+                'You attempted to start a SIP call for a session that '
                 'does not use the OpenTok Media Router.')
         else:
             raise RequestError('OpenTok server error.', response.status_code)
