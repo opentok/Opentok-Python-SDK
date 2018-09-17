@@ -50,3 +50,8 @@ class Endpoints(object):
         """ this method returns the url to initialize a SIP call """
         url = self.api_url + '/v2/project/' + self.api_key + '/dial'
         return url
+
+    def set_stream_class_lists_url(self, session_id):
+        """ this method returns the url to set the stream class list """
+        url = self.api_url + '/v2/project/' + self.api_key + '/session/' + session_id + '/stream'
+        return url

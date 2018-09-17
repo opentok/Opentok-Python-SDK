@@ -56,3 +56,10 @@ class SipDialError(OpenTokException):
     that does not use the OpenTok Media Router.
     """
     pass
+
+class SetStreamClassError(OpenTokException):
+    """
+    Indicates that there is invalid data in the JSON request.
+    It may also indicate that invalid layout options have been passed
+    """
+    pass
