@@ -9,5 +9,8 @@ from .exceptions import (
     SetStreamClassError,
     BroadcastError
 )
+from .version import __version__
+from .stream import Stream
+from .streamlist import StreamList
 from .sip_call import SipCall
 from .broadcast import Broadcast
