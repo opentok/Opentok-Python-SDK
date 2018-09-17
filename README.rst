@@ -362,6 +362,108 @@ You can connect your SIP platform to an OpenTok session, the audio from your end
 For more information, including technical details and security considerations, see the
 `OpenTok SIP interconnect <https://tokbox.com/developer/guides/sip/>`_ developer guide.
 
+Working with Broadcasts
+~~~~~~~~~~~~~~~~~~~~~~~
+
+OpenTok broadcast lets you share live OpenTok sessions with many viewers.
+
+You can use the ``opentok.start_broadcast()`` method to start a live streaming for an OpenTok session. This broadcasts the session to an HLS (HTTP live streaming) or to RTMP streams.
+
+To successfully start broadcasting a session, at least one client must be connected to the session.
+
+The live streaming broadcast can target one HLS endpoint and up to five RTMP servers simulteneously for a session. You can only start live streaming for sessions that use the OpenTok Media Router; you cannot use live streaming with sessions that have the media mode set to relayed.
+
+.. code:: python
+
+  session_id = 'SESSIONID'
+  options = {
+    'layout': {
+      'type': 'custom',
+      'stylesheet': 'the layout stylesheet (only used with type == custom)'
+    },
+    'maxDuration': 5400,
+    'outputs': {
+      'hls': {},
+      'rtmp': [{
+        'id': 'foo',
+        'serverUrl': 'rtmp://myfooserver/myfooapp',
+        'streamName': 'myfoostream'
+      }, {
+        'id': 'bar',
+        'serverUrl': 'rtmp://mybarserver/mybarapp',
+        'streamName': 'mybarstream'
+      }]
+    },
+    'resolution': '640x480'
+  }
+
+  broadcast = opentok.start_broadcast(session_id, options)
+
+You can stop a started Broadcast using the ``opentok.stop_broadcast(broadcast_id)`` method.
+
+.. code:: python
+
+  # getting the ID from a broadcast object
+  broadcast_id = broadcast.id
+
+  # stop a broadcast
+  broadcast = opentok.stop_broadcast(broadcast_id)
+
+You can get details on a broadcast that is in-progress using the method ``opentok.get_broadcast(broadcast_id)``.
+
+.. code:: python
+
+  broadcast_id = '1748b7070a81464c9759c46ad10d3734'
+
+  # get broadcast details
+  broadcast = opentok.get_broadcast(broadcast_id)
+
+  print broadcast.json()
+
+  # print result
+  # {
+  #   "createdAt": 1437676551000,
+  #   "id": "1748b707-0a81-464c-9759-c46ad10d3734",
+  #   "projectId": 100,
+  #   "resolution": "640x480",
+  #   "sessionId": "2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4",
+  #   "status": "started",
+  #   "updatedAt": 1437676551000,
+  #   "broadcastUrls": {
+  #       "hls": "http://server/fakepath/playlist.m3u8",
+  #       "rtmp": {
+  #           "bar": {
+  #               "serverUrl": "rtmp://mybarserver/mybarapp",
+  #               "status": "live",
+  #               "streamName": "mybarstream"
+  #           },
+  #           "foo": {
+  #               "serverUrl": "rtmp://myfooserver/myfooapp",
+  #               "status": "live",
+  #               "streamName": "myfoostream"
+  #           }
+  #       }
+  #   }
+  # }
+
+You can dynamically change the layout type of a live streaming broadcast.
+
+.. code:: python
+
+  # Valid values to 'layout_type' are: 'custom', 'horizontalPresentation',
+  # 'pip' and 'verticalPresentation' 
+  opentok.set_broadcast_layout('BROADCASTID', 'horizontalPresentation')
+
+  # if you specify a 'custom' layout type, set the stylesheet parameter:
+  opentok.set_broadcast_layout(
+      'BROADCASTID',
+      'custom',
+      'stream.instructor {position: absolute; width: 100%;  height:50%;}'
+  )
+
+For more information about OpenTok live streaming broadcasts, see the
+`Broadcast developer guide <https://tokbox.com/developer/guides/broadcast/>`_.
+
 Samples
 -------
 

@@ -55,3 +55,15 @@ class Endpoints(object):
         """ this method returns the url to set the stream class list """
         url = self.api_url + '/v2/project/' + self.api_key + '/session/' + session_id + '/stream'
         return url
+
+    def broadcast_url(self, broadcast_id=None, stop=False, layout=False):
+        """ this method returns urls for working with broadcast """
+        url = self.api_url + '/v2/project/' + self.api_key + '/broadcast'
+
+        if broadcast_id:
+            url = url + '/' + broadcast_id
+        if stop:
+            url = url + '/stop'
+        if layout:
+            url = url + '/layout'
+        return url
