@@ -9,7 +9,9 @@ python:
 install:
 - pip install -r test_requirements.txt
 - pip install -r requirements.txt
-script: nosetests
+script: 
+  - nosetests --with-coverage --cover-package=opentok
+  - coveralls
 notifications:
   slack:
     secure: JHQCkY3tajvauFzD0V5A19QN/ZWNNAgt+qsYgaQTPkmhxbxeu48lOifp/jUaaf07aemOm9nFCla/PlTHemCQAe71CsjPIOLNHkXAWjLQ3RJJscIvyKCUbuzn/zZIDt774wx+xIuf5SSjFGmqZFJSyfE/bbNKo1I2EDUmRztrp7c=
