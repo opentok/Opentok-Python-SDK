@@ -659,8 +659,7 @@ class OpenTok(object):
             as the caller
 
             Dictionary 'headers': Defines custom headers to be added to the SIP INVITE request
-            initiated from OpenTok to the SIP platform. Each of the custom headers must
-            start with the "X-" prefix, or the call will result in a Bad Request (400) response
+            initiated from OpenTok to the SIP platform
 
             Dictionary 'auth': Contains the username and password to be used in the the SIP
             INVITE request for HTTP digest authentication, if it is required by the SIP platform
