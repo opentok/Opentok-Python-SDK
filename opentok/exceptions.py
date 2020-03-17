@@ -63,3 +63,12 @@ class SetStreamClassError(OpenTokException):
     It may also indicate that invalid layout options have been passed
     """
     pass
+
+class BroadcastError(OpenTokException):
+    """
+    Indicates that data in your request data is invalid JSON. It may also indicate
+    that you passed in invalid layout options. Or you have exceeded the limit of five
+    simultaneous RTMP streams for an OpenTok session. Or you specified and invalid resolution.
+    Or The broadcast has already started for the session
+    """
+    pass
