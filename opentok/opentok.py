@@ -288,7 +288,7 @@ class OpenTok(object):
                 raise AuthError('Failed to create session, invalid credentials')
             if not response.content:
                 raise RequestError()
-            dom = xmldom.parseString(response.content)
+            dom = xmldom.parseString(response.content.decode('utf-8'))
         except Exception as e:
             raise RequestError('Failed to create session: %s' % str(e))
 
