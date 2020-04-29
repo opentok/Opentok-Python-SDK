@@ -475,21 +475,15 @@ Configuring Timeout
 -------
 Timeout is passed in the OpenTok constructor:
 
-```
-self.timeout = timeout
-```
+``self.timeout = timeout``
 
 In order to configure timeout, first create an instance:
 
-```
-opentok = OpenTok(...., timeout=value)
-``
+``opentok = OpenTok(...., timeout=value)``
 
 And then proceed to change the value with
 
-```
-opentok.timeout = value
-```
+``opentok.timeout = value``
 
 Samples
 -------
