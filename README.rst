@@ -470,7 +470,7 @@ You can dynamically change the layout type of a live streaming broadcast.
 For more information about OpenTok live streaming broadcasts, see the
 `Broadcast developer guide <https://tokbox.com/developer/guides/broadcast/>`_.
 
-<<<<<<< HEAD
+
 Configuring Timeout
 -------
 Timeout is passed in the OpenTok constructor:
@@ -491,8 +491,6 @@ And then proceed to change the value with
 opentok.timeout = value
 ```
 
-=======
->>>>>>> parent of 801a371... adding custom timeout information
 Samples
 -------
 
