@@ -4,7 +4,7 @@ OpenTok Python SDK
 
 .. image:: https://travis-ci.org/opentok/Opentok-Python-SDK.svg
    :target: https://travis-ci.org/opentok/Opentok-Python-SDK
-.. image:: https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg
+.. image:: https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg 
    :target: CODE_OF_CONDUCT.md
 
 .. image:: https://assets.tokbox.com/img/vonage/Vonage_VideoAPI_black.svg
@@ -457,7 +457,7 @@ You can dynamically change the layout type of a live streaming broadcast.
 .. code:: python
 
   # Valid values to 'layout_type' are: 'custom', 'horizontalPresentation',
-  # 'pip' and 'verticalPresentation'
+  # 'pip' and 'verticalPresentation' 
   opentok.set_broadcast_layout('BROADCASTID', 'horizontalPresentation')
 
   # if you specify a 'custom' layout type, set the stylesheet parameter:
@@ -470,26 +470,29 @@ You can dynamically change the layout type of a live streaming broadcast.
 For more information about OpenTok live streaming broadcasts, see the
 `Broadcast developer guide <https://tokbox.com/developer/guides/broadcast/>`_.
 
-Configuring / Customizing Timeout
+<<<<<<< HEAD
+Configuring Timeout
 -------
 Timeout is passed in the OpenTok constructor:
 
-```python
+```
 self.timeout = timeout
 ```
 
 In order to configure timeout, first create an instance:
 
-```python
-opentok = OpenTok(...., timeout=value)
 ```
+opentok = OpenTok(...., timeout=value)
+``
 
 And then proceed to change the value with
 
-```python
+```
 opentok.timeout = value
 ```
 
+=======
+>>>>>>> parent of 801a371... adding custom timeout information
 Samples
 -------
 
