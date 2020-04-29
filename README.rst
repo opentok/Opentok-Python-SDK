@@ -470,13 +470,25 @@ You can dynamically change the layout type of a live streaming broadcast.
 For more information about OpenTok live streaming broadcasts, see the
 `Broadcast developer guide <https://tokbox.com/developer/guides/broadcast/>`_.
 
-Configuring Timeout
+Configuring / Customizing Timeout
 -------
 Timeout is passed in the OpenTok constructor:
 
-```self.timeout = timeout```
+```python
+self.timeout = timeout
+```
 
-The solution is to create an instance: opentok = OpenTok(...., timeout=value) and then the value can be changed later with opentok.timeout = value
+In order to configure timeout, first create an instance:
+
+```python
+opentok = OpenTok(...., timeout=value)
+```
+
+And then proceed to change the value with
+
+```python
+opentok.timeout = value
+```
 
 Samples
 -------
