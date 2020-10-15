@@ -46,3 +46,5 @@ venv/
 
 # Mac Desktop files
 .DS_Store
+
+.vscode
