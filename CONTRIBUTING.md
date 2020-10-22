@@ -12,7 +12,7 @@ that we would be interested in hearing about.
     -  If you'd like to accomplish something in the library that it doesn't already do, describe the problem in a new
        Github Issue.
     -  Issues that have been identified as a feature request will be labelled `enhancement`.
-    -  If you'd like to implement the new feature, please wait for feedback from the project maintainers before spending too much time writing the code. In some cases, `enhancement's may not align well with the project objectives at the time.
+    -  If you'd like to implement the new feature, please wait for feedback from the project maintainers before spending too much time writing the code. In some cases, `enhancement`s may not align well with the project objectives at the time.
 *  Tests, Documentation, Miscellaneous
     -  If you think the test coverage could be improved, the documentation could be clearer, you've got an alternative
        implementation of something that may have more advantages or any other change we would still be glad to hear about
