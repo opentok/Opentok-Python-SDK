@@ -130,7 +130,7 @@ class Archive(object):
         """
         Returns a dictionary of the archive's attributes.
         """
-        return dict((k, v) for k, v in iteritems(self.__dict__) if k is not "sdk")
+        return dict((k, v) for k, v in iteritems(self.__dict__) if k != "sdk")
 
     def json(self):
         """
