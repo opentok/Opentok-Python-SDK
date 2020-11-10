@@ -28,7 +28,6 @@ with codecs.open('README.rst', encoding='utf-8') as f:
     long_description = f.read()
 
 install_requires = [
-    'enum34  ; python_version < "3.4"',
     'requests',
     'six',
     'pytz',
