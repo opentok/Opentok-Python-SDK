@@ -51,6 +51,16 @@ class OpenTokSessionCreationTest(unittest.TestCase):
         expect(session).to(have_property(u('session_id'), u('1_MX4xMjM0NTZ-fk1vbiBNYXIgMTcgMDA6NDE6MzEgUERUIDIwMTR-MC42ODM3ODk1MzQ0OTQyODA4fg')))
         expect(session).to(have_property(u('media_mode'), MediaModes.routed))
         expect(session).to(have_property(u('location'), None))
+    
+    @httpretty.activate
+    def test_failure_create_routed_session(self):
+        #Session creation fails when server doesn't returns a XML
+        httpretty.register_uri(httpretty.POST, u('https://api.opentok.com/session/create'),
+                               body=u('<html><head><meta charset="UTF-8"></head><body>Page not found</body></html>'),
+                               status=200,
+                               content_type=u('text/xml'))
+
+        self.assertRaises(OpenTokException, self.opentok.create_session, media_mode=MediaModes.routed)
 
     @httpretty.activate
     def test_create_session_with_location_hint(self):
