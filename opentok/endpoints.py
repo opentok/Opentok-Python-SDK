@@ -7,17 +7,17 @@ class Endpoints(object):
         self.api_url = api_url
         self.api_key = api_key
 
-    def session_url(self):
+    def get_session_url(self):
         url = self.api_url + '/session/create'
         return url
 
-    def archive_url(self, archive_id=None):
+    def get_archive_url(self, archive_id=None):
         url = self.api_url + '/v2/project/' + self.api_key + '/archive'
         if archive_id:
             url = url + '/' + archive_id
         return url
 
-    def signaling_url(self, session_id, connection_id=None):
+    def get_signaling_url(self, session_id, connection_id=None):
         url = self.api_url + '/v2/project/' + self.api_key + '/session/' + session_id
 
         if connection_id:
@@ -56,7 +56,7 @@ class Endpoints(object):
         url = self.api_url + '/v2/project/' + self.api_key + '/session/' + session_id + '/stream'
         return url
 
-    def broadcast_url(self, broadcast_id=None, stop=False, layout=False):
+    def get_broadcast_url(self, broadcast_id=None, stop=False, layout=False):
         """ this method returns urls for working with broadcast """
         url = self.api_url + '/v2/project/' + self.api_key + '/broadcast'
 

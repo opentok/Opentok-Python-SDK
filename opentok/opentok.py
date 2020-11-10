@@ -12,7 +12,6 @@ from socket import inet_aton   # create_session
 import xml.dom.minidom as xmldom # create_session
 from jose import jwt           # _create_jwt_auth_header
 import random                  # _create_jwt_auth_header
-import logging #logging
 
 # compat
 from six.moves.urllib.parse import urlencode
@@ -69,8 +68,6 @@ class ArchiveModes(Enum):
     """The session will be manually archived."""
     always = u('always')
     """The session will be automatically archived."""
-
-logger = logging.getLogger("opentok")
 
 class OpenTok(object):
     """Use this SDK to create tokens and interface with the server-side portion
@@ -302,8 +299,7 @@ class OpenTok(object):
             options[u('location')] = location
 
         try:
-            logger.debug("POST to %r with params %r, headers %r, proxies %r", self.endpoints.session_url(), options, self.headers(), self.proxies)
-            response = requests.post(self.endpoints.session_url(), data=options, headers=self.headers(), proxies=self.proxies, timeout=self.timeout)
+            response = requests.post(self.endpoints.get_session_url(), data=options, headers=self.get_headers(), proxies=self.proxies, timeout=self.timeout)
             response.encoding = 'utf-8'
 
             if response.status_code == 403:
@@ -325,16 +321,16 @@ class OpenTok(object):
         except Exception as e:
             raise OpenTokException('Failed to generate session: %s' % str(e))
 
-    def headers(self):
+    def get_headers(self):
         """For internal use."""
         return {
             'User-Agent': self.app_name + '/' + self.app_version + ' python/' + platform.python_version(),
             'X-OPENTOK-AUTH': self._create_jwt_auth_header()
         }
 
-    def json_headers(self):
+    def get_json_headers(self):
         """For internal use."""
-        result = self.headers()
+        result = self.get_headers()
         result['Content-Type'] = 'application/json'
         return result
 
@@ -388,8 +384,7 @@ class OpenTok(object):
                    'resolution': resolution,
         }
 
-        logger.debug("POST to %r with params %r, headers %r, proxies %r", self.endpoints.archive_url(), json.dumps(payload), self.json_headers(), self.proxies)
-        response = requests.post(self.endpoints.archive_url(), data=json.dumps(payload), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.post(self.endpoints.get_archive_url(), data=json.dumps(payload), headers=self.get_json_headers(), proxies=self.proxies, timeout=self.timeout)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -422,8 +417,7 @@ class OpenTok(object):
 
         :rtype: The Archive object corresponding to the archive being stopped.
         """
-        logger.debug("POST to %r with headers %r, proxies %r", self.endpoints.archive_url(archive_id) + '/stop', self.json_headers(), self.proxies)
-        response = requests.post(self.endpoints.archive_url(archive_id) + '/stop', headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.post(self.endpoints.get_archive_url(archive_id) + '/stop', headers=self.get_json_headers(), proxies=self.proxies, timeout=self.timeout)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -446,8 +440,7 @@ class OpenTok(object):
 
         :param String archive_id: The archive ID of the archive to be deleted.
         """
-        logger.debug("DELETE to %r with headers %r, proxies %r", self.endpoints.archive_url(archive_id), self.json_headers(), self.proxies)
-        response = requests.delete(self.endpoints.archive_url(archive_id), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.delete(self.endpoints.get_archive_url(archive_id), headers=self.get_json_headers(), proxies=self.proxies, timeout=self.timeout)
 
         if response.status_code < 300:
             pass
@@ -465,8 +458,7 @@ class OpenTok(object):
 
         :rtype: The Archive object.
         """
-        logger.debug("GET to %r with headers %r, proxies %r", self.endpoints.archive_url(archive_id), self.json_headers(), self.proxies)
-        response = requests.get(self.endpoints.archive_url(archive_id), headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout)
+        response = requests.get(self.endpoints.get_archive_url(archive_id), headers=self.get_json_headers(), proxies=self.proxies, timeout=self.timeout)
 
         if response.status_code < 300:
             return Archive(self, response.json())
@@ -498,11 +490,10 @@ class OpenTok(object):
         if session_id is not None:
             params['sessionId'] = session_id
 
-        endpoint = self.endpoints.archive_url() + "?" + urlencode(params)
+        endpoint = self.endpoints.get_archive_url() + "?" + urlencode(params)
 
-        logger.debug("GET to %r with headers %r, proxies %r", endpoint, self.json_headers(), self.proxies)
         response = requests.get(
-            endpoint, headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout
+            endpoint, headers=self.get_json_headers(), proxies=self.proxies, timeout=self.timeout
         )
 
         if response.status_code < 300:
@@ -521,7 +512,7 @@ class OpenTok(object):
         """
         return self.get_archives(offset, count, session_id)
 
-    def signal(self, session_id, payload, connection_id=None):
+    def send_signal(self, session_id, payload, connection_id=None):
         """
         Send signals to all participants in an active OpenTok session or to a specific client
         connected to that session.
@@ -536,11 +527,10 @@ class OpenTok(object):
         the signal is sent to the specified client. Otherwise, the signal is sent to all clients
         connected to the session
         """
-        logger.debug("POST to %r with params %r, headers %r, proxies %r", self.endpoints.signaling_url(session_id, connection_id), json.dumps(payload), self.json_headers(), self.proxies)
         response = requests.post(
-            self.endpoints.signaling_url(session_id, connection_id),
+            self.endpoints.get_signaling_url(session_id, connection_id),
             data=json.dumps(payload),
-            headers=self.json_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout
         )
@@ -568,9 +558,8 @@ class OpenTok(object):
         -layoutClassList: It's an array of the layout classes for the stream
         """
         endpoint = self.endpoints.get_stream_url(session_id, stream_id)
-        logger.debug("GET to %r with headers %r, proxies %r", endpoint, self.json_headers(), self.proxies)
         response = requests.get(
-            endpoint, headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout
+            endpoint, headers=self.get_json_headers(), proxies=self.proxies, timeout=self.timeout
         )
 
         if response.status_code == 200:
@@ -594,9 +583,8 @@ class OpenTok(object):
         """
         endpoint = self.endpoints.get_stream_url(session_id)
 
-        logger.debug("GET to %r with headers %r, proxies %r", endpoint, self.json_headers(), self.proxies)
         response = requests.get(
-            endpoint, headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout
+            endpoint, headers=self.get_json_headers(), proxies=self.proxies, timeout=self.timeout
         )
 
         if response.status_code == 200:
@@ -618,9 +606,8 @@ class OpenTok(object):
         :param String connection_id: The connection ID of the client that will be disconnected
         """
         endpoint = self.endpoints.force_disconnect_url(session_id, connection_id)
-        logger.debug("DELETE to %r with headers %r, proxies %r", endpoint, self.json_headers(), self.proxies)
         response = requests.delete(
-            endpoint, headers=self.json_headers(), proxies=self.proxies, timeout=self.timeout
+            endpoint, headers=self.get_json_headers(), proxies=self.proxies, timeout=self.timeout
         )
 
         if response.status_code == 204:
@@ -655,11 +642,10 @@ class OpenTok(object):
                 payload['stylesheet'] = stylesheet
 
         endpoint = self.endpoints.set_archive_layout_url(archive_id)
-        logger.debug("PUT to %r with params %r, headers %r, proxies %r", endpoint, json.dumps(payload), self.json_headers(), self.proxies)
         response = requests.put(
             endpoint,
             data=json.dumps(payload),
-            headers=self.json_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout
         )
@@ -731,11 +717,10 @@ class OpenTok(object):
             payload['sip']['secure'] = options['secure']
 
         endpoint = self.endpoints.dial_url()
-        logger.debug("POST to %r with params %r, headers %r, proxies %r", endpoint, json.dumps(payload), self.json_headers(), self.proxies)
         response = requests.post(
             endpoint,
             data=json.dumps(payload),
-            headers=self.json_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout
         )
@@ -776,11 +761,10 @@ class OpenTok(object):
         items_payload = {'items': payload}
 
         endpoint = self.endpoints.set_stream_class_lists_url(session_id)
-        logger.debug("PUT to %r with params %r, headers %r, proxies %r", endpoint, json.dumps(items_payload), self.json_headers(), self.proxies)
         response = requests.put(
             endpoint,
             data=json.dumps(items_payload),
-            headers=self.json_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout
         )
@@ -841,12 +825,11 @@ class OpenTok(object):
 
         payload.update(options)
 
-        endpoint = self.endpoints.broadcast_url()
-        logger.debug("POST to %r with params %r, headers %r, proxies %r", endpoint, json.dumps(payload), self.json_headers(), self.proxies)
+        endpoint = self.endpoints.get_broadcast_url()
         response = requests.post(
             endpoint,
             data=json.dumps(payload),
-            headers=self.json_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout
         )
@@ -875,11 +858,10 @@ class OpenTok(object):
         :rtype A Broadcast object, which contains information of the broadcast: id, sessionId
         projectId, createdAt, updatedAt and resolution
         """
-        endpoint = self.endpoints.broadcast_url(broadcast_id, stop=True)
-        logger.debug("POST to %r with headers %r, proxies %r", endpoint, self.json_headers(), self.proxies)
+        endpoint = self.endpoints.get_broadcast_url(broadcast_id, stop=True)
         response = requests.post(
             endpoint,
-            headers=self.json_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout
         )
@@ -908,11 +890,10 @@ class OpenTok(object):
         :rtype A Broadcast object, which contains information of the broadcast: id, sessionId
         projectId, createdAt, updatedAt, resolution, broadcastUrls and status
         """
-        endpoint = self.endpoints.broadcast_url(broadcast_id)
-        logger.debug("GET to %r with headers %r, proxies %r", endpoint, self.json_headers(), self.proxies)
+        endpoint = self.endpoints.get_broadcast_url(broadcast_id)
         response = requests.get(
             endpoint,
-            headers=self.json_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout
         )
@@ -950,12 +931,11 @@ class OpenTok(object):
             if stylesheet is not None:
                 payload['stylesheet'] = stylesheet
 
-        endpoint = self.endpoints.broadcast_url(broadcast_id, layout=True)
-        logger.debug("PUT to %r with params %r, headers %r, proxies %r", endpoint, json.dumps(payload), self.json_headers(), self.proxies)
+        endpoint = self.endpoints.get_broadcast_url(broadcast_id, layout=True)
         response = requests.put(
             endpoint,
             data=json.dumps(payload),
-            headers=self.json_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout
         )
