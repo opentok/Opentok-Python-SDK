@@ -1,15 +1,14 @@
 import json
 
-
 class SipCall(object):
     """
     Represents data from a SIP call
     """
 
     def __init__(self, kwargs):
-        self.id = kwargs.get("id")
-        self.connectionId = kwargs.get("connectionId")
-        self.streamId = kwargs.get("streamId")
+        self.id = kwargs.get('id')
+        self.connectionId = kwargs.get('connectionId')
+        self.streamId = kwargs.get('streamId')
 
     def json(self):
         """

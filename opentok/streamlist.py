@@ -3,15 +3,14 @@ import json
 from .opentok import Stream
 from .exceptions import GetStreamError
 
-
 class StreamList(object):
     """
     Represents a list of OpenTok stream objects
     """
 
     def __init__(self, values):
-        self.count = values.get("count")
-        self.items = list(map(lambda x: Stream(x), values.get("items", [])))
+        self.count = values.get('count')
+        self.items = list(map(lambda x: Stream(x), values.get('items', [])))
 
     def __iter__(self):
         for x in self.items:
@@ -24,9 +23,7 @@ class StreamList(object):
         return self.items.get(key)
 
     def __setitem__(self, key, item):
-        raise GetStreamError(
-            u("Cannot set item {0} for key {1} in Archive object").format(item, key)
-        )
+        raise GetStreamError(u('Cannot set item {0} for key {1} in Archive object').format(item, key))
 
     def __len__(self):
         return len(self.items)
