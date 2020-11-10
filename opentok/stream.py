@@ -2,9 +2,15 @@ from datetime import datetime, date
 from six import iteritems, PY2, PY3, u
 import json
 from six.moves import map
-dthandler = lambda obj: obj.isoformat() if isinstance(obj, datetime)  or isinstance(obj, date) else None
+
+dthandler = (
+    lambda obj: obj.isoformat()
+    if isinstance(obj, datetime) or isinstance(obj, date)
+    else None
+)
 
 from .exceptions import GetStreamError
+
 
 class Stream(object):
     """
@@ -12,10 +18,10 @@ class Stream(object):
     """
 
     def __init__(self, kwargs):
-        self.id = kwargs.get('id')
-        self.videoType = kwargs.get('videoType')
-        self.name = kwargs.get('name')
-        self.layoutClassList = kwargs.get('layoutClassList')
+        self.id = kwargs.get("id")
+        self.videoType = kwargs.get("videoType")
+        self.name = kwargs.get("name")
+        self.layoutClassList = kwargs.get("layoutClassList")
 
     def attrs(self):
         """
