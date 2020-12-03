@@ -14,10 +14,3 @@ class GetterSetterTest(unittest.TestCase):
             "1_MX4xMjM0NTZ-flNhdCBNYXIgMTUgMTQ6NDI6MjMgUERUIDIwMTR-MC40OTAxMzAyNX4"
         )
         self.opentok = OpenTok(self.api_key, self.api_secret)
-
-    def test_getset_appname(self):
-        assert self.opentok.app_name == "OpenTok-Python-SDK"
-        self.opentok.app_name = "Vonage-Video-SDK"
-        expect(self.opentok.headers()["User-Agent"]).to(
-            contain(u("Vonage-Video-SDK/") + __version__)
-        )
