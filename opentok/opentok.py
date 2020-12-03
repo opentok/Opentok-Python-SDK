@@ -90,7 +90,6 @@ class OpenTok(object):
         api_secret,
         api_url="https://api.opentok.com",
         timeout=None,
-        app_name="OpenTok-Python-SDK",
         app_version=None,
     ):
         self.api_key = str(api_key)
@@ -98,7 +97,6 @@ class OpenTok(object):
         self.timeout = timeout
         self._proxies = None
         self.endpoints = Endpoints(api_url, self.api_key)
-        self._app_name = app_name
         self._app_version = __version__ if app_version == None else app_version
 
     @property
@@ -108,14 +106,6 @@ class OpenTok(object):
     @proxies.setter
     def proxies(self, proxies):
         self._proxies = proxies
-
-    @property
-    def app_name(self):
-        return self._app_name
-
-    @app_name.setter
-    def app_name(self, value):
-        self._app_name = value
 
     @property
     def app_version(self):
@@ -425,8 +415,7 @@ class OpenTok(object):
     def headers(self):
         """For internal use."""
         return {
-            "User-Agent": self.app_name
-            + "/"
+            "User-Agent": "OpenTok-Python-SDK/"
             + self.app_version
             + " python/"
             + platform.python_version(),
