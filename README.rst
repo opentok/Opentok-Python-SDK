@@ -4,6 +4,12 @@ OpenTok Python SDK
 
 .. image:: https://travis-ci.org/opentok/Opentok-Python-SDK.svg
    :target: https://travis-ci.org/opentok/Opentok-Python-SDK
+.. image:: https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg 
+   :target: CODE_OF_CONDUCT.md
+
+.. image:: https://assets.tokbox.com/img/vonage/Vonage_VideoAPI_black.svg
+   :height: 48px
+   :alt: Tokbox is now known as Vonage
 
 The OpenTok Python SDK lets you generate
 `sessions <http://tokbox.com/opentok/tutorials/create-session/>`_ and
@@ -464,6 +470,21 @@ You can dynamically change the layout type of a live streaming broadcast.
 For more information about OpenTok live streaming broadcasts, see the
 `Broadcast developer guide <https://tokbox.com/developer/guides/broadcast/>`_.
 
+
+Configuring Timeout
+-------
+Timeout is passed in the OpenTok constructor:
+
+``self.timeout = timeout``
+
+In order to configure timeout, first create an instance:
+
+``opentok = OpenTok(...., timeout=value)``
+
+And then proceed to change the value with
+
+``opentok.timeout = value``
+
 Samples
 -------
 
@@ -476,7 +497,7 @@ repository and follow the Walkthroughs:
 Documentation
 -------------
 
-Reference documentation is available at <http://www.tokbox.com/opentok/libraries/server/python/reference/index.html>.
+Reference documentation is available at http://www.tokbox.com/opentok/libraries/server/python/reference/index.html.
 
 Requirements
 ------------
@@ -509,7 +530,7 @@ This version of the SDK includes support for working with OpenTok archives.
 The OpenTok.create_session() method now includes a media_mode parameter, instead of a p2p parameter.
 
 For details, see the reference documentation at
-<http://www.tokbox.com/opentok/libraries/server/python/reference/index.html>.
+http://www.tokbox.com/opentok/libraries/server/python/reference/index.html.
 
 Development and Contributing
 ----------------------------
@@ -517,10 +538,12 @@ Development and Contributing
 Interested in contributing? We :heart: pull requests! See the `Development <DEVELOPING.md>`_ and
 `Contribution <CONTRIBUTING.md>`_ guidelines.
 
-Support
--------
+Getting Help
+------------
 
-See https://support.tokbox.com/ for all our support options.
+We love to hear from you so if you have questions, comments or find a bug in the project, let us know! You can either:
 
-Find a bug? File it on the `Issues <https://github.com/opentok/opentok-python-sdk/issues>`_ page.
-Hint: test cases are really helpful!
+* Open an issue on this repository
+* See https://support.tokbox.com/ for support options
+* Tweet at us! We're `@VonageDev on Twitter <https://twitter.com/VonageDev>`_
+* Or `join the Vonage Developer Community Slack <https://developer.nexmo.com/community/slack>`_

@@ -3,21 +3,29 @@ from six import iteritems, PY2, PY3, u
 import json
 import pytz
 from enum import Enum
+
 if PY3:
     from datetime import timezone
 
 # compat
 from six.moves import map
 
-dthandler = lambda obj: obj.isoformat() if isinstance(obj, datetime)  or isinstance(obj, date) else None
+dthandler = (
+    lambda obj: obj.isoformat()
+    if isinstance(obj, datetime) or isinstance(obj, date)
+    else None
+)
+
 
 class OutputModes(Enum):
     """List of valid settings for the output_mode parameter of the OpenTok.start_archive()
     method."""
-    composed = u('composed')
+
+    composed = u("composed")
     """All streams in the archive are recorded to a single (composed) file."""
-    individual = u('individual')
+    individual = u("individual")
     """Each stream in the archive is recorded to an individual file."""
+
 
 class Archive(object):
     """Represents an archive of an OpenTok session.
@@ -87,22 +95,26 @@ class Archive(object):
 
     def __init__(self, sdk, values):
         self.sdk = sdk
-        self.id = values.get('id')
-        self.name = values.get('name')
-        self.status = values.get('status')
-        self.session_id = values.get('sessionId')
-        self.partner_id = values.get('partnerId')
+        self.id = values.get("id")
+        self.name = values.get("name")
+        self.status = values.get("status")
+        self.session_id = values.get("sessionId")
+        self.partner_id = values.get("partnerId")
         if PY2:
-            self.created_at = datetime.fromtimestamp(values.get('createdAt') / 1000, pytz.UTC)
+            self.created_at = datetime.fromtimestamp(
+                values.get("createdAt") / 1000, pytz.UTC
+            )
         if PY3:
-            self.created_at = datetime.fromtimestamp(values.get('createdAt') // 1000, timezone.utc)
-        self.size = values.get('size')
-        self.duration = values.get('duration')
-        self.has_audio = values.get('hasAudio')
-        self.has_video = values.get('hasVideo')
-        self.output_mode = OutputModes[values.get('outputMode', 'composed')]
-        self.url = values.get('url')
-        self.resolution = values.get('resolution')
+            self.created_at = datetime.fromtimestamp(
+                values.get("createdAt") // 1000, timezone.utc
+            )
+        self.size = values.get("size")
+        self.duration = values.get("duration")
+        self.has_audio = values.get("hasAudio")
+        self.has_video = values.get("hasVideo")
+        self.output_mode = OutputModes[values.get("outputMode", "composed")]
+        self.url = values.get("url")
+        self.resolution = values.get("resolution")
 
     def stop(self):
         """
@@ -112,7 +124,7 @@ class Archive(object):
         disconnected from the session being archived.
         """
         temp_archive = self.sdk.stop_archive(self.id)
-        for k,v in iteritems(temp_archive.attrs()):
+        for k, v in iteritems(temp_archive.attrs()):
             setattr(self, k, v)
 
     def delete(self):
@@ -130,7 +142,7 @@ class Archive(object):
         """
         Returns a dictionary of the archive's attributes.
         """
-        return dict((k, v) for k, v in iteritems(self.__dict__) if k is not "sdk")
+        return dict((k, v) for k, v in iteritems(self.__dict__) if k != "sdk")
 
     def json(self):
         """
@@ -138,21 +150,18 @@ class Archive(object):
         """
         return json.dumps(self.attrs(), default=dthandler, indent=4)
 
-class ArchiveList(object):
 
+class ArchiveList(object):
     def __init__(self, sdk, values):
-        self.count = values.get('count')
-        self.items = list(map(lambda x: Archive(sdk, x), values.get('items', [])))
+        self.count = values.get("count")
+        self.items = list(map(lambda x: Archive(sdk, x), values.get("items", [])))
 
     def __iter__(self):
         for x in self.items:
             yield x
 
     def attrs(self):
-        return {
-            'count': self.count,
-            'items': map(Archive.attrs, self.items)
-        }
+        return {"count": self.count, "items": map(Archive.attrs, self.items)}
 
     def json(self):
         return json.dumps(self.attrs(), default=dthandler, indent=4)
@@ -161,7 +170,9 @@ class ArchiveList(object):
         return self.items.get(key)
 
     def __setitem__(self, key, item):
-        raise ArchiveError(u('Cannot set item {0} for key {1} in Archive object').format(item, key))
+        raise ArchiveError(
+            u("Cannot set item {0} for key {1} in Archive object").format(item, key)
+        )
 
     def __len__(self):
         return len(self.items)
