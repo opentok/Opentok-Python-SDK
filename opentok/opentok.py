@@ -12,6 +12,7 @@ from socket import inet_aton  # create_session
 import xml.dom.minidom as xmldom  # create_session
 from jose import jwt  # _create_jwt_auth_header
 import random  # _create_jwt_auth_header
+import warnings  # Native. Used for notifying deprecations
 
 # compat
 from six.moves.urllib.parse import urlencode
@@ -422,11 +423,27 @@ class OpenTok(object):
             "X-OPENTOK-AUTH": self._create_jwt_auth_header(),
         }
 
+    def headers(self):
+        warnings.warn(
+            "opentok.headers is deprecated (use opentok.get_headers instead).",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.get_headers()
+
     def get_json_headers(self):
         """For internal use."""
         result = self.get_headers()
         result["Content-Type"] = "application/json"
         return result
+
+    def json_headers(self):
+        warnings.warn(
+            "opentok.json_headers is deprecated (use opentok.get_json_headers instead).",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.get_json_headers()
 
     def start_archive(
         self,
@@ -689,6 +706,14 @@ class OpenTok(object):
             )
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
+
+    def signal(self, session_id, payload, connection_id=None):
+        warnings.warn(
+            "opentok.signal is deprecated (use opentok.send_signal instead).",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        self.send_signal(session_id, payload, connection_id)
 
     def get_stream(self, session_id, stream_id):
         """
