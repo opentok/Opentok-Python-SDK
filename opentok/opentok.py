@@ -98,6 +98,7 @@ class OpenTok(object):
         self._proxies = None
         self.endpoints = Endpoints(api_url, self.api_key)
         self._app_version = __version__ if app_version == None else app_version
+        self.request_session = requests.Session()
 
     @property
     def proxies(self):
@@ -370,7 +371,7 @@ class OpenTok(object):
             options[u("location")] = location
 
         try:
-            response = requests.post(
+            response = self.request_session.post(
                 self.endpoints.session_url(),
                 data=options,
                 headers=self.headers(),
@@ -494,7 +495,7 @@ class OpenTok(object):
             "resolution": resolution,
         }
 
-        response = requests.post(
+        response = self.request_session.post(
             self.endpoints.archive_url(),
             data=json.dumps(payload),
             headers=self.json_headers(),
@@ -533,7 +534,7 @@ class OpenTok(object):
 
         :rtype: The Archive object corresponding to the archive being stopped.
         """
-        response = requests.post(
+        response = self.request_session.post(
             self.endpoints.archive_url(archive_id) + "/stop",
             headers=self.json_headers(),
             proxies=self.proxies,
@@ -561,7 +562,7 @@ class OpenTok(object):
 
         :param String archive_id: The archive ID of the archive to be deleted.
         """
-        response = requests.delete(
+        response = self.request_session.delete(
             self.endpoints.archive_url(archive_id),
             headers=self.json_headers(),
             proxies=self.proxies,
@@ -584,7 +585,7 @@ class OpenTok(object):
 
         :rtype: The Archive object.
         """
-        response = requests.get(
+        response = self.request_session.get(
             self.endpoints.archive_url(archive_id),
             headers=self.json_headers(),
             proxies=self.proxies,
@@ -623,7 +624,7 @@ class OpenTok(object):
 
         endpoint = self.endpoints.archive_url() + "?" + urlencode(params)
 
-        response = requests.get(
+        response = self.request_session.get(
             endpoint,
             headers=self.json_headers(),
             proxies=self.proxies,
@@ -661,7 +662,7 @@ class OpenTok(object):
         the signal is sent to the specified client. Otherwise, the signal is sent to all clients
         connected to the session
         """
-        response = requests.post(
+        response = self.request_session.post(
             self.endpoints.signaling_url(session_id, connection_id),
             data=json.dumps(payload),
             headers=self.json_headers(),
@@ -700,7 +701,7 @@ class OpenTok(object):
         -layoutClassList: It's an array of the layout classes for the stream
         """
         endpoint = self.endpoints.get_stream_url(session_id, stream_id)
-        response = requests.get(
+        response = self.request_session.get(
             endpoint,
             headers=self.json_headers(),
             proxies=self.proxies,
@@ -730,7 +731,7 @@ class OpenTok(object):
         """
         endpoint = self.endpoints.get_stream_url(session_id)
 
-        response = requests.get(
+        response = self.request_session.get(
             endpoint,
             headers=self.json_headers(),
             proxies=self.proxies,
@@ -758,7 +759,7 @@ class OpenTok(object):
         :param String connection_id: The connection ID of the client that will be disconnected
         """
         endpoint = self.endpoints.force_disconnect_url(session_id, connection_id)
-        response = requests.delete(
+        response = self.request_session.delete(
             endpoint,
             headers=self.json_headers(),
             proxies=self.proxies,
@@ -803,7 +804,7 @@ class OpenTok(object):
                 payload["stylesheet"] = stylesheet
 
         endpoint = self.endpoints.set_archive_layout_url(archive_id)
-        response = requests.put(
+        response = self.request_session.put(
             endpoint,
             data=json.dumps(payload),
             headers=self.json_headers(),
@@ -874,7 +875,7 @@ class OpenTok(object):
             payload["sip"]["secure"] = options["secure"]
 
         endpoint = self.endpoints.dial_url()
-        response = requests.post(
+        response = self.request_session.post(
             endpoint,
             data=json.dumps(payload),
             headers=self.json_headers(),
@@ -919,7 +920,7 @@ class OpenTok(object):
         items_payload = {"items": payload}
 
         endpoint = self.endpoints.set_stream_class_lists_url(session_id)
-        response = requests.put(
+        response = self.request_session.put(
             endpoint,
             data=json.dumps(items_payload),
             headers=self.json_headers(),
@@ -982,7 +983,7 @@ class OpenTok(object):
         payload.update(options)
 
         endpoint = self.endpoints.broadcast_url()
-        response = requests.post(
+        response = self.request_session.post(
             endpoint,
             data=json.dumps(payload),
             headers=self.json_headers(),
@@ -1016,7 +1017,7 @@ class OpenTok(object):
         projectId, createdAt, updatedAt and resolution
         """
         endpoint = self.endpoints.broadcast_url(broadcast_id, stop=True)
-        response = requests.post(
+        response = self.request_session.post(
             endpoint,
             headers=self.json_headers(),
             proxies=self.proxies,
@@ -1050,7 +1051,7 @@ class OpenTok(object):
         projectId, createdAt, updatedAt, resolution, broadcastUrls and status
         """
         endpoint = self.endpoints.broadcast_url(broadcast_id)
-        response = requests.get(
+        response = self.request_session.get(
             endpoint,
             headers=self.json_headers(),
             proxies=self.proxies,
@@ -1092,7 +1093,7 @@ class OpenTok(object):
                 payload["stylesheet"] = stylesheet
 
         endpoint = self.endpoints.broadcast_url(broadcast_id, layout=True)
-        response = requests.put(
+        response = self.request_session.put(
             endpoint,
             data=json.dumps(payload),
             headers=self.json_headers(),
