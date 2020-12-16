@@ -90,6 +90,7 @@ class OpenTok(object):
         api_secret,
         api_url="https://api.opentok.com",
         timeout=None,
+        app_name=None,
         app_version=None,
     ):
         self.api_key = str(api_key)
@@ -97,7 +98,8 @@ class OpenTok(object):
         self.timeout = timeout
         self._proxies = None
         self.endpoints = Endpoints(api_url, self.api_key)
-        self._app_version = __version__ if app_version == None else app_version
+        self._app_version = app_version
+        self._app_name = app_name
 
     @property
     def proxies(self):
@@ -106,6 +108,14 @@ class OpenTok(object):
     @proxies.setter
     def proxies(self, proxies):
         self._proxies = proxies
+
+    @property
+    def app_name(self):
+        return self._app_name
+
+    @app_name.setter
+    def app_name(self, value):
+        self._app_name = value
 
     @property
     def app_version(self):
@@ -414,11 +424,17 @@ class OpenTok(object):
 
     def headers(self):
         """For internal use."""
+        user_agent = (
+            "OpenTok-Python-SDK/" + __version__ + " python/" + platform.python_version()
+        )
+        """ For user purposes. Append app name and version """
+        if self._app_name and self._app_version:
+            user_agent += " {app_name}/{app_version}".format(
+                app_name=self._app_name, app_version=self._app_version
+            )
+
         return {
-            "User-Agent": "OpenTok-Python-SDK/"
-            + self.app_version
-            + " python/"
-            + platform.python_version(),
+            "User-Agent": user_agent,
             "X-OPENTOK-AUTH": self._create_jwt_auth_header(),
         }
 
