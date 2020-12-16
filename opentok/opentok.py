@@ -76,7 +76,7 @@ class ArchiveModes(Enum):
     """The session will be automatically archived."""
 
 
-class OpenTok(object):
+class Client(object):
     """Use this SDK to create tokens and interface with the server-side portion
     of the Opentok API.
     """

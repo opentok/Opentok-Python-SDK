@@ -1,6 +1,6 @@
 import unittest
 from six import text_type, u, b, PY2, PY3
-from opentok import OpenTok, Stream, StreamList, __version__, SetStreamClassError
+from opentok import Client, Stream, StreamList, __version__, SetStreamClassError
 import httpretty
 import json
 import textwrap
@@ -13,7 +13,7 @@ class OpenTokStreamTest(unittest.TestCase):
     def setUp(self):
         self.api_key = u("123456")
         self.api_secret = u("1234567890abcdef1234567890abcdef1234567890")
-        self.opentok = OpenTok(self.api_key, self.api_secret)
+        self.opentok = Client(self.api_key, self.api_secret)
         self.session_id = u("SESSIONID")
         self.stream_id = u("8b732909-0a06-46a2-8ea8-074e64d43422")
 

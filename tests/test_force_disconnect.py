@@ -3,7 +3,7 @@ from six import u
 from expects import *
 import httpretty
 
-from opentok import OpenTok, __version__, AuthError, ForceDisconnectError
+from opentok import Client, __version__, AuthError, ForceDisconnectError
 from .validate_jwt import validate_jwt_header
 
 
@@ -13,7 +13,7 @@ class OpenTokForceDisconnectTest(unittest.TestCase):
     def setUp(self):
         self.api_key = u("123456")
         self.api_secret = u("1234567890abcdef1234567890abcdef1234567890")
-        self.opentok = OpenTok(self.api_key, self.api_secret)
+        self.opentok = Client(self.api_key, self.api_secret)
         self.session_id = u("SESSIONID")
         self.connection_id = u("CONNECTIONID")
 

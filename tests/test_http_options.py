@@ -4,7 +4,7 @@ from nose.tools import raises
 import httpretty
 import requests
 
-from opentok import OpenTok, OpenTokException
+from opentok import Client, OpenTokException
 
 
 def _raise_timeout(*args):
@@ -29,5 +29,5 @@ class OpenTokSessionCreationTest(unittest.TestCase):
 
     @raises(OpenTokException)
     def test_timeout(self):
-        opentok = OpenTok(self.api_key, self.api_secret, timeout=1)
+        opentok = Client(self.api_key, self.api_secret, timeout=1)
         opentok.create_session()

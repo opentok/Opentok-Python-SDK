@@ -1,6 +1,6 @@
 import unittest
 from six import text_type, u, b, PY2, PY3
-from opentok import OpenTok, Session, __version__
+from opentok import Client, Session, __version__
 import httpretty
 import json
 import textwrap
@@ -13,7 +13,7 @@ class OpenTokSignalTest(unittest.TestCase):
     def setUp(self):
         self.api_key = u("123456")
         self.api_secret = u("1234567890abcdef1234567890abcdef1234567890")
-        self.opentok = OpenTok(self.api_key, self.api_secret)
+        self.opentok = Client(self.api_key, self.api_secret)
         self.session_id = u("SESSIONID")
 
     @httpretty.activate

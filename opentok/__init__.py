@@ -1,4 +1,4 @@
-from .opentok import OpenTok, Roles, MediaModes, ArchiveModes
+from .opentok import Client, Roles, MediaModes, ArchiveModes
 from .session import Session
 from .archives import Archive, ArchiveList, OutputModes
 from .exceptions import (
@@ -7,7 +7,7 @@ from .exceptions import (
     ForceDisconnectError,
     ArchiveError,
     SetStreamClassError,
-    BroadcastError
+    BroadcastError,
 )
 from .version import __version__
 from .stream import Stream
