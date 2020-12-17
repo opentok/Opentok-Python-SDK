@@ -425,7 +425,7 @@ class OpenTok(object):
     def headers(self):
         """For internal use."""
         user_agent = (
-            "OpenTok-Python-SDK/" + __version__ + " python/" + platform.python_version()
+            "OpenTok-Python-SDK/" + self._app_version+ " python/" + platform.python_version()
         )
         """ For user purposes. Append app name and version """
         if self._app_name and self._app_version:
