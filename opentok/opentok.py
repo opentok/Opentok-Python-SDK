@@ -12,6 +12,9 @@ from socket import inet_aton  # create_session
 import xml.dom.minidom as xmldom  # create_session
 from jose import jwt  # _create_jwt_auth_header
 import random  # _create_jwt_auth_header
+import warnings  # For notifying deprecated class
+
+warnings.simplefilter("always", DeprecationWarning)
 
 # compat
 from six.moves.urllib.parse import urlencode
@@ -1127,3 +1130,26 @@ class Client(object):
         }
 
         return jwt.encode(payload, self.api_secret, algorithm="HS256")
+
+
+class OpenTok(Client):
+    def __init__(
+        self,
+        api_key,
+        api_secret,
+        api_url="https://api.opentok.com",
+        timeout=None,
+        app_version=None,
+    ):
+        warnings.warn(
+            "OpenTok class is deprecated (Use Client class instead)",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        super(OpenTok, self).__init__(
+            api_key,
+            api_secret,
+            api_url="https://api.opentok.com",
+            timeout=None,
+            app_version=None,
+        )

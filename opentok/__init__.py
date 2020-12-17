@@ -1,4 +1,4 @@
-from .opentok import Client, Roles, MediaModes, ArchiveModes
+from .opentok import OpenTok, Client, Roles, MediaModes, ArchiveModes
 from .session import Session
 from .archives import Archive, ArchiveList, OutputModes
 from .exceptions import (
