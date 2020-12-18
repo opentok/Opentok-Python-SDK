@@ -99,6 +99,8 @@ class OpenTok(object):
         self._proxies = None
         self.endpoints = Endpoints(api_url, self.api_key)
         self._app_version = __version__ if app_version == None else app_version
+        # JWT custom claims - Default values
+        self._jwt_livetime = 3  # In minutes
 
     @property
     def proxies(self):
@@ -115,6 +117,14 @@ class OpenTok(object):
     @app_version.setter
     def app_version(self, value):
         self._app_version = value
+
+    @property
+    def jwt_livetime(self):
+        return self._jwt_livetime
+
+    @jwt_livetime.setter
+    def jwt_livetime(self, minutes):
+        self._jwt_livetime = minutes
 
     def generate_token(
         self,
@@ -1147,7 +1157,8 @@ class OpenTok(object):
             "ist": "project",
             "iss": self.api_key,
             "iat": int(time.time()),  # current time in unix time (seconds)
-            "exp": int(time.time()) + (60 * 3),  # 3 minutes in the future (seconds)
+            "exp": int(time.time())
+            + (60 * self._jwt_livetime),  # 3 minutes in the future (seconds)
             "jti": "{0}".format(0, random.random()),
         }
 
