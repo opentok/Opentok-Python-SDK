@@ -4,6 +4,7 @@ from nose.tools import raises
 from expects import *
 
 from opentok import OpenTok, __version__
+import time
 
 
 class GetterSetterTest(unittest.TestCase):
@@ -14,3 +15,8 @@ class GetterSetterTest(unittest.TestCase):
             "1_MX4xMjM0NTZ-flNhdCBNYXIgMTUgMTQ6NDI6MjMgUERUIDIwMTR-MC40OTAxMzAyNX4"
         )
         self.opentok = OpenTok(self.api_key, self.api_secret)
+
+    def test_getset_jwt_livetime(self):
+        livetime = self.opentok.jwt_livetime
+        self.opentok.jwt_livetime = 5
+        assert self.opentok.jwt_livetime is not livetime
