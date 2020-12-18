@@ -12,6 +12,7 @@ from socket import inet_aton  # create_session
 import xml.dom.minidom as xmldom  # create_session
 from jose import jwt  # _create_jwt_auth_header
 import random  # _create_jwt_auth_header
+import warnings  # Native. Used for notifying deprecations
 
 # compat
 from six.moves.urllib.parse import urlencode
@@ -381,9 +382,9 @@ class OpenTok(object):
 
         try:
             response = requests.post(
-                self.endpoints.session_url(),
+                self.endpoints.get_session_url(),
                 data=options,
-                headers=self.headers(),
+                headers=self.get_headers(),
                 proxies=self.proxies,
                 timeout=self.timeout,
             )
@@ -422,7 +423,7 @@ class OpenTok(object):
         except Exception as e:
             raise OpenTokException("Failed to generate session: %s" % str(e))
 
-    def headers(self):
+    def get_headers(self):
         """For internal use."""
         return {
             "User-Agent": "OpenTok-Python-SDK/"
@@ -432,11 +433,27 @@ class OpenTok(object):
             "X-OPENTOK-AUTH": self._create_jwt_auth_header(),
         }
 
-    def json_headers(self):
+    def headers(self):
+        warnings.warn(
+            "opentok.headers is deprecated (use opentok.get_headers instead).",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.get_headers()
+
+    def get_json_headers(self):
         """For internal use."""
-        result = self.headers()
+        result = self.get_headers()
         result["Content-Type"] = "application/json"
         return result
+
+    def json_headers(self):
+        warnings.warn(
+            "opentok.json_headers is deprecated (use opentok.get_json_headers instead).",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.get_json_headers()
 
     def start_archive(
         self,
@@ -505,9 +522,9 @@ class OpenTok(object):
         }
 
         response = requests.post(
-            self.endpoints.archive_url(),
+            self.endpoints.get_archive_url(),
             data=json.dumps(payload),
-            headers=self.json_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout,
         )
@@ -544,8 +561,8 @@ class OpenTok(object):
         :rtype: The Archive object corresponding to the archive being stopped.
         """
         response = requests.post(
-            self.endpoints.archive_url(archive_id) + "/stop",
-            headers=self.json_headers(),
+            self.endpoints.get_archive_url(archive_id) + "/stop",
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout,
         )
@@ -572,8 +589,8 @@ class OpenTok(object):
         :param String archive_id: The archive ID of the archive to be deleted.
         """
         response = requests.delete(
-            self.endpoints.archive_url(archive_id),
-            headers=self.json_headers(),
+            self.endpoints.get_archive_url(archive_id),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout,
         )
@@ -595,8 +612,8 @@ class OpenTok(object):
         :rtype: The Archive object.
         """
         response = requests.get(
-            self.endpoints.archive_url(archive_id),
-            headers=self.json_headers(),
+            self.endpoints.get_archive_url(archive_id),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout,
         )
@@ -631,11 +648,11 @@ class OpenTok(object):
         if session_id is not None:
             params["sessionId"] = session_id
 
-        endpoint = self.endpoints.archive_url() + "?" + urlencode(params)
+        endpoint = self.endpoints.get_archive_url() + "?" + urlencode(params)
 
         response = requests.get(
             endpoint,
-            headers=self.json_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout,
         )
@@ -656,7 +673,7 @@ class OpenTok(object):
         """
         return self.get_archives(offset, count, session_id)
 
-    def signal(self, session_id, payload, connection_id=None):
+    def send_signal(self, session_id, payload, connection_id=None):
         """
         Send signals to all participants in an active OpenTok session or to a specific client
         connected to that session.
@@ -672,9 +689,9 @@ class OpenTok(object):
         connected to the session
         """
         response = requests.post(
-            self.endpoints.signaling_url(session_id, connection_id),
+            self.endpoints.get_signaling_url(session_id, connection_id),
             data=json.dumps(payload),
-            headers=self.json_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout,
         )
@@ -700,6 +717,14 @@ class OpenTok(object):
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 
+    def signal(self, session_id, payload, connection_id=None):
+        warnings.warn(
+            "opentok.signal is deprecated (use opentok.send_signal instead).",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        self.send_signal(session_id, payload, connection_id)
+
     def get_stream(self, session_id, stream_id):
         """
         Returns an Stream object that contains information of an OpenTok stream:
@@ -712,7 +737,7 @@ class OpenTok(object):
         endpoint = self.endpoints.get_stream_url(session_id, stream_id)
         response = requests.get(
             endpoint,
-            headers=self.json_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout,
         )
@@ -742,7 +767,7 @@ class OpenTok(object):
 
         response = requests.get(
             endpoint,
-            headers=self.json_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout,
         )
@@ -770,7 +795,7 @@ class OpenTok(object):
         endpoint = self.endpoints.force_disconnect_url(session_id, connection_id)
         response = requests.delete(
             endpoint,
-            headers=self.json_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout,
         )
@@ -816,7 +841,7 @@ class OpenTok(object):
         response = requests.put(
             endpoint,
             data=json.dumps(payload),
-            headers=self.json_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout,
         )
@@ -887,7 +912,7 @@ class OpenTok(object):
         response = requests.post(
             endpoint,
             data=json.dumps(payload),
-            headers=self.json_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout,
         )
@@ -932,7 +957,7 @@ class OpenTok(object):
         response = requests.put(
             endpoint,
             data=json.dumps(items_payload),
-            headers=self.json_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout,
         )
@@ -991,11 +1016,11 @@ class OpenTok(object):
 
         payload.update(options)
 
-        endpoint = self.endpoints.broadcast_url()
+        endpoint = self.endpoints.get_broadcast_url()
         response = requests.post(
             endpoint,
             data=json.dumps(payload),
-            headers=self.json_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout,
         )
@@ -1025,10 +1050,10 @@ class OpenTok(object):
         :rtype A Broadcast object, which contains information of the broadcast: id, sessionId
         projectId, createdAt, updatedAt and resolution
         """
-        endpoint = self.endpoints.broadcast_url(broadcast_id, stop=True)
+        endpoint = self.endpoints.get_broadcast_url(broadcast_id, stop=True)
         response = requests.post(
             endpoint,
-            headers=self.json_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout,
         )
@@ -1059,10 +1084,10 @@ class OpenTok(object):
         :rtype A Broadcast object, which contains information of the broadcast: id, sessionId
         projectId, createdAt, updatedAt, resolution, broadcastUrls and status
         """
-        endpoint = self.endpoints.broadcast_url(broadcast_id)
+        endpoint = self.endpoints.get_broadcast_url(broadcast_id)
         response = requests.get(
             endpoint,
-            headers=self.json_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout,
         )
@@ -1101,11 +1126,11 @@ class OpenTok(object):
             if stylesheet is not None:
                 payload["stylesheet"] = stylesheet
 
-        endpoint = self.endpoints.broadcast_url(broadcast_id, layout=True)
+        endpoint = self.endpoints.get_broadcast_url(broadcast_id, layout=True)
         response = requests.put(
             endpoint,
             data=json.dumps(payload),
-            headers=self.json_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout,
         )
