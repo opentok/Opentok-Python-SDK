@@ -49,3 +49,6 @@ venv/
 
 # IDE
 .vscode
+
+#Pypi
+.pypirc
