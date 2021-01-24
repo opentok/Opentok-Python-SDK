@@ -1149,7 +1149,7 @@ class OpenTok(Client):
         super(OpenTok, self).__init__(
             api_key,
             api_secret,
-            api_url="https://api.opentok.com",
-            timeout=None,
-            app_version=None,
+            api_url=api_url,
+            timeout=timeout,
+            app_version=app_version,
         )
