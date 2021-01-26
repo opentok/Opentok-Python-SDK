@@ -10,7 +10,7 @@ import pytz
 from .validate_jwt import validate_jwt_header
 
 from opentok import (
-    OpenTok,
+    Client,
     Archive,
     ArchiveList,
     OutputModes,
@@ -25,7 +25,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         self.api_key = u("123456")
         self.api_secret = u("1234567890abcdef1234567890abcdef1234567890")
         self.session_id = u("SESSIONID")
-        self.opentok = OpenTok(self.api_key, self.api_secret)
+        self.opentok = Client(self.api_key, self.api_secret)
 
     @httpretty.activate
     def test_start_archive(self):

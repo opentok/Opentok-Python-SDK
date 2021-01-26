@@ -82,7 +82,9 @@ class ArchiveModes(Enum):
 logger = logging.getLogger("opentok")
 
 
-class OpenTok(object):
+
+class Client(object):
+
     """Use this SDK to create tokens and interface with the server-side portion
     of the Opentok API.
     """
@@ -1305,3 +1307,25 @@ class OpenTok(object):
         }
 
         return jwt.encode(payload, self.api_secret, algorithm="HS256")
+
+class OpenTok(Client):
+    def __init__(
+        self,
+        api_key,
+        api_secret,
+        api_url="https://api.opentok.com",
+        timeout=None,
+        app_version=None,
+    ):
+        warnings.warn(
+            "OpenTok class is deprecated (Use Client class instead)",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        super(OpenTok, self).__init__(
+            api_key,
+            api_secret,
+            api_url=api_url,
+            timeout=timeout,
+            app_version=app_version
+        )

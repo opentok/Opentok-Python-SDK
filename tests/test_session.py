@@ -2,7 +2,7 @@ import unittest
 from six import text_type, u, b, PY2, PY3
 from nose.tools import raises
 
-from opentok import OpenTok, Session, Roles, MediaModes
+from opentok import Client, Session, Roles, MediaModes
 from .helpers import token_decoder, token_signature_validator
 
 
@@ -13,7 +13,7 @@ class SessionTest(unittest.TestCase):
         self.session_id = u(
             "1_MX4xMjM0NTZ-flNhdCBNYXIgMTUgMTQ6NDI6MjMgUERUIDIwMTR-MC40OTAxMzAyNX4"
         )
-        self.opentok = OpenTok(self.api_key, self.api_secret)
+        self.opentok = Client(self.api_key, self.api_secret)
 
     def test_generate_token(self):
         session = Session(
