@@ -14,6 +14,7 @@ class GetterSetterTest(unittest.TestCase):
         self.session_id = u(
             "1_MX4xMjM0NTZ-flNhdCBNYXIgMTUgMTQ6NDI6MjMgUERUIDIwMTR-MC40OTAxMzAyNX4"
         )
+
         self.opentok = Client(self.api_key, self.api_secret)
 
     def test_getset_jwt_livetime(self):

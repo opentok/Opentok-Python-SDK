@@ -82,7 +82,9 @@ class ArchiveModes(Enum):
 logger = logging.getLogger("opentok")
 
 
+
 class Client(object):
+
     """Use this SDK to create tokens and interface with the server-side portion
     of the Opentok API.
     """
