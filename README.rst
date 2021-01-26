@@ -39,7 +39,7 @@ Initializing
 ~~~~~~~~~~~~
 
 Import the package at the top of any file where you will use it. At the very least you will need the
-``Client`` class. Then initialize an Client instance with your own API Key and API Secret.
+``Client`` class. Then initialize a Client instance with your own API Key and API Secret.
 
 .. code:: python
 
