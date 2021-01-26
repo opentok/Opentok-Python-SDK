@@ -7,7 +7,7 @@ from .exceptions import (
     ForceDisconnectError,
     ArchiveError,
     SetStreamClassError,
-    BroadcastError,
+    BroadcastError
 )
 from .version import __version__
 from .stream import Stream

@@ -39,7 +39,7 @@ class OpenTokSignalTest(unittest.TestCase):
             content_type=u("application/json"),
         )
 
-        self.opentok.signal(self.session_id, data)
+        self.opentok.send_signal(self.session_id, data)
 
         validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
         expect(httpretty.last_request().headers[u("user-agent")]).to(
@@ -81,7 +81,7 @@ class OpenTokSignalTest(unittest.TestCase):
             content_type=u("application/json"),
         )
 
-        self.opentok.signal(self.session_id, data, connection_id)
+        self.opentok.send_signal(self.session_id, data, connection_id)
 
         validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
         expect(httpretty.last_request().headers[u("user-agent")]).to(

@@ -39,7 +39,7 @@ Initializing
 ~~~~~~~~~~~~
 
 Import the package at the top of any file where you will use it. At the very least you will need the
-``Client`` class from the opentok module. Then initialize an opentok Client instance with your own API Key and API Secret.
+``Client`` class. Then initialize an Client instance with your own API Key and API Secret.
 
 .. code:: python
 
@@ -300,7 +300,7 @@ The method returns a StreamList object that contains a list of all the streams
   print stream.name #stream name
   print stream.layoutClassList #['full']
 
-You can change the layout classes for streams in a session by calling the `set_stream_class_lists(session_id, stream_list)` method of the `OpenTok` class.
+You can change the layout classes for streams in a session by calling the `set_stream_class_lists(session_id, stream_list)` method of the `Client` class.
 
 The layout classes define how the stream is displayed in the layout of a composed OpenTok archive.
 

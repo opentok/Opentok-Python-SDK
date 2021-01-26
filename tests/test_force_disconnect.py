@@ -19,7 +19,7 @@ class OpenTokForceDisconnectTest(unittest.TestCase):
 
     @httpretty.activate
     def test_force_disconnect(self):
-        """ Method to test force disconnect functionality using an OpenTok instance """
+        """ Method to test force disconnect functionality using an Client instance """
 
         httpretty.register_uri(
             httpretty.DELETE,
