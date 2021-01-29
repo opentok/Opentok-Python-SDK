@@ -2,8 +2,6 @@
 OpenTok Python SDK
 ==================
 
-.. image:: https://travis-ci.org/opentok/Opentok-Python-SDK.svg
-   :target: https://travis-ci.org/opentok/Opentok-Python-SDK
 .. image:: https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg 
    :target: CODE_OF_CONDUCT.md
 
@@ -25,7 +23,7 @@ http://www.pip-installer.org/en/latest/
 Add the ``opentok`` package as a dependency in your project. The most common way is to add it to your
 ``requirements.txt`` file::
 
-  opentok>=2.10.0
+  opentok>=3.0
 
 Next, install the dependencies::
 
@@ -472,7 +470,7 @@ For more information about OpenTok live streaming broadcasts, see the
 
 
 Configuring Timeout
--------
+-------------------
 Timeout is passed in the Client constructor:
 
 ``self.timeout = timeout``
@@ -528,6 +526,10 @@ session uses the OpenTok TURN server to relay audio-video streams.
 This version of the SDK includes support for working with OpenTok archives.
 
 The Client.create_session() method now includes a media_mode parameter, instead of a p2p parameter.
+
+**Changes in v3.X.X:**
+
+This version of the SDK includes significant improvements such as top level entity naming, where the Opentok class is now `Client`.  We also implemented a standardised logging module, improved naming conventions and JWT generation to make developer experience more rewarding.
 
 For details, see the reference documentation at
 http://www.tokbox.com/opentok/libraries/server/python/reference/index.html.
