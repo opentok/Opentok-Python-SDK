@@ -477,6 +477,7 @@ class Client(object):
         name=None,
         output_mode=OutputModes.composed,
         resolution=None,
+        layout=None,
     ):
         """
         Starts archiving an OpenTok session.
@@ -508,6 +509,19 @@ class Client(object):
           or "1280x720". This parameter only applies to composed archives. If you set this
           parameter and set the output_mode parameter to OutputModes.individual, the call to the
           start_archive() method results in an error.
+        :param Dictionary 'layout' optional: Specify this to assign the initial layout type for the
+            archive.
+
+            String 'type': Type of layout. Valid values for the layout property are "bestFit" (best fit),
+            "custom" (custom), "horizontalPresentation" (horizontal presentation), "pip" (picture-in-picture),
+            and "verticalPresentation" (vertical presentation)). If you specify a "custom" layout type, set
+            the stylesheet property of the layout object to the stylesheet.
+
+            String 'stylesheet' optional: Custom stylesheet to use for layout. Must set 'type' to custom,
+            and cannot use 'screenshareType'
+
+            String 'screenshareType' optional: Layout to use for screenshares. If this is set, you must
+            set 'type' to 'bestFit'
 
         :rtype: The Archive object, which includes properties defining the archive,
           including the archive ID.
@@ -534,6 +548,9 @@ class Client(object):
             "outputMode": output_mode.value,
             "resolution": resolution,
         }
+
+        if layout is not None:
+            payload['layout'] = layout
 
         logger.debug(
             "POST to %r with params %r, headers %r, proxies %r",
@@ -898,7 +915,7 @@ class Client(object):
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 
-    def set_archive_layout(self, archive_id, layout_type, stylesheet=None):
+    def set_archive_layout(self, archive_id, layout_type, stylesheet=None, screenshare_type=None):
         """
         Use this method to change the layout of videos in an OpenTok archive
 
@@ -909,10 +926,16 @@ class Client(object):
 
         :param String stylesheet optional: CSS used to style the custom layout.
         Specify this only if you set the type property to 'custom'
+
+        :param String screenshare_type optional: Layout to use for screenshares. Must
+        set 'layout_type' to 'bestFit'
         """
         payload = {
             "type": layout_type,
         }
+
+        if screenshare_type is not None:
+            payload["screenshareType"] = screenshare_type
 
         if layout_type == "custom":
             if stylesheet is not None:
@@ -1096,11 +1119,18 @@ class Client(object):
         :param Dictionary options, with the following properties:
 
             Dictionary 'layout' optional: Specify this to assign the initial layout type for the
-            broadcast. Valid values for the layout property are "bestFit", "custom",
-            "horizontalPresentation", "pip" and "verticalPresentation". If you specify a "custom"
-            layout type, set the stylesheet property of the layout object to the stylesheet.
-            If you do not specify an initial layout type, the broadcast stream uses the Best Fit
-            layout type
+            broadcast.
+
+                String 'type': Type of layout. Valid values for the layout property are "bestFit" (best fit),
+                "custom" (custom), "horizontalPresentation" (horizontal presentation), "pip" (picture-in-picture),
+                and "verticalPresentation" (vertical presentation)). If you specify a "custom" layout type, set
+                the stylesheet property of the layout object to the stylesheet.
+
+                String 'stylesheet' optional: Custom stylesheet to use for layout. Must set 'type' to custom,
+                and cannot use 'screenshareType'
+
+                String 'screenshareType' optional: Layout to use for screenshares. If this is set, you must
+                set 'type' to 'bestFit'
 
             Integer 'maxDuration' optional: The maximum duration for the broadcast, in seconds.
             The broadcast will automatically stop when the maximum duration is reached. You can
@@ -1241,7 +1271,7 @@ class Client(object):
         else:
             raise RequestError("OpenTok server error.", response.status_code)
 
-    def set_broadcast_layout(self, broadcast_id, layout_type, stylesheet=None):
+    def set_broadcast_layout(self, broadcast_id, layout_type, stylesheet=None, screenshare_type=None):
         """
         Use this method to change the layout type of a live streaming broadcast
 
@@ -1252,10 +1282,16 @@ class Client(object):
 
         :param String stylesheet optional: CSS used to style the custom layout.
         Specify this only if you set the type property to 'custom'
+
+        :param String screenshare_type optional: Layout to use for screenshares. Must
+        set 'layout_type' to 'bestFit'
         """
         payload = {
             "type": layout_type,
         }
+
+        if screenshare_type is not None:
+            payload["screenshareType"] = screenshare_type
 
         if layout_type == "custom":
             if stylesheet is not None:
