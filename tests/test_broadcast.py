@@ -1,8 +1,9 @@
 import unittest
 import textwrap
 import httpretty
+import json
 
-from six import u
+from six import u, PY2, PY3
 from expects import *
 from opentok import Client, Broadcast, __version__, BroadcastError
 from .validate_jwt import validate_jwt_header
@@ -86,7 +87,15 @@ class OpenTokBroadcastTest(unittest.TestCase):
         )
         expect(httpretty.last_request().headers[u("content-type")]).to(
             equal(u("application/json"))
+        
         )
+        # non-deterministic json encoding. have to decode to test it properly
+        if PY2:
+            body = json.loads(httpretty.last_request().body)
+        if PY3:
+            body = json.loads(httpretty.last_request().body.decode("utf-8"))
+
+        expect(body).to(have_key(u("layout")))
         expect(broadcast).to(be_an(Broadcast))
         expect(broadcast).to(
             have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734"))
@@ -167,6 +176,102 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("content-type")]).to(
             equal(u("application/json"))
         )
+        expect(broadcast).to(be_an(Broadcast))
+        expect(broadcast).to(
+            have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734"))
+        )
+        expect(broadcast).to(
+            have_property(u("sessionId"), u("2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4"))
+        )
+        expect(broadcast).to(have_property(u("projectId"), 100))
+        expect(broadcast).to(have_property(u("createdAt"), 1437676551000))
+        expect(broadcast).to(have_property(u("updatedAt"), 1437676551000))
+        expect(broadcast).to(have_property(u("resolution"), u("640x480")))
+        expect(broadcast).to(have_property(u("status"), u("started")))
+        expect(list(broadcast.broadcastUrls)).to(have_length(2))
+        expect(list(broadcast.broadcastUrls["rtmp"])).to(have_length(2))
+
+    @httpretty.activate
+    def test_start_broadcast_with_screenshare_type(self):
+        """
+        Test start_broadcast() method
+        """
+        httpretty.register_uri(
+            httpretty.POST,
+            u("https://api.opentok.com/v2/project/{0}/broadcast").format(self.api_key),
+            body=textwrap.dedent(
+                u(
+                    """\
+                        {
+                            "id": "1748b7070a81464c9759c46ad10d3734",
+                            "sessionId": "2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4",
+                            "projectId": 100,
+                            "createdAt": 1437676551000,
+                            "updatedAt": 1437676551000,
+                            "resolution": "640x480",
+                            "status": "started",
+                            "broadcastUrls": {
+                                "hls" : "http://server/fakepath/playlist.m3u8",
+                                "rtmp": {
+                                    "foo": {
+                                        "serverUrl": "rtmp://myfooserver/myfooapp",
+                                        "streamName": "myfoostream"
+                                    },
+                                    "bar": {
+                                        "serverUrl": "rtmp://mybarserver/mybarapp",
+                                        "streamName": "mybarstream"
+                                    }
+                                }
+                            }
+                        }
+                    """
+                )
+            ),
+            status=200,
+            content_type=u("application/json"),
+        )
+
+        options = {
+            "layout": {
+                "screenshareType": "verticalPresentation"
+            },
+            "maxDuration": 5400,
+            "outputs": {
+                "hls": {},
+                "rtmp": [
+                    {
+                        "id": "foo",
+                        "serverUrl": "rtmp://myfooserver/myfooapp",
+                        "streamName": "myfoostream",
+                    },
+                    {
+                        "id": "bar",
+                        "serverUrl": "rtmp://mybarserver/mybarapp",
+                        "streamName": "mybarstream",
+                    },
+                ],
+            },
+            "resolution": "640x480",
+        }
+
+        broadcast = self.opentok.start_broadcast(self.session_id, options)
+        validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
+        expect(httpretty.last_request().headers[u("user-agent")]).to(
+            contain(u("OpenTok-Python-SDK/") + __version__)
+        )
+        expect(httpretty.last_request().headers[u("content-type")]).to(
+            equal(u("application/json"))
+        )
+        # non-deterministic json encoding. have to decode to test it properly
+        if PY2:
+            body = json.loads(httpretty.last_request().body)
+        if PY3:
+            body = json.loads(httpretty.last_request().body.decode("utf-8"))
+
+        expect(body).to(have_key("sessionId", self.session_id))
+        expect(body).to(have_key("layout"))
+        expect(body["layout"]).to(have_key("screenshareType"))
+        expect(body["layout"]["screenshareType"]).to(equal("verticalPresentation"))
         expect(broadcast).to(be_an(Broadcast))
         expect(broadcast).to(
             have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734"))
@@ -323,6 +428,38 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("content-type")]).to(
             equal(u("application/json"))
         )
+
+    @httpretty.activate
+    def test_set_broadcast_layout_with_screenshare_type(self):
+        """ Test set_broadcast_layout() functionality """
+        broadcast_id = u("1748b707-0a81-464c-9759-c46ad10d3734")
+
+        httpretty.register_uri(
+            httpretty.PUT,
+            u("https://api.opentok.com/v2/project/{0}/broadcast/{1}/layout").format(
+                self.api_key, broadcast_id
+            ),
+            status=200,
+            content_type=u("application/json"),
+        )
+
+        self.opentok.set_broadcast_layout(broadcast_id, "bestFit", screenshare_type="horizontalPresentation")
+
+        validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
+        expect(httpretty.last_request().headers[u("user-agent")]).to(
+            contain(u("OpenTok-Python-SDK/") + __version__)
+        )
+        expect(httpretty.last_request().headers[u("content-type")]).to(
+            equal(u("application/json"))
+        )
+        if PY2:
+            body = json.loads(httpretty.last_request().body)
+        if PY3:
+            body = json.loads(httpretty.last_request().body.decode("utf-8"))
+
+        expect(body).to(have_key(u("type"), u("bestFit")))
+        expect(body).to_not(have_key(u("stylesheet")))
+        expect(body).to(have_key(u("screenshareType"), u("horizontalPresentation")))
 
     @httpretty.activate
     def test_set_custom_broadcast_layout(self):

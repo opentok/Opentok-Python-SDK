@@ -1440,6 +1440,39 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         )
 
     @httpretty.activate
+    def test_set_archive_screenshare_type(self):
+        """ Test set archive layout functionality """
+        archive_id = u("f6e7ee58-d6cf-4a59-896b-6d56b158ec71")
+
+        httpretty.register_uri(
+            httpretty.PUT,
+            u("https://api.opentok.com/v2/project/{0}/archive/{1}/layout").format(
+                self.api_key, archive_id
+            ),
+            status=200,
+            content_type=u("application/json"),
+        )
+
+        self.opentok.set_archive_layout(archive_id, "bestFit", screenshare_type="horizontalPresentation")
+
+        validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
+        expect(httpretty.last_request().headers[u("user-agent")]).to(
+            contain(u("OpenTok-Python-SDK/") + __version__)
+        )
+        expect(httpretty.last_request().headers[u("content-type")]).to(
+            equal(u("application/json"))
+        )
+
+        if PY2:
+            body = json.loads(httpretty.last_request().body)
+        if PY3:
+            body = json.loads(httpretty.last_request().body.decode("utf-8"))
+
+        expect(body).to(have_key(u("type"), u("bestFit")))
+        expect(body).to_not(have_key(u("stylesheet")))
+        expect(body).to(have_key(u("screenshareType"), u("horizontalPresentation")))
+
+    @httpretty.activate
     def test_set_custom_archive_layout(self):
         """ Test set a custom archive layout specifying the 'stylesheet' parameter """
         archive_id = u("f6e7ee58-d6cf-4a59-896b-6d56b158ec71")
