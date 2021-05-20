@@ -14,6 +14,7 @@ from jose import jwt  # _create_jwt_auth_header
 import random  # _create_jwt_auth_header
 import logging  # logging
 import warnings  # Native. Used for notifying deprecations
+import os
 
 
 # compat
@@ -80,8 +81,6 @@ class ArchiveModes(Enum):
 
 
 logger = logging.getLogger("opentok")
-
-
 
 class Client(object):
 
@@ -402,6 +401,7 @@ class Client(object):
                 proxies=self.proxies,
                 timeout=self.timeout,
             )
+           
             response.encoding = "utf-8"
 
             if response.status_code == 403:
@@ -1343,6 +1343,8 @@ class Client(object):
         }
 
         return jwt.encode(payload, self.api_secret, algorithm="HS256")
+                
+  
 
 class OpenTok(Client):
     def __init__(
@@ -1365,3 +1367,66 @@ class OpenTok(Client):
             timeout=timeout,
             app_version=app_version
         )
+
+    
+
+
+    def mute(self, session_id: str, stream_id: str= "", options: dict = {}) -> requests.Response:
+        """
+        Use this method so the moderator can mute all streams or a specific stream for OpenTok.
+        Please note that a client is able to unmute themselves.
+        This function stays in the OpenTok class and inherits from the Client class.
+
+        :param session_id gets the session id from another function called get_session()
+
+        :param stream_id gets the stream id from another function called get_stream(). Note
+        that this variable is set to an empty string in the function definition as a specific
+        stream may not be chosen.
+   
+        """
+
+        session_id = self.get_session()
+        stream_id = self.get_stream()
+        jwt = self._create_jwt_auth_header()
+
+        if not stream_id:
+            response = requests.post(
+            f'https://api.opentok.com/v2/project/{os.getenv("API_SECRET")}/{session_id}/stream/mute',
+            data={'excludedStream': streamId},
+            headers={'Content-Type':'application/json', 
+                    'X-OPENTOK-AUTH': jwt})
+        else:
+            response = requests.post(
+            f'https://api.opentok.com/v2/project/{os.getenv("API_SECRET")}/{session_id}/stream/{stream_id}/mute',
+            headers={'X-OPENTOK-AUTH': jwt})
+
+        return response
+        
+    
+    def get_session(self):
+        """
+        Use this method to get the session id that is created and pass it into
+        the mute function above. 
+        """
+        response = requests.post('https://api.opentok.com/session/create',
+            headers={
+                "Content-Type":"application/x-www-form-urlencoded",
+                "Accept":"application/json",
+                "X-OPENTOK-AUTH":jwt },
+            data="archiveMode=always"
+            )
+
+
+        return response
+
+    def get_stream(self):
+        """
+        Use this method to get the stream id that is created from each session and pass it into
+        the mute function above. 
+        """
+        response = requests.get(f'https://api.opentok.com/v2/project/{os.getenv("API_SECRET")}/session/{session_id}/stream/',
+            headers={
+                "X-OPENTOK-AUTH":jwt }
+        )
+
+        return response 
