@@ -7,6 +7,7 @@ class Endpoints(object):
     Class that provides the endpoint urls
     """
 
+
     def __init__(self, api_url, api_key):
         self.api_url = api_url
         self.api_key = api_key
@@ -130,3 +131,15 @@ class Endpoints(object):
         if layout:
             url = url + "/layout"
         return url
+
+    def get_mute_all_url(self, session_id):
+        """ this method returns the urls for muting every stream in a session """
+        url = (
+             self.api_url  
+            + "/v2/project/" 
+            + self.api_key
+            + "/session/"
+            + session_id
+            + "/mute"
+
+        )

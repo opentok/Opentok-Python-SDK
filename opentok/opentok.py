@@ -1385,48 +1385,14 @@ class OpenTok(Client):
    
         """
 
-        session_id = self.get_session()
-        stream_id = self.get_stream()
-        jwt = self._create_jwt_auth_header()
-
         if not stream_id:
             response = requests.post(
-            f'https://api.opentok.com/v2/project/{os.getenv("API_SECRET")}/{session_id}/stream/mute',
-            data={'excludedStream': streamId},
-            headers={'Content-Type':'application/json', 
-                    'X-OPENTOK-AUTH': jwt})
+                self.endpoints.get_mute_all_url(session_id),
+                data={'excludedStream': stream_id},
+                headers=self.get_headers())
         else:
             response = requests.post(
-            f'https://api.opentok.com/v2/project/{os.getenv("API_SECRET")}/{session_id}/stream/{stream_id}/mute',
-            headers={'X-OPENTOK-AUTH': jwt})
+                self.endpoints.get_stream_url(session_id, stream_id) + "/mute",
+                headers=self.get_headers())
 
         return response
-        
-    
-    def get_session(self):
-        """
-        Use this method to get the session id that is created and pass it into
-        the mute function above. 
-        """
-        response = requests.post('https://api.opentok.com/session/create',
-            headers={
-                "Content-Type":"application/x-www-form-urlencoded",
-                "Accept":"application/json",
-                "X-OPENTOK-AUTH":jwt },
-            data="archiveMode=always"
-            )
-
-
-        return response
-
-    def get_stream(self):
-        """
-        Use this method to get the stream id that is created from each session and pass it into
-        the mute function above. 
-        """
-        response = requests.get(f'https://api.opentok.com/v2/project/{os.getenv("API_SECRET")}/session/{session_id}/stream/',
-            headers={
-                "X-OPENTOK-AUTH":jwt }
-        )
-
-        return response 
