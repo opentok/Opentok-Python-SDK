@@ -1399,7 +1399,7 @@ class OpenTok(Client):
             if response:
                 return response
             elif response.status_code == 400:
-                raise SipDialError("Invalid request. Invalid session ID.")
+                raise GetStreamError("Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.")
             elif response.status_code == 403:
                 raise AuthError("Failed to create session, invalid credentials")
             elif response.status_code == 404:
