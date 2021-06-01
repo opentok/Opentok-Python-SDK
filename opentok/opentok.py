@@ -1384,15 +1384,28 @@ class OpenTok(Client):
         stream may not be chosen.
    
         """
+        
+        try:
+            if not stream_id:
+                url = self.endpoints.get_mute_all_url(session_id)
+                data = {'excludedStream': stream_id}
+            else:
+                url = self.endpoints.get_stream_url(session_id, stream_id) + "/mute"
+                data = None
+            
+            
+            response = requests.post(url, headers=self.get_headers(), data=data)
 
-        if not stream_id:
-            response = requests.post(
-                self.endpoints.get_mute_all_url(session_id),
-                data={'excludedStream': stream_id},
-                headers=self.get_headers())
-        else:
-            response = requests.post(
-                self.endpoints.get_stream_url(session_id, stream_id) + "/mute",
-                headers=self.get_headers())
+            if response:
+                return response
+            elif response.status_code == 400:
+                raise SipDialError("Invalid request. Invalid session ID.")
+            elif response.status_code == 403:
+                raise AuthError("Failed to create session, invalid credentials")
+            elif response.status_code == 404:
+                raise NotFoundError("Mute not found")
+        except Exception as e:
+            raise OpenTokException(
+                ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} and stream_id (if exists) {1} are valid").format(
+                    session_id, stream_id))
 
-        return response
