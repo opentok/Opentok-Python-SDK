@@ -502,7 +502,7 @@ Requirements
 
 You need an OpenTok API key and API secret, which you can obtain at https://dashboard.tokbox.com/
 
-The OpenTok Python SDK requires Python 2.6, 2.7, 3.3, 3.4, 3.5 or 3.6
+The OpenTok Python SDK requires Python 3.5 or higher
 
 Release Notes
 -------------
