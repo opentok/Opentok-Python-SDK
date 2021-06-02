@@ -23,7 +23,7 @@ class OpenTokTest(unittest.TestCase):
         self.session_id = "SESSIONID"
         self.opentok = Client(self.api_key, self.api_secret)
         token = string.ascii_letters+string.digits
-        self.jwt_token_string = ''.join(random.choice(token[:100])
+        self.jwt_token_string = ''.join(random.choice(token[:100]))
         self.stream_id_1 = "Stream1"
 
     @httpretty.activate
