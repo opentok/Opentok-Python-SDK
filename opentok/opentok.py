@@ -1368,44 +1368,4 @@ class OpenTok(Client):
             app_version=app_version
         )
 
-    
-
-
-    def mute(self, session_id: str, stream_id: str= "", options: dict = {}) -> requests.Response:
-        """
-        Use this method so the moderator can mute all streams or a specific stream for OpenTok.
-        Please note that a client is able to unmute themselves.
-        This function stays in the OpenTok class and inherits from the Client class.
-
-        :param session_id gets the session id from another function called get_session()
-
-        :param stream_id gets the stream id from another function called get_stream(). Note
-        that this variable is set to an empty string in the function definition as a specific
-        stream may not be chosen.
    
-        """
-        
-        try:
-            if not stream_id:
-                url = self.endpoints.get_mute_all_url(session_id)
-                data = {'excludedStream': stream_id}
-            else:
-                url = self.endpoints.get_stream_url(session_id, stream_id) + "/mute"
-                data = None
-            
-            
-            response = requests.post(url, headers=self.get_headers(), data=data)
-
-            if response:
-                return response
-            elif response.status_code == 400:
-                raise GetStreamError("Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.")
-            elif response.status_code == 403:
-                raise AuthError("Failed to create session, invalid credentials")
-            elif response.status_code == 404:
-                raise NotFoundError("Mute not found")
-        except Exception as e:
-            raise OpenTokException(
-                ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} and stream_id (if exists) {1} are valid").format(
-                    session_id, stream_id))
-
