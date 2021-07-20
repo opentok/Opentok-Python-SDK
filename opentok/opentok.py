@@ -1059,7 +1059,6 @@ class Client(object):
             observeForceMute = True
             payload["sip"]["observeForceMute"] = options["observeForceMute"]
 
-
         endpoint = self.endpoints.dial_url()
 
         logger.debug(
