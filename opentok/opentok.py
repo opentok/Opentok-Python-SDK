@@ -1005,9 +1005,43 @@ class Client(object):
             Boolean 'secure': A Boolean flag that indicates whether the media must be transmitted
             encrypted (true) or not (false, the default)
 
-        :rtype: A SipCall object, which contains data of the SIP call: id, connectionId and streamId
+            Boolean 'observeForceMute': A Boolean flag that determines whether the SIP endpoint should 
+            honor the force mute action. Defaults to False if moderator does not want to observe force
+            mute a stream and set to True if the moderator wants to observe force mute a stream.
+
+            This is an example of what the payload POST data body could look like:
+
+            {
+                "sessionId": "Your OpenTok session ID",
+                "token": "Your valid OpenTok token",
+                "sip": {
+                        "uri": "sip:user@sip.partner.com;transport=tls",
+                        "from": "from@example.com",
+                        "headers": {
+                            "headerKey": "headerValue"
+                        },
+                    "auth": {
+                        "username": "username",
+                        "password": "password"
+                    },
+                        "secure": true|false,
+                        "observeForceMute": true|false
+                    }
+                }
+
+        :rtype: A SipCall object, which contains data of the SIP call: id, connectionId and streamId. 
+        This is what the response body should look like after returning with a status code of 200:
+
+        {
+            "id": "b0a5a8c7-dc38-459f-a48d-a7f2008da853",
+            "connectionId": "e9f8c166-6c67-440d-994a-04fb6dfed007",
+            "streamId": "482bce73-f882-40fd-8ca5-cb74ff416036",
+        }
+
+        Note: Your response will have a different: id, connectionId and streamId
         """
         payload = {"sessionId": session_id, "token": token, "sip": {"uri": sip_uri}}
+        observeForceMute = False
 
         if "from" in options:
             payload["sip"]["from"] = options["from"]
@@ -1020,6 +1054,10 @@ class Client(object):
 
         if "secure" in options:
             payload["sip"]["secure"] = options["secure"]
+
+        if "observeForceMute" in options:
+            observeForceMute = True
+            payload["sip"]["observeForceMute"] = options["observeForceMute"]
 
         endpoint = self.endpoints.dial_url()
 
