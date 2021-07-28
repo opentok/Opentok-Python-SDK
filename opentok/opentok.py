@@ -1007,8 +1007,9 @@ class Client(object):
             encrypted (true) or not (false, the default)
 
             Boolean 'observeForceMute': A Boolean flag that determines whether the SIP endpoint should 
-            honor the force mute action. Defaults to False if moderator does not want to observe force
-            mute a stream and set to True if the moderator wants to observe force mute a stream.
+            honor the force mute action. The force mute action allows a moderator to force clients to 
+            mute audio in streams they publish. It defaults to False if moderator does not want to observe 
+            force mute a stream and set to True if the moderator wants to observe force mute a stream.
 
             Boolean 'video': A Boolean flag that indicates whether the SIP call will include video(true)
             or not(false, which is the default). With video included, the SIP client's video is included 
