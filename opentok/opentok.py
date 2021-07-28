@@ -1037,7 +1037,6 @@ class Client(object):
                     }
                 }
 
-
         :rtype: A SipCall object, which contains data of the SIP call: id, connectionId and streamId. 
         This is what the response body should look like after returning with a status code of 200:
 
