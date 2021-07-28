@@ -42,6 +42,7 @@ from .exceptions import (
     SipDialError,
     SetStreamClassError,
     BroadcastError,
+    DTMFError
 )
 
 
@@ -1009,6 +1010,11 @@ class Client(object):
             honor the force mute action. Defaults to False if moderator does not want to observe force
             mute a stream and set to True if the moderator wants to observe force mute a stream.
 
+            Boolean 'video': A Boolean flag that indicates whether the SIP call will include video(true)
+            or not(false, which is the default). With video included, the SIP client's video is included 
+            in the OpenTok stream that is sent to the OpenTok session. The SIP client will receive a single 
+            composed video of the published streams in the OpenTok session.
+
             This is an example of what the payload POST data body could look like:
 
             {
@@ -1025,9 +1031,11 @@ class Client(object):
                         "password": "password"
                     },
                         "secure": true|false,
-                        "observeForceMute": true|false
+                        "observeForceMute": true|false,
+                        "video": true|false
                     }
                 }
+
 
         :rtype: A SipCall object, which contains data of the SIP call: id, connectionId and streamId. 
         This is what the response body should look like after returning with a status code of 200:
@@ -1042,6 +1050,7 @@ class Client(object):
         """
         payload = {"sessionId": session_id, "token": token, "sip": {"uri": sip_uri}}
         observeForceMute = False
+        video = False
 
         if "from" in options:
             payload["sip"]["from"] = options["from"]
@@ -1058,6 +1067,10 @@ class Client(object):
         if "observeForceMute" in options:
             observeForceMute = True
             payload["sip"]["observeForceMute"] = options["observeForceMute"]
+        
+        if "video" in options:
+            video = True
+            payload["sip"]["video"] = options["video"]
 
         endpoint = self.endpoints.dial_url()
 
@@ -1446,4 +1459,42 @@ class OpenTok(Client):
             raise OpenTokException(
                 ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} and stream_id (if exists) {1} are valid").format(
                     session_id, stream_id))
+
+    def play_dtmf(self, session_id: str, connection_id: str, digits: str, options: dict = {}) -> requests.Response:
+        """
+        Plays a DTMF string into a session or to a specific connection
+
+        :param session_id The ID of the OpenTok session that the participant being called
+        will join
+
+        :param connection_id An optional parameter used to send the DTMF tones to a specific
+        connectoiin in a session.
+
+        :param digits DTMF digits to play
+        Valid DTMF digits are 0-9, p, #, and * digits. 'p' represents a 500ms pause if a delay is
+        needed during the input process.
+
+        """
+
+        try:
+            if not connection_id:
+                url = self.endpoints.get_dtmf_all_url(session_id)
+                payload = {"digits": digits}
+            else:
+                url = self.endpoints.get_dtmf_specific_url(session_id, connection_id)
+                payload = {"digits": digits}
+
+            response = requests.post(url, headers=self.get_json_headers(), data=json.dumps(payload))
+
+            if response.status_code == 200:
+                return response
+            elif response.status_code == 400:
+                raise DTMFError("One of the properties digits, sessionId or connectionId is invalid.")
+            elif response.status_code == 403:
+                raise AuthError("Failed to create session, invalid credentials. Please check your OpenTok API Key or JSON web token")
+            elif response.status_code == 404:
+                raise NotFoundError("The session does not exists or the client specified by the connection_id is not connected to the session")
+        except Exception as e:
+            raise OpenTokException(
+                (f"There was an error thrown by the OpenTok SDK, please check that your session_id: {session_id}, connection_id (if exists): {connection_id} and digits: {digits} are valid"))
 
