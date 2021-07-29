@@ -88,3 +88,9 @@ class BroadcastError(OpenTokException):
     """
 
     pass
+
+class DTMFError(OpenTokException):
+    """
+    Indicates that one of the properties digits, session_id or connection_id is invalid
+    """
+    pass

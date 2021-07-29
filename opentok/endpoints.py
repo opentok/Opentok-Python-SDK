@@ -143,3 +143,27 @@ class Endpoints(object):
             + "/mute"
 
         )
+
+    def get_dtmf_all_url(self, session_id):
+        """ this method returns the url for Play DTMF to all clients in the session """
+        url = (
+            self.api_url
+            + "/v2/project/" 
+            + self.api_key
+            + "/session/"
+            + session_id
+            + "/play-dtmf"
+        )
+
+    def get_dtmf_specific_url(self, session_id, connection_id):
+        """ this method returns the url for Play DTMF to a specific client connection"""
+        url = (
+            self.api_url
+            + "/v2/project/"
+            + self.api_key
+            + "/session/"
+            + session_id
+            + "/connection/"
+            + connection_id
+            + "/play-dtmf"
+        )
