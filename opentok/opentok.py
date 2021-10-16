@@ -53,9 +53,10 @@ class Roles(Enum):
     publisher = u("publisher")
     """A publisher can publish streams, subscribe to streams, and signal"""
     moderator = u("moderator")
-    """In addition to the privileges granted to a publisher, in clients using the OpenTok.js 2.2
-    library, a moderator can call the `forceUnpublish()` and `forceDisconnect()` method of the
-    Session object.
+    """In addition to the privileges granted to a publisher, a moderator can perform
+    moderation functions, such as forcing clients to disconnect, to stop publishing streams,
+    or to mute audio in published streams. See the
+    `Moderation developer guide <https://tokbox.com/developer/guides/moderation/>`_
     """
 
 
@@ -1135,7 +1136,7 @@ class Client(object):
             Integer 'maxDuration' optional: The maximum duration for the broadcast, in seconds.
             The broadcast will automatically stop when the maximum duration is reached. You can
             set the maximum duration to a value from 60 (60 seconds) to 36000 (10 hours). The
-            default maximum duration is 2 hours (7200 seconds)
+            default maximum duration is 4 hours (14,400 seconds)
 
             Dictionary 'outputs': This object defines the types of broadcast streams you want to
             start (both HLS and RTMP). You can include HLS, RTMP, or both as broadcast streams.

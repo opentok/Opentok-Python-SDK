@@ -34,7 +34,7 @@ class Archive(object):
        The time at which the archive was created, in milliseconds since the UNIX epoch.
 
     :ivar duration:
-       The duration of the archive, in milliseconds.
+       The duration of the archive, in seconds.
 
     :ivar has_audio:
        Boolean value set to true when the archive contains an audio track,
