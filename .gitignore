@@ -43,9 +43,13 @@ docs/_build/
 
 # Virtual env
 venv/
+env/
 
 # Mac Desktop files
 .DS_Store
 
 # IDE
 .vscode
+
+#Pypi
+.pypirc

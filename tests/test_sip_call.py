@@ -4,7 +4,7 @@ import httpretty
 
 from six import u
 from expects import *
-from opentok import OpenTok, SipCall, __version__
+from opentok import Client, SipCall, __version__
 
 from .validate_jwt import validate_jwt_header
 
@@ -13,7 +13,7 @@ class OpenTokSipCallTest(unittest.TestCase):
     def setUp(self):
         self.api_key = u("123456")
         self.api_secret = u("1234567890abcdef1234567890abcdef1234567890")
-        self.opentok = OpenTok(self.api_key, self.api_secret)
+        self.opentok = Client(self.api_key, self.api_secret)
 
         self.session_id = u("SESSIONID")
         self.token = u("TOKEN")

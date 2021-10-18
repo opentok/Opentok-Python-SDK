@@ -1,24 +1,45 @@
+import warnings
+
+
 class Endpoints(object):
     """
     For internal use.
     Class that provides the endpoint urls
     """
 
+
     def __init__(self, api_url, api_key):
         self.api_url = api_url
         self.api_key = api_key
 
-    def session_url(self):
+    def get_session_url(self):
         url = self.api_url + "/session/create"
         return url
 
-    def archive_url(self, archive_id=None):
+    def session_url(self):
+        warnings.warn(
+            "endpoints.session_url is deprecated (use endpoints.get_session_url instead).",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
+        return self.get_session_url()
+
+    def get_archive_url(self, archive_id=None):
         url = self.api_url + "/v2/project/" + self.api_key + "/archive"
         if archive_id:
             url = url + "/" + archive_id
         return url
 
-    def signaling_url(self, session_id, connection_id=None):
+    def archive_url(self, archive_id=None):
+        warnings.warn(
+            "endpoints.archive_url is deprecated (use endpoints.get_archive_url instead).",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.get_archive_url(archive_id)
+
+    def get_signaling_url(self, session_id, connection_id=None):
         url = self.api_url + "/v2/project/" + self.api_key + "/session/" + session_id
 
         if connection_id:
@@ -26,6 +47,14 @@ class Endpoints(object):
 
         url += "/signal"
         return url
+
+    def signaling_url(self, session_id, connection_id=None):
+        warnings.warn(
+            "endpoints.signaling_url is deprecated (use endpoints.get_signaling_url instead).",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.get_signaling_url(session_id, connection_id)
 
     def get_stream_url(self, session_id, stream_id=None):
         """ this method returns the url to get streams information """
@@ -40,6 +69,14 @@ class Endpoints(object):
         if stream_id:
             url = url + "/" + stream_id
         return url
+
+    def broadcast_url(self, broadcast_id=None, stop=False, layout=False):
+        warnings.warn(
+            "endpoints.broadcast_url is deprecated (use endpoints.get_broadcast_url instead).",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.get_broadcast_url(broadcast_id, stop, layout)
 
     def force_disconnect_url(self, session_id, connection_id):
         """ this method returns the force disconnect url endpoint """
@@ -83,7 +120,7 @@ class Endpoints(object):
         )
         return url
 
-    def broadcast_url(self, broadcast_id=None, stop=False, layout=False):
+    def get_broadcast_url(self, broadcast_id=None, stop=False, layout=False):
         """ this method returns urls for working with broadcast """
         url = self.api_url + "/v2/project/" + self.api_key + "/broadcast"
 
@@ -94,3 +131,15 @@ class Endpoints(object):
         if layout:
             url = url + "/layout"
         return url
+
+    def get_mute_all_url(self, session_id):
+        """ this method returns the urls for muting every stream in a session """
+        url = (
+             self.api_url  
+            + "/v2/project/" 
+            + self.api_key
+            + "/session/"
+            + session_id
+            + "/mute"
+
+        )

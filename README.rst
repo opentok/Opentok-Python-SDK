@@ -2,8 +2,6 @@
 OpenTok Python SDK
 ==================
 
-.. image:: https://travis-ci.org/opentok/Opentok-Python-SDK.svg
-   :target: https://travis-ci.org/opentok/Opentok-Python-SDK
 .. image:: https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg 
    :target: CODE_OF_CONDUCT.md
 
@@ -25,7 +23,7 @@ http://www.pip-installer.org/en/latest/
 Add the ``opentok`` package as a dependency in your project. The most common way is to add it to your
 ``requirements.txt`` file::
 
-  opentok>=2.10.0
+  opentok>=3.0
 
 Next, install the dependencies::
 
@@ -39,13 +37,13 @@ Initializing
 ~~~~~~~~~~~~
 
 Import the package at the top of any file where you will use it. At the very least you will need the
-``OpenTok`` class. Then initialize an OpenTok instance with your own API Key and API Secret.
+``Client`` class. Then initialize a Client instance with your own API Key and API Secret.
 
 .. code:: python
 
-  from opentok import OpenTok
+  from opentok import Client
 
-  opentok = OpenTok(api_key, api_secret)
+  opentok = Client(api_key, api_secret)
 
 Creating Sessions
 ~~~~~~~~~~~~~~~~~
@@ -238,7 +236,7 @@ For more information on archiving, see the
 Sending Signals
 ~~~~~~~~~~~~~~~~~~~~~
 
-Once a Session is created, you can send signals to everyone in the session or to a specific connection. You can send a signal by calling the ``signal(session_id, payload)`` method of the ``OpenTok`` class. The ``payload`` parameter is a dictionary used to set the ``type``, ``data`` fields. Ỳou can also call the method with the parameter ``connection_id`` to send a signal to a specific connection ``signal(session_id, data, connection_id)``.
+Once a Session is created, you can send signals to everyone in the session or to a specific connection. You can send a signal by calling the ``signal(session_id, payload)`` method of the ``Client`` class. The ``payload`` parameter is a dictionary used to set the ``type``, ``data`` fields. Ỳou can also call the method with the parameter ``connection_id`` to send a signal to a specific connection ``signal(session_id, data, connection_id)``.
 
 .. code:: python
 
@@ -259,7 +257,7 @@ Once a Session is created, you can send signals to everyone in the session or to
 Working with Streams
 ~~~~~~~~~~~~~~~~~~~~~
 
-You can get information about a stream by calling the `get_stream(session_id, stream_id)` method of the `OpenTok` class.
+You can get information about a stream by calling the `get_stream(session_id, stream_id)` method of the `Client` class.
 
 The method returns a Stream object that contains information of an OpenTok stream:
 
@@ -282,7 +280,7 @@ The method returns a Stream object that contains information of an OpenTok strea
   print stream.name #stream name
   print stream.layoutClassList #['full']
 
-Also, you can get information about all the streams in a session by calling the `list_streams(session_id)` method of the `OpenTok` class.
+Also, you can get information about all the streams in a session by calling the `list_streams(session_id)` method of the `Client` class.
 
 The method returns a StreamList object that contains a list of all the streams
 
@@ -300,7 +298,7 @@ The method returns a StreamList object that contains a list of all the streams
   print stream.name #stream name
   print stream.layoutClassList #['full']
 
-You can change the layout classes for streams in a session by calling the `set_stream_class_lists(session_id, stream_list)` method of the `OpenTok` class.
+You can change the layout classes for streams in a session by calling the `set_stream_class_lists(session_id, stream_list)` method of the `Client` class.
 
 The layout classes define how the stream is displayed in the layout of a composed OpenTok archive.
 
@@ -324,7 +322,7 @@ For more information see
 Force Disconnect
 ~~~~~~~~~~~~~~~~~~~~~
 
-Your application server can disconnect a client from an OpenTok session by calling the force_disconnect(session_id, connection_id) method of the OpenTok class, or the force_disconnect(connection_id) method of the Session class.
+Your application server can disconnect a client from an OpenTok session by calling the force_disconnect(session_id, connection_id) method of the Client class, or the force_disconnect(connection_id) method of the Session class.
 
 .. code:: python
 
@@ -472,14 +470,14 @@ For more information about OpenTok live streaming broadcasts, see the
 
 
 Configuring Timeout
--------
-Timeout is passed in the OpenTok constructor:
+-------------------
+Timeout is passed in the Client constructor:
 
 ``self.timeout = timeout``
 
 In order to configure timeout, first create an instance:
 
-``opentok = OpenTok(...., timeout=value)``
+``opentok = Client(...., timeout=value)``
 
 And then proceed to change the value with
 
@@ -504,7 +502,7 @@ Requirements
 
 You need an OpenTok API key and API secret, which you can obtain at https://dashboard.tokbox.com/
 
-The OpenTok Python SDK requires Python 2.6, 2.7, 3.3, 3.4, 3.5 or 3.6
+The OpenTok Python SDK requires Python 3.5 or higher
 
 Release Notes
 -------------
@@ -527,7 +525,11 @@ session uses the OpenTok TURN server to relay audio-video streams.
 
 This version of the SDK includes support for working with OpenTok archives.
 
-The OpenTok.create_session() method now includes a media_mode parameter, instead of a p2p parameter.
+The Client.create_session() method now includes a media_mode parameter, instead of a p2p parameter.
+
+**Changes in v3.X.X:**
+
+This version of the SDK includes significant improvements such as top level entity naming, where the Opentok class is now `Client`.  We also implemented a standardised logging module, improved naming conventions and JWT generation to make developer experience more rewarding.
 
 For details, see the reference documentation at
 http://www.tokbox.com/opentok/libraries/server/python/reference/index.html.

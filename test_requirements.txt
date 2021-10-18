@@ -2,3 +2,6 @@ nose
 httpretty
 expects
 wheel
+twine
+bump2version
+sure

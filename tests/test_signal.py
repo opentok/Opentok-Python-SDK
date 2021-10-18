@@ -1,6 +1,6 @@
 import unittest
 from six import text_type, u, b, PY2, PY3
-from opentok import OpenTok, Session, __version__
+from opentok import Client, Session, __version__
 import httpretty
 import json
 import textwrap
@@ -13,7 +13,7 @@ class OpenTokSignalTest(unittest.TestCase):
     def setUp(self):
         self.api_key = u("123456")
         self.api_secret = u("1234567890abcdef1234567890abcdef1234567890")
-        self.opentok = OpenTok(self.api_key, self.api_secret)
+        self.opentok = Client(self.api_key, self.api_secret)
         self.session_id = u("SESSIONID")
 
     @httpretty.activate
@@ -39,7 +39,7 @@ class OpenTokSignalTest(unittest.TestCase):
             content_type=u("application/json"),
         )
 
-        self.opentok.signal(self.session_id, data)
+        self.opentok.send_signal(self.session_id, data)
 
         validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
         expect(httpretty.last_request().headers[u("user-agent")]).to(
@@ -81,7 +81,7 @@ class OpenTokSignalTest(unittest.TestCase):
             content_type=u("application/json"),
         )
 
-        self.opentok.signal(self.session_id, data, connection_id)
+        self.opentok.send_signal(self.session_id, data, connection_id)
 
         validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
         expect(httpretty.last_request().headers[u("user-agent")]).to(

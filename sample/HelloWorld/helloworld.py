@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from opentok import OpenTok
+from opentok import Client
 import os
 
 try:
@@ -9,7 +9,7 @@ except Exception:
     raise Exception("You must define API_KEY and API_SECRET environment variables")
 
 app = Flask(__name__)
-opentok = OpenTok(api_key, api_secret)
+opentok = Client(api_key, api_secret)
 session = opentok.create_session()
 
 

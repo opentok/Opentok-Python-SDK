@@ -38,13 +38,16 @@ install_requires = [
 if sys.version_info[0] < 3 or sys.version_info[1] < 4:
     install_requires.append('enum34')
 
+if sys.version_info[0] < 3:
+    install_requires.append('rsa<=4.0')
+
 setup(
     name = 'opentok',
     version = find_version('opentok', 'version.py'),
     description = 'OpenTok server-side SDK',
+    long_description_content_type='text/x-rst',
+    url='https://github.com/opentok/Opentok-Python-SDK/',
     long_description=long_description,
-
-    url = 'https://github.com/opentok/Opentok-Python-SDK',
 
     author='TokBox, Inc.',
     author_email='support@tokbox.com',
@@ -58,14 +61,12 @@ setup(
 
         'License :: OSI Approved :: MIT License',
 
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
 
         'Topic :: Communications',
         'Topic :: Communications :: Chat',

@@ -10,7 +10,7 @@ import pytz
 from .validate_jwt import validate_jwt_header
 
 from opentok import (
-    OpenTok,
+    Client,
     Archive,
     ArchiveList,
     OutputModes,
@@ -25,7 +25,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         self.api_key = u("123456")
         self.api_secret = u("1234567890abcdef1234567890abcdef1234567890")
         self.session_id = u("SESSIONID")
-        self.opentok = OpenTok(self.api_key, self.api_secret)
+        self.opentok = Client(self.api_key, self.api_secret)
 
     @httpretty.activate
     def test_start_archive(self):
@@ -516,6 +516,72 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(archive).to(have_property(u("has_video"), True))
         expect(archive).to(have_property(u("output_mode"), OutputModes.composed))
         expect(archive).to(have_property(u("url"), None))
+
+    @httpretty.activate
+    def test_start_archive_with_layout(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            u("https://api.opentok.com/v2/project/{0}/archive").format(self.api_key),
+            body=textwrap.dedent(
+                u(
+                    """\
+                        {
+                            "createdAt" : 1395183243556,
+                            "duration" : 0,
+                            "id" : "30b3ebf1-ba36-4f5b-8def-6f70d9986fe9",
+                            "name" : "",
+                            "partnerId" : 123456,
+                            "reason" : "",
+                            "sessionId" : "SESSIONID",
+                            "size" : 0,
+                            "status" : "started",
+                            "hasAudio": true,
+                            "hasVideo": true,
+                            "outputMode": "composed",
+                            "url" : null                            
+                        }
+                    """
+                )
+            ),
+            status=200,
+            content_type=u("application/json"),
+        )
+
+        archive = self.opentok.start_archive(self.session_id, layout={"type": "pip", "screenshareType": "horizontal"})
+
+        validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
+        expect(httpretty.last_request().headers[u("user-agent")]).to(
+            contain(u("OpenTok-Python-SDK/") + __version__)
+        )
+        expect(httpretty.last_request().headers[u("content-type")]).to(
+            equal(u("application/json"))
+        )
+        # non-deterministic json encoding. have to decode to test it properly
+        if PY2:
+            body = json.loads(httpretty.last_request().body)
+        if PY3:
+            body = json.loads(httpretty.last_request().body.decode("utf-8"))
+        expect(body).to(have_key(u("sessionId"), u("SESSIONID")))
+        expect(body).to(have_key(u("name"), None))
+        expect(body).to(have_key(u("layout"), {"type": "pip", "screenshareType": "horizontal"}))
+        expect(archive).to(be_an(Archive))
+        expect(archive).to(
+            have_property(u("id"), u("30b3ebf1-ba36-4f5b-8def-6f70d9986fe9"))
+        )
+        expect(archive).to(have_property(u("name"), ("")))
+        expect(archive).to(have_property(u("status"), u("started")))
+        expect(archive).to(have_property(u("session_id"), u("SESSIONID")))
+        expect(archive).to(have_property(u("partner_id"), 123456))
+        if PY2:
+            created_at = datetime.datetime.fromtimestamp(1395183243, pytz.UTC)
+        if PY3:
+            created_at = datetime.datetime.fromtimestamp(
+                1395183243, datetime.timezone.utc
+            )
+        expect(archive).to(have_property(u("created_at"), equal(created_at)))
+        expect(archive).to(have_property(u("size"), equal(0)))
+        expect(archive).to(have_property(u("duration"), equal(0)))
+        expect(archive).to(have_property(u("url"), equal(None)))
 
     @httpretty.activate
     def test_stop_archive(self):
@@ -1372,6 +1438,39 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("content-type")]).to(
             equal(u("application/json"))
         )
+
+    @httpretty.activate
+    def test_set_archive_screenshare_type(self):
+        """ Test set archive layout functionality """
+        archive_id = u("f6e7ee58-d6cf-4a59-896b-6d56b158ec71")
+
+        httpretty.register_uri(
+            httpretty.PUT,
+            u("https://api.opentok.com/v2/project/{0}/archive/{1}/layout").format(
+                self.api_key, archive_id
+            ),
+            status=200,
+            content_type=u("application/json"),
+        )
+
+        self.opentok.set_archive_layout(archive_id, "bestFit", screenshare_type="horizontalPresentation")
+
+        validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
+        expect(httpretty.last_request().headers[u("user-agent")]).to(
+            contain(u("OpenTok-Python-SDK/") + __version__)
+        )
+        expect(httpretty.last_request().headers[u("content-type")]).to(
+            equal(u("application/json"))
+        )
+
+        if PY2:
+            body = json.loads(httpretty.last_request().body)
+        if PY3:
+            body = json.loads(httpretty.last_request().body.decode("utf-8"))
+
+        expect(body).to(have_key(u("type"), u("bestFit")))
+        expect(body).to_not(have_key(u("stylesheet")))
+        expect(body).to(have_key(u("screenshareType"), u("horizontalPresentation")))
 
     @httpretty.activate
     def test_set_custom_archive_layout(self):

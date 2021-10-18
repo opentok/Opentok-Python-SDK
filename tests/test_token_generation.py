@@ -6,7 +6,7 @@ import datetime
 import calendar
 import pytz
 
-from opentok import OpenTok, Roles, OpenTokException
+from opentok import Client, Roles, OpenTokException
 
 from .helpers import token_decoder, token_signature_validator
 
@@ -18,7 +18,7 @@ class OpenTokTokenGenerationTest(unittest.TestCase):
         self.session_id = u(
             "1_MX4xMjM0NTZ-flNhdCBNYXIgMTUgMTQ6NDI6MjMgUERUIDIwMTR-MC40OTAxMzAyNX4"
         )
-        self.opentok = OpenTok(self.api_key, self.api_secret)
+        self.opentok = Client(self.api_key, self.api_secret)
 
     def test_generate_plain_token(self):
         token = self.opentok.generate_token(self.session_id)

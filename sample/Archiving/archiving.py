@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-from opentok import OpenTok, MediaModes, OutputModes
+from opentok import Client, MediaModes, OutputModes
 from email.utils import formatdate
 import os, time
 
@@ -10,7 +10,7 @@ except Exception:
     raise Exception("You must define API_KEY and API_SECRET environment variables")
 
 app = Flask(__name__)
-opentok = OpenTok(api_key, api_secret)
+opentok = Client(api_key, api_secret)
 session = opentok.create_session(media_mode=MediaModes.routed)
 
 
