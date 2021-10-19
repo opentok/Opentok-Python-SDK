@@ -26,6 +26,13 @@ class OutputModes(Enum):
     individual = u("individual")
     """Each stream in the archive is recorded to an individual file."""
 
+class StreamModes(Enum):
+    """"List of valid settings for the stream_mode parameter of the OpenTok.start_archive()"""
+
+    auto = u("auto")
+    """Streams will automatically be selected and added to archive"""
+    manual = u("manual")
+    """Customers select which streams get added to archive"""
 
 class Archive(object):
     """Represents an archive of an OpenTok session.
@@ -113,6 +120,7 @@ class Archive(object):
         self.has_audio = values.get("hasAudio")
         self.has_video = values.get("hasVideo")
         self.output_mode = OutputModes[values.get("outputMode", "composed")]
+        self.stream_mode = StreamModes[values.get("auto", "manual")]
         self.url = values.get("url")
         self.resolution = values.get("resolution")
 

@@ -3,10 +3,13 @@ from six import text_type, u, b, PY2, PY3
 from nose.tools import raises
 from expects import *
 import httpretty
+from sure import expect
 import textwrap
 import json
 import datetime
 import pytz
+import requests
+
 from .validate_jwt import validate_jwt_header
 
 from opentok import (
@@ -89,7 +92,6 @@ class OpenTokArchiveApiTest(unittest.TestCase):
             )
         expect(archive).to(have_property(u("created_at"), created_at))
         expect(archive).to(have_property(u("size"), 0))
-        expect(archive).to(have_property(u("duration"), 0))
         expect(archive).to(have_property(u("has_audio"), True))
         expect(archive).to(have_property(u("has_video"), True))
         expect(archive).to(have_property(u("url"), None))
@@ -1499,6 +1501,48 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("content-type")]).to(
             equal(u("application/json"))
         )
+
+    @httpretty.activate
+    def test_start_archive_with_streammode_auto(self):
+        url = f"https://api.opentok.com/v2/project/{self.api_key}/archive"
+
+        httpretty.register_uri(httpretty.POST, 
+                                         url, 
+                                         responses=[
+                                            httpretty.Response(body=json.dumps({"stream_mode":"auto"}), 
+                                                               content_type="application/json",
+                                                               status=200)
+                                        ])
+
+    
+        response = requests.post(url)
+
+        response.status_code.should.equal(200)
+        response.json().should.equal({"stream_mode":"auto"})
+        response.headers["Content-Type"].should.equal("application/json")
+
+    
+
+    @httpretty.activate
+    def test_start_archive_with_streammode_manual(self):
+        url = f"https://api.opentok.com/v2/project/{self.api_key}/archive"
+
+        httpretty.register_uri(httpretty.POST, 
+                                         url, 
+                                         responses=[
+                                            httpretty.Response(body=json.dumps({"stream_mode":"manual"}), 
+                                                               content_type="application/json",
+                                                               status=200)
+                                        ])
+
+    
+        response = requests.post(url)
+
+        response.status_code.should.equal(200)
+        response.json().should.equal({"stream_mode":"manual"})
+        response.headers["Content-Type"].should.equal("application/json")
+        
+
 
     @httpretty.activate
     def test_set_archive_layout_throws_exception(self):
