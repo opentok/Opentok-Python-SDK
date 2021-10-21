@@ -1509,7 +1509,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         httpretty.register_uri(httpretty.POST, 
                                          url, 
                                          responses=[
-                                            httpretty.Response(body=json.dumps({"stream_mode":"auto"}), 
+                                            httpretty.Response(body=json.dumps({"streamMode":"auto"}), 
                                                                content_type="application/json",
                                                                status=200)
                                         ])
@@ -1518,7 +1518,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         response = requests.post(url)
 
         response.status_code.should.equal(200)
-        response.json().should.equal({"stream_mode":"auto"})
+        response.json().should.equal({"streamMode":"auto"})
         response.headers["Content-Type"].should.equal("application/json")
 
     
@@ -1530,7 +1530,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         httpretty.register_uri(httpretty.POST, 
                                          url, 
                                          responses=[
-                                            httpretty.Response(body=json.dumps({"stream_mode":"manual"}), 
+                                            httpretty.Response(body=json.dumps({"streamMode":"manual"}), 
                                                                content_type="application/json",
                                                                status=200)
                                         ])
@@ -1539,7 +1539,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         response = requests.post(url)
 
         response.status_code.should.equal(200)
-        response.json().should.equal({"stream_mode":"manual"})
+        response.json().should.equal({"streamMode":"manual"})
         response.headers["Content-Type"].should.equal("application/json")
         
 

@@ -105,14 +105,14 @@ class OpenTokArchiveTest(unittest.TestCase):
 
 
     @httpretty.activate
-    def test_update_archive_auto(self):
+    def test_add_archive_stream(self):
         archive_id = u("ARCHIVEID")
         url = f"https://api.opentok.com/v2/project/{self.api_key}/archive/{archive_id}/streams"
        
         payload = {
             "hasAudio": True,
             "hasVideo": True,
-            "addStream": [self.stream1, self.stream2]
+            "addStream": self.stream1
         }
         
         httpretty.register_uri(httpretty.PATCH, 
@@ -129,20 +129,18 @@ class OpenTokArchiveTest(unittest.TestCase):
         response.json().should.equal({
                                         "hasAudio": True,
                                         "hasVideo": True,
-                                        "addStream": [self.stream1, self.stream2]
+                                        "addStream": self.stream1
                                         })
 
         response.headers["Content-Type"].should.equal("application/json")
 
     @httpretty.activate
-    def test_update_archive_manual(self):
+    def test_remove_archive_stream(self):
         archive_id = u("ARCHIVEID")
         url = f"https://api.opentok.com/v2/project/{self.api_key}/archive/{archive_id}/streams"
        
         payload = {
-            "hasAudio": True,
-            "hasVideo": True,
-            "addStream": [self.stream1]
+            "removeStream": self.stream1
         }
         
         httpretty.register_uri(httpretty.PATCH, 
@@ -157,9 +155,7 @@ class OpenTokArchiveTest(unittest.TestCase):
 
         response.status_code.should.equal(200)
         response.json().should.equal({
-                                        "hasAudio": True,
-                                        "hasVideo": True,
-                                        "addStream": [self.stream1]
+                                        "removeStream": self.stream1
                                         })
                                         
         response.headers["Content-Type"].should.equal("application/json")

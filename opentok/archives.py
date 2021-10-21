@@ -62,6 +62,14 @@ class Archive(object):
         Whether all streams in the archive are recorded to a single file
         (OutputModes.composed) or to individual files (OutputModes.individual).
 
+    :ivar streamMode:
+        Determines the archive stream handling mode. It's set to 'auto' by
+        default if you want all streams. To explicitly select specific streams 
+        in the archive then set to 'manual'.
+    
+    :ivar streams:
+        A list of streams in an archive.
+
     :ivar partner_id:
        The API key associated with the archive.
 
@@ -120,7 +128,8 @@ class Archive(object):
         self.has_audio = values.get("hasAudio")
         self.has_video = values.get("hasVideo")
         self.output_mode = OutputModes[values.get("outputMode", "composed")]
-        self.stream_mode = StreamModes[values.get("auto", "manual")]
+        self.stream_mode = values.get("streamMode", StreamModes.auto)
+        self.streams = values.get("streams")
         self.url = values.get("url")
         self.resolution = values.get("resolution")
 

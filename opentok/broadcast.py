@@ -7,6 +7,14 @@ from six import iteritems, u
 class Broadcast(object):
     """
     Represents a live streaming broadcast
+
+    :ivar streamMode:
+        Determines the broadcast stream handling mode. It's set to 'auto' by
+        default if you want all streams. To explicitly select specific streams 
+        in the broadcast then set to 'manual'.
+    
+    :ivar streams:
+        A list of streams in a broadcast.
     """
 
     def __init__(self, kwargs):
@@ -18,7 +26,8 @@ class Broadcast(object):
         self.resolution = kwargs.get("resolution")
         self.status = kwargs.get("status")
         self.broadcastUrls = kwargs.get("broadcastUrls")
-        self.streamMode = kwargs.get(BroadcastStreamModes.auto)
+        self.stream_mode = kwargs.get("streamMode", BroadcastStreamModes.auto)
+        self.streams = kwargs.get("streams")
 
     def json(self):
         """
