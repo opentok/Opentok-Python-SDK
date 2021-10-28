@@ -27,12 +27,14 @@ class OutputModes(Enum):
     """Each stream in the archive is recorded to an individual file."""
 
 class StreamModes(Enum):
-    """"List of valid settings for the stream_mode parameter of the OpenTok.start_archive()"""
+    """"List of valid settings for the stream_mode parameter of the OpenTok.start_archive()
+    method."""
 
     auto = u("auto")
-    """Streams will automatically be selected and added to archive"""
+    """Streams are automatically added to archive."""
     manual = u("manual")
-    """Customers select which streams get added to archive"""
+    """Streams are included in the archive based on calls to the OpenTok.add_archive_stream()
+    and OpenTok.remove_archive_stream() methods."""
 
 class Archive(object):
     """Represents an archive of an OpenTok session.
@@ -63,12 +65,12 @@ class Archive(object):
         (OutputModes.composed) or to individual files (OutputModes.individual).
 
     :ivar streamMode:
-        Determines the archive stream handling mode. It's set to 'auto' by
-        default if you want all streams. To explicitly select specific streams 
-        in the archive then set to 'manual'.
+        Whether streams included in the archive are selected automatically
+        ("auto", the default) or manually ("manual"). 
     
     :ivar streams:
-        A list of streams in an archive.
+        A list of streams currently being archived. This is only set for an archive with
+        the status set to "started"  and the stream_Mode set to "manual".
 
     :ivar partner_id:
        The API key associated with the archive.

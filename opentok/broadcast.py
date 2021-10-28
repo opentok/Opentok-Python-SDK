@@ -6,15 +6,15 @@ from six import iteritems, u
 
 class Broadcast(object):
     """
-    Represents a live streaming broadcast
+    Represents a live streaming broadcast.
 
     :ivar streamMode:
-        Determines the broadcast stream handling mode. It's set to 'auto' by
-        default if you want all streams. To explicitly select specific streams 
-        in the broadcast then set to 'manual'.
+        Whether streams included in the broadcast are selected automatically
+        ("auto", the default) or manually ("manual"). 
     
     :ivar streams:
-        A list of streams in a broadcast.
+        A list of streams currently being broadcast. This is only set for a broadcast with
+        the status set to "started"  and the stream_Mode set to "manual".
     """
 
     def __init__(self, kwargs):
@@ -36,9 +36,11 @@ class Broadcast(object):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
 class BroadcastStreamModes(Enum):
-    """"List of valid settings for the stream_mode parameter of the OpenTok.start_broadcast()"""
+    """"List of valid settings for the stream_mode parameter of the OpenTok.start_broadcast()
+    method."""
 
     auto = u("auto")
-    """Streams will automatically be selected and added to broadcase"""
+    """Streams are automatically added to broadcast."""
     manual = u("manual")
-    """Customers select which streams get added to broadcast"""
+    """Streams are included in the broadcast based on calls to the OpenTok.add_broadcast_stream()
+    and OpenTok.remove_broadcast_stream() methods."""
