@@ -7,6 +7,7 @@ class Endpoints(object):
     Class that provides the endpoint urls
     """
 
+
     def __init__(self, api_url, api_key):
         self.api_url = api_url
         self.api_key = api_key
@@ -152,5 +153,3 @@ class Endpoints(object):
             + broadcast_id
             + "/streams"
         )
-
-    

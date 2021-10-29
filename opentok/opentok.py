@@ -15,6 +15,7 @@ from jose import jwt  # _create_jwt_auth_header
 import random  # _create_jwt_auth_header
 import logging  # logging
 import warnings  # Native. Used for notifying deprecations
+import os
 
 
 # compat
@@ -83,8 +84,6 @@ class ArchiveModes(Enum):
 
 
 logger = logging.getLogger("opentok")
-
-
 
 class Client(object):
 
@@ -405,6 +404,7 @@ class Client(object):
                 proxies=self.proxies,
                 timeout=self.timeout,
             )
+           
             response.encoding = "utf-8"
 
             if response.status_code == 403:
@@ -1561,6 +1561,8 @@ class Client(object):
         }
 
         return jwt.encode(payload, self.api_secret, algorithm="HS256")
+                
+  
 
 class OpenTok(Client):
     def __init__(
@@ -1583,3 +1585,5 @@ class OpenTok(Client):
             timeout=timeout,
             app_version=app_version
         )
+
+   
