@@ -1,6 +1,5 @@
 import json
 from enum import Enum
-from opentok.archives import StreamModes
 from six import iteritems, u
 
 
