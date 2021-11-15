@@ -1,4 +1,5 @@
 from datetime import datetime  # generate_token
+from typing import List, Optional # imports List, Optional type hint
 import calendar  # generate_token
 import base64  # generate_token
 import random  # generate_token
@@ -1423,7 +1424,12 @@ class OpenTok(Client):
     
 
 
-    def mute(self, session_id: str, stream_id: str= "", options: dict = {}) -> requests.Response:
+    def mute(self, 
+            session_id: str,
+            excludedStreamIds: Optional[List[str]],
+            stream_id: str= "", 
+            active: bool= True,
+            data: dict = {}) -> requests.Response:
         """
         Use this method so the moderator can mute all streams or a specific stream for OpenTok.
         Please note that a client is able to unmute themselves.
@@ -1431,22 +1437,32 @@ class OpenTok(Client):
 
         :param session_id gets the session id from another function called get_session()
 
+        :param excludedStreamIds is a list of The stream IDs for streams that should not be muted. 
+        This is an optional property. If you omit this property, all streams in the session will be muted.
+
         :param stream_id gets the stream id from another function called get_stream(). Note
         that this variable is set to an empty string in the function definition as a specific
         stream may not be chosen.
+
+        :param active is a required boolean that determines whether streams published after the 
+        call, in addition to the current streams in the session, should be muted (True) or not (False).
    
         """
-        
+    
         try:
             if not stream_id:
                 url = self.endpoints.get_mute_all_url(session_id)
-                data = {'excludedStream': stream_id}
+                if active:
+                    data = {'active': active, 'excludedStreams': excludedStreamIds }
+                else:
+                    active = False
+                    data = {'active': active, 'excludedStreams': []}
             else:
                 url = self.endpoints.get_stream_url(session_id, stream_id) + "/mute"
                 data = None
             
             
-            response = requests.post(url, headers=self.get_headers(), data=data)
+            response = requests.post(url, headers=self.get_headers(), data=json.dumps(data))
 
             if response:
                 return response
