@@ -31,7 +31,7 @@ class StreamModes(Enum):
     method."""
 
     auto = u("auto")
-    """Streams are automatically added to archive."""
+    """Streams are automatically added to the archive."""
     manual = u("manual")
     """Streams are included in the archive based on calls to the OpenTok.add_archive_stream()
     and OpenTok.remove_archive_stream() methods."""
@@ -70,7 +70,7 @@ class Archive(object):
     
     :ivar streams:
         A list of streams currently being archived. This is only set for an archive with
-        the status set to "started"  and the stream_Mode set to "manual".
+        the status set to "started" and the stream_Mode set to "manual".
 
     :ivar partner_id:
        The API key associated with the archive.

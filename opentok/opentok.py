@@ -527,9 +527,10 @@ class Client(object):
             String 'screenshareType' optional: Layout to use for screenshares. If this is set, you must
             set 'type' to 'bestFit'
 
-        :param StreamModes stream_mode: Determines the archive stream handling mode. It's set to 'auto' by
-        default if you want all streams to get added and set to 'manual' if you want to explicitly select 
-        the streams in the archive.
+        :param StreamModes stream_mode (Optional): Determines the archive stream handling mode.
+        Set this to StreamModes.auto (the default) to have streams added automatically. Set this to
+        StreamModes.manual to explicitly select streams to include in the the archive, using the
+        OpenTok.add_archive_stream() and OpenTok.remove_archive_stream() methods.
 
         :rtype: The Archive object, which includes properties defining the archive,
           including the archive ID.
@@ -1246,10 +1247,6 @@ class Client(object):
                 String 'screenshareType' optional: Layout to use for screenshares. If this is set, you must
                 set 'type' to 'bestFit'
 
-        :param StreamModes stream_mode: Determines the archive stream handling mode. It's set to 'auto' by
-        default if you want all streams to get added and set to 'manual' if you want to explicitly select 
-        the streams in the broadcast.
-
             Integer 'maxDuration' optional: The maximum duration for the broadcast, in seconds.
             The broadcast will automatically stop when the maximum duration is reached. You can
             set the maximum duration to a value from 60 (60 seconds) to 36000 (10 hours). The
@@ -1264,6 +1261,11 @@ class Client(object):
 
             String 'resolution' optional: The resolution of the broadcast, either "640x480"
             (SD, the default) or "1280x720" (HD)
+
+        :param BroadcastStreamModes stream_mode (Optional): Determines the broadcast stream handling mode.
+        Set this to BroadcastStreamModes.auto (the default) to have streams added automatically. Set this to
+        BroadcastStreamModes.manual to explicitly select streams to include in the the broadcast, using the
+        OpenTok.add_broadcast_stream() and OpenTok.remove_broadcast_stream() methods.
 
         :rtype A Broadcast object, which contains information of the broadcast: id, sessionId
         projectId, createdAt, updatedAt, resolution, status and broadcastUrls

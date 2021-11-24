@@ -13,7 +13,7 @@ class Broadcast(object):
     
     :ivar streams:
         A list of streams currently being broadcast. This is only set for a broadcast with
-        the status set to "started"  and the stream_Mode set to "manual".
+        the status set to "started" and the stream_Mode set to "manual".
     """
 
     def __init__(self, kwargs):
@@ -39,7 +39,7 @@ class BroadcastStreamModes(Enum):
     method."""
 
     auto = u("auto")
-    """Streams are automatically added to broadcast."""
+    """Streams are automatically added to the broadcast."""
     manual = u("manual")
     """Streams are included in the broadcast based on calls to the OpenTok.add_broadcast_stream()
     and OpenTok.remove_broadcast_stream() methods."""
