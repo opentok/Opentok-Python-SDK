@@ -167,3 +167,25 @@ class Endpoints(object):
             + connection_id
             + "/play-dtmf"
         )
+
+    def get_archive_stream(self, archive_id=None):
+        """ this method returns urls for working with streamModes in archives """
+        url = (
+            self.api_url
+            + "/v2/project/"
+            + self.api_key
+            + "archive/"
+            + archive_id
+            + "/streams"
+        )
+
+    def get_broadcast_stream(self, broadcast_id=None):
+        """ this method returns urls for working with streamModes in broadcasts """
+        url = (
+            self.api_url
+            + "/v2/partner/"
+            + self.api_key
+            + "broadcast/"
+            + broadcast_id
+            + "/streams"
+        )

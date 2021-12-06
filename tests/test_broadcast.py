@@ -2,6 +2,8 @@ import unittest
 import textwrap
 import httpretty
 import json
+import requests
+from sure import expect
 
 from six import u, PY2, PY3
 from expects import *
@@ -15,6 +17,8 @@ class OpenTokBroadcastTest(unittest.TestCase):
         self.api_secret = u("1234567890abcdef1234567890abcdef1234567890")
         self.opentok = Client(self.api_key, self.api_secret)
         self.session_id = u("2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4")
+        self.stream1 = "kjhk-09898-kjn"
+        self.stream2 = "jnn-99kjk-88734r"
 
     @httpretty.activate
     def test_start_broadcast(self):
@@ -286,6 +290,146 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(broadcast).to(have_property(u("status"), u("started")))
         expect(list(broadcast.broadcastUrls)).to(have_length(2))
         expect(list(broadcast.broadcastUrls["rtmp"])).to(have_length(2))
+
+    @httpretty.activate
+    def test_start_broadcast_with_streammode_auto(self):
+        url = f"https://api.opentok.com/v2/partner/{self.api_key}/broadcast"
+
+        httpretty.register_uri(httpretty.POST, 
+                                         url, 
+                                         responses=[
+                                            httpretty.Response(body=json.dumps({"stream_mode":"auto"}), 
+                                                               content_type="application/json",
+                                                               status=200)
+                                        ])
+
+
+        response = requests.post(url)
+
+        response.status_code.should.equal(200)
+        response.json().should.equal({"stream_mode":"auto"})
+        response.headers["Content-Type"].should.equal("application/json")
+
+
+    @httpretty.activate
+    def test_add_broadcast_stream(self):
+        broadcast_id = "BROADCASTID"
+        url = f"https://api.opentok.com/v2/partner/{self.api_key}/broadcast/{broadcast_id}/streams"
+
+        payload = {
+            "hasAudio": True,
+            "hasVideo": True,
+            "addStream": self.stream1
+        }
+
+        httpretty.register_uri(httpretty.POST, 
+                                         url, 
+                                         responses=[
+                                            httpretty.Response(body=json.dumps(payload), 
+                                                               content_type="application/json",
+                                                               status=200)
+                                        ])
+
+    
+        response = requests.post(url)
+
+        response.status_code.should.equal(200)
+        response.json().should.equal({
+                                        "hasAudio": True,
+                                        "hasVideo": True,
+                                        "addStream": self.stream1
+                                        })
+        response.headers["Content-Type"].should.equal("application/json")
+
+    
+
+    @httpretty.activate
+    def test_remove_broadcast_stream(self):
+        broadcast_id = "BROADCASTID"
+        url = f"https://api.opentok.com/v2/partner/{self.api_key}/broadcast/{broadcast_id}/streams"
+
+        payload = {
+            "removeStream": self.stream1
+        }
+
+        httpretty.register_uri(httpretty.POST, 
+                                         url, 
+                                         responses=[
+                                            httpretty.Response(body=json.dumps(payload), 
+                                                               content_type="application/json",
+                                                               status=200)
+                                        ])
+
+    
+        response = requests.post(url)
+
+        response.status_code.should.equal(200)
+        response.json().should.equal({
+                                        "removeStream": self.stream1
+                                        })
+        response.headers["Content-Type"].should.equal("application/json")
+
+
+    @httpretty.activate
+    def test_update_broadcast_auto(self):
+        broadcast_id = u("BROADCASTID")
+        url = f"https://api.opentok.com/v2/partner/{self.api_key}/broadcast/{broadcast_id}/streams"
+       
+        payload = {
+            "hasAudio": True,
+            "hasVideo": True,
+            "addStream": [self.stream1, self.stream2]
+        }
+        
+        httpretty.register_uri(httpretty.PATCH, 
+                                         url, 
+                                         responses=[
+                                            httpretty.Response(body=json.dumps(payload), 
+                                                               content_type="application/json",
+                                                               status=200)
+                                        ])
+        
+        response = requests.patch(url)
+
+        response.status_code.should.equal(200)
+        response.json().should.equal({
+                                        "hasAudio": True,
+                                        "hasVideo": True,
+                                        "addStream": [self.stream1, self.stream2]
+                                        })
+
+        response.headers["Content-Type"].should.equal("application/json")
+
+    @httpretty.activate
+    def test_update_broadcast_manual(self):
+        broadcast_id = u("BROADCASTID")
+        url = f"https://api.opentok.com/v2/partner/{self.api_key}/broadcast/{broadcast_id}/streams"
+       
+        payload = {
+            "hasAudio": True,
+            "hasVideo": True,
+            "addStream": [self.stream1]
+        }
+        
+        httpretty.register_uri(httpretty.PATCH, 
+                                         url, 
+                                         responses=[
+                                            httpretty.Response(body=json.dumps(payload), 
+                                                               content_type="application/json",
+                                                               status=200)
+                                        ])
+        
+        response = requests.patch(url)
+
+        response.status_code.should.equal(200)
+        response.json().should.equal({
+                                        "hasAudio": True,
+                                        "hasVideo": True,
+                                        "addStream": [self.stream1]
+                                        })
+                                        
+        response.headers["Content-Type"].should.equal("application/json")
+
 
     @httpretty.activate
     def test_stop_broadcast(self):

@@ -22,6 +22,7 @@ class OpenTokTest(unittest.TestCase):
         self.api_secret = "1234567890abcdef1234567890abcdef1234567890"
         self.session_id = "SESSIONID"
         self.connection_id = "CONNECTIONID"
+
         self.opentok = Client(self.api_key, self.api_secret)
         token = string.ascii_letters+string.digits
         self.jwt_token_string = ''.join(random.choice(token[:100]))
@@ -115,5 +116,4 @@ class OpenTokTest(unittest.TestCase):
         response.text.should.equal("Testing text matches inside of the JSON file")
         response.headers["x-opentok-auth"].should.equal(self.jwt_token_string)
         response.headers["Content-Type"].should.equal("application/json")
-
 
