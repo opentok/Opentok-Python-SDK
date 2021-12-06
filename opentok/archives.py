@@ -26,6 +26,15 @@ class OutputModes(Enum):
     individual = u("individual")
     """Each stream in the archive is recorded to an individual file."""
 
+class StreamModes(Enum):
+    """"List of valid settings for the stream_mode parameter of the OpenTok.start_archive()
+    method."""
+
+    auto = u("auto")
+    """Streams are automatically added to the archive."""
+    manual = u("manual")
+    """Streams are included in the archive based on calls to the OpenTok.add_archive_stream()
+    and OpenTok.remove_archive_stream() methods."""
 
 class Archive(object):
     """Represents an archive of an OpenTok session.
@@ -34,7 +43,7 @@ class Archive(object):
        The time at which the archive was created, in milliseconds since the UNIX epoch.
 
     :ivar duration:
-       The duration of the archive, in milliseconds.
+       The duration of the archive, in seconds.
 
     :ivar has_audio:
        Boolean value set to true when the archive contains an audio track,
@@ -54,6 +63,14 @@ class Archive(object):
     :ivar output_mode:
         Whether all streams in the archive are recorded to a single file
         (OutputModes.composed) or to individual files (OutputModes.individual).
+
+    :ivar streamMode:
+        Whether streams included in the archive are selected automatically
+        ("auto", the default) or manually ("manual"). 
+    
+    :ivar streams:
+        A list of streams currently being archived. This is only set for an archive with
+        the status set to "started" and the stream_Mode set to "manual".
 
     :ivar partner_id:
        The API key associated with the archive.
@@ -113,6 +130,8 @@ class Archive(object):
         self.has_audio = values.get("hasAudio")
         self.has_video = values.get("hasVideo")
         self.output_mode = OutputModes[values.get("outputMode", "composed")]
+        self.stream_mode = values.get("streamMode", StreamModes.auto)
+        self.streams = values.get("streams")
         self.url = values.get("url")
         self.resolution = values.get("resolution")
 
