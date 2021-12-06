@@ -88,3 +88,18 @@ class BroadcastError(OpenTokException):
     """
 
     pass
+
+class ArchiveStreamModeError(OpenTokException):
+    """
+    Indicates that the archive is configured with a streamMode that does not support stream manipulation.
+    """
+
+    pass
+
+
+class BroadcastStreamModeError(OpenTokException):
+    """
+    Indicates that the broadcast is configured with a streamMode that does not support stream manipulation.
+    """
+
+    pass

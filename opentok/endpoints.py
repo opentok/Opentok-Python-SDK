@@ -132,14 +132,24 @@ class Endpoints(object):
             url = url + "/layout"
         return url
 
-    def get_mute_all_url(self, session_id):
-        """ this method returns the urls for muting every stream in a session """
+    def get_archive_stream(self, archive_id=None):
+        """ this method returns urls for working with streamModes in archives """
         url = (
-             self.api_url  
-            + "/v2/project/" 
+            self.api_url
+            + "/v2/project/"
             + self.api_key
-            + "/session/"
-            + session_id
-            + "/mute"
+            + "archive/"
+            + archive_id
+            + "/streams"
+        )
 
+    def get_broadcast_stream(self, broadcast_id=None):
+        """ this method returns urls for working with streamModes in broadcasts """
+        url = (
+            self.api_url
+            + "/v2/partner/"
+            + self.api_key
+            + "broadcast/"
+            + broadcast_id
+            + "/streams"
         )

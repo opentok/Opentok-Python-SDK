@@ -4,7 +4,8 @@ import base64  # generate_token
 import random  # generate_token
 import time  # generate_token
 import hmac  # _sign_string
-import hashlib  # _sign_string
+import hashlib
+from typing import List  # use for type hinting
 import requests  # create_session, archiving
 import json  # archiving
 import platform  # user-agent
@@ -25,12 +26,14 @@ from enum import Enum
 from .version import __version__
 from .endpoints import Endpoints
 from .session import Session
-from .archives import Archive, ArchiveList, OutputModes
+from .archives import Archive, ArchiveList, OutputModes, StreamModes
 from .stream import Stream
 from .streamlist import StreamList
 from .sip_call import SipCall
-from .broadcast import Broadcast
+from .broadcast import Broadcast, BroadcastStreamModes
 from .exceptions import (
+    ArchiveStreamModeError,
+    BroadcastStreamModeError,
     OpenTokException,
     RequestError,
     AuthError,
@@ -477,8 +480,9 @@ class Client(object):
         has_video=True,
         name=None,
         output_mode=OutputModes.composed,
+        stream_mode=StreamModes.auto,
         resolution=None,
-        layout=None,
+        layout=None
     ):
         """
         Starts archiving an OpenTok session.
@@ -524,6 +528,11 @@ class Client(object):
             String 'screenshareType' optional: Layout to use for screenshares. If this is set, you must
             set 'type' to 'bestFit'
 
+        :param StreamModes stream_mode (Optional): Determines the archive stream handling mode.
+        Set this to StreamModes.auto (the default) to have streams added automatically. Set this to
+        StreamModes.manual to explicitly select streams to include in the the archive, using the
+        OpenTok.add_archive_stream() and OpenTok.remove_archive_stream() methods.
+
         :rtype: The Archive object, which includes properties defining the archive,
           including the archive ID.
         """
@@ -548,6 +557,7 @@ class Client(object):
             "hasVideo": has_video,
             "outputMode": output_mode.value,
             "resolution": resolution,
+            "streamMode": stream_mode.value
         }
 
         if layout is not None:
@@ -569,7 +579,7 @@ class Client(object):
             timeout=self.timeout,
         )
 
-        if response.status_code < 300:
+        if response:
             return Archive(self, response.json())
         elif response.status_code == 403:
             raise AuthError()
@@ -679,7 +689,7 @@ class Client(object):
             timeout=self.timeout,
         )
 
-        if response.status_code < 300:
+        if response:
             return Archive(self, response.json())
         elif response.status_code == 403:
             raise AuthError()
@@ -725,7 +735,7 @@ class Client(object):
             timeout=self.timeout,
         )
 
-        if response.status_code < 300:
+        if response:
             return ArchiveList(self, response.json())
         elif response.status_code == 403:
             raise AuthError()
@@ -740,6 +750,111 @@ class Client(object):
         both methods exist to have backwards compatible
         """
         return self.get_archives(offset, count, session_id)
+
+    def add_archive_stream(
+        self, 
+        archive_id: str,
+        stream_id: str,
+        has_audio: bool = True,
+        has_video: bool = True    
+        ) -> requests.Response:
+        
+        """
+        This method will add streams to the archive with addStream for new participant(choosing audio, video or both).
+
+        :param String archive_id: the ID of the archive that will be updated
+        :param String stream_id: the id of the stream that will get added to the archive
+        :param Boolean has_audio: if set to True, an audio track will be inserted to the archive.
+          has_audio is an optional parameter that is set to True by default. If you set both
+          has_audio and has_video to False, the call to the add_archive_stream() method results in
+          an error.
+        :param Boolean has_video: if set to True, a video track will be inserted to the archive.
+          has_video is an optional parameter that is set to True by default.
+        """
+
+        endpoint = self.endpoints.get_archive_stream(archive_id)
+
+        streams = {
+            "hasAudio": has_audio,
+            "hasVideo": has_video,
+            "addStream": stream_id
+        }
+
+        response = requests.patch(
+            endpoint,
+            data=json.dumps(streams),
+            headers=self.get_json_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout,
+        )
+
+        if response:
+            return Archive(self, response.json())
+        elif response.status_code == 403:
+            raise AuthError()
+        elif response.status_code == 400:
+            """
+            The HTTP response has a 400 status code in the following cases:
+            You do not pass in a session ID or you pass in an invalid session ID.
+            No clients are actively connected to the OpenTok session.
+            You specify an invalid resolution value.
+            The outputMode property is set to "individual" and you set the resolution property and (which is not supported in individual stream archives).
+            """
+            raise RequestError(response.json().get("message"))
+        elif response.status_code == 404:
+            raise NotFoundError("Archive or Stream not found")
+        elif response.status_code == 405:
+            raise ArchiveStreamModeError("Your archive is configured with a streamMode that does not support stream manipulation.")
+        elif response.status_code == 409:
+            raise ArchiveError(response.json().get("message"))
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+    def remove_archive_stream(self, archive_id: str, stream_id: str) -> requests.Response:
+        """
+        This method will remove streams from the archive with removeStream.
+
+        :param String archive_id: the ID of the archive that will be updated
+        :param String stream_id: the ID of the stream that will get added to the archive
+        """
+
+        endpoint = self.endpoints.get_archive_stream(archive_id)
+
+        streams = {
+            "removeStream": stream_id
+        }
+
+        response = requests.patch(
+            endpoint,
+            data=json.dumps(streams),
+            headers=self.get_json_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout,
+        )
+
+        if response:
+            return Archive(self, response.json())
+        elif response.status_code == 403:
+            raise AuthError()
+        elif response.status_code == 400:
+            """
+            The HTTP response has a 400 status code in the following cases:
+            You do not pass in a session ID or you pass in an invalid session ID.
+            No clients are actively connected to the OpenTok session.
+            You specify an invalid resolution value.
+            The outputMode property is set to "individual" and you set the resolution property and (which is not supported in individual stream archives).
+            """
+            raise RequestError(response.json().get("message"))
+        elif response.status_code == 404:
+            raise NotFoundError("Archive or Stream not found")
+        elif response.status_code == 405:
+            raise ArchiveStreamModeError("Your archive is configured with a streamMode that does not support stream manipulation.")
+        elif response.status_code == 409:
+            raise ArchiveError(response.json().get("message"))
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+
 
     def send_signal(self, session_id, payload, connection_id=None):
         """
@@ -1105,7 +1220,7 @@ class Client(object):
         else:
             raise RequestError("OpenTok server error.", response.status_code)
 
-    def start_broadcast(self, session_id, options):
+    def start_broadcast(self, session_id, options, stream_mode=BroadcastStreamModes.auto):
         """
         Use this method to start a live streaming for an OpenTok session. This broadcasts the
         session to an HLS (HTTP live streaming) or to RTMP streams. To successfully start
@@ -1147,10 +1262,18 @@ class Client(object):
             String 'resolution' optional: The resolution of the broadcast, either "640x480"
             (SD, the default) or "1280x720" (HD)
 
+        :param BroadcastStreamModes stream_mode (Optional): Determines the broadcast stream handling mode.
+        Set this to BroadcastStreamModes.auto (the default) to have streams added automatically. Set this to
+        BroadcastStreamModes.manual to explicitly select streams to include in the the broadcast, using the
+        OpenTok.add_broadcast_stream() and OpenTok.remove_broadcast_stream() methods.
+
         :rtype A Broadcast object, which contains information of the broadcast: id, sessionId
         projectId, createdAt, updatedAt, resolution, status and broadcastUrls
         """
-        payload = {"sessionId": session_id}
+        payload = {
+                    "sessionId": session_id,
+                    "streamMode": stream_mode.value
+                  }
 
         payload.update(options)
 
@@ -1172,7 +1295,7 @@ class Client(object):
             timeout=self.timeout,
         )
 
-        if response.status_code == 200:
+        if response:
             return Broadcast(response.json())
         elif response.status_code == 400:
             raise BroadcastError(
@@ -1230,6 +1353,103 @@ class Client(object):
             )
         else:
             raise RequestError("OpenTok server error.", response.status_code)
+
+    def add_broadcast_stream(
+        self, 
+        broadcast_id: str,
+        stream_id: str,
+        has_audio: bool = True,
+        has_video: bool = True    
+        ) -> requests.Response:
+        
+        """
+        This method will add streams to the broadcast with addStream for new participant(choosing audio, video or both).
+
+        :param String broadcast_id: the ID of the broadcast that will be updated
+        :param String stream_id: the id of the stream that will get added to the broadcast
+        :param Boolean has_audio: if set to True, an audio track will be inserted to the broadcast.
+          has_audio is an optional parameter that is set to True by default. If you set both
+          has_audio and has_video to False, the call to the add_broadcast_stream() method results in
+          an error.
+        :param Boolean has_video: if set to True, a video track will be inserted to the broadcast.
+          has_video is an optional parameter that is set to True by default.
+        """
+
+        endpoint = self.endpoints.get_broadcast_stream(broadcast_id)
+
+        streams = {
+            "hasAudio": has_audio,
+            "hasVideo": has_video,
+            "addStream": stream_id
+        }
+
+        response = requests.patch(
+            endpoint,
+            data=json.dumps(streams),
+            headers=self.get_json_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout,
+        )
+
+        if response:
+            return Broadcast(response.json())
+        elif response.status_code == 400:
+            raise BroadcastError(
+                "Invalid request. This response may indicate that data in your request data is "
+                "invalid JSON. It may also indicate that you passed in invalid layout options. "
+                "Or you have exceeded the limit of five simultaneous RTMP streams for an OpenTok "
+                "session. Or you specified and invalid resolution."
+            )
+        elif response.status_code == 403:
+            raise AuthError("Authentication error.")
+        elif response.status_code == 405:
+            raise BroadcastStreamModeError("Your broadcast is configured with a streamMode that does not support stream manipulation.")
+        elif response.status_code == 409:
+            raise BroadcastError("The broadcast has already started for the session.")
+        else:
+            raise RequestError("OpenTok server error.", response.status_code)
+
+    
+    def remove_broadcast_stream(self, broadcast_id: str, stream_id: str) -> requests.Response:
+        """
+        This method will remove streams from the broadcast with removeStream.
+
+        :param String broadcast_id: the ID of the broadcast that will be updated
+        :param String stream_id: the id of the stream that will get added to the broadcast
+        """
+
+        endpoint = self.endpoints.get_broadcast_stream(broadcast_id)
+
+        streams = {
+            "removeStream": stream_id
+        }
+
+        response = requests.patch(
+            endpoint,
+            data=json.dumps(streams),
+            headers=self.get_json_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout,
+        )
+
+        if response:
+            return Broadcast(response.json())
+        elif response.status_code == 400:
+            raise BroadcastError(
+                "Invalid request. This response may indicate that data in your request data is "
+                "invalid JSON. It may also indicate that you passed in invalid layout options. "
+                "Or you have exceeded the limit of five simultaneous RTMP streams for an OpenTok "
+                "session. Or you specified and invalid resolution."
+            )
+        elif response.status_code == 403:
+            raise AuthError("Authentication error.")
+        elif response.status_code == 405:
+            raise BroadcastStreamModeError("Your broadcast is configured with a streamMode that does not support stream manipulation.")
+        elif response.status_code == 409:
+            raise BroadcastError("The broadcast has already started for the session.")
+        else:
+            raise RequestError("OpenTok server error.", response.status_code)
+
 
     def get_broadcast(self, broadcast_id):
         """
