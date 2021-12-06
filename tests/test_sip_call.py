@@ -102,6 +102,8 @@ class OpenTokSipCallTest(unittest.TestCase):
             "headers": {"headerKey": "headerValue"},
             "auth": {"username": "username", "password": "password"},
             "secure": True,
+            "observeForceMute": True,
+            "video": True
         }
 
         sip_call_response = self.opentok.dial(
