@@ -1648,20 +1648,17 @@ class OpenTok(Client):
                 options: dict = {}) -> requests.Response:
 
         """
-        Use this method so the moderator can mute all streams for OpenTok.
+        Mutes all streams in an OpenTok session.
 
-        A moderator can exclude streams Id's from being muted. Please note that a 
-        client is able to unmute themselves.
+        You can include an optional list of streams IDs to exclude from being muted. 
 
-        This function stays in the OpenTok class and inherits from the Client class.
+        :param session_id The session ID
 
-        :param session_id gets the session id
-
-        :param excludedStreamIds is a list of the stream IDs for streams that should not be muted. 
+        :param excludedStreamIds A list of stream IDs for streams that should not be muted. 
         This is an optional property. If you omit this property, all streams in the session will be muted.
 
-        :param active is a required boolean that determines whether streams published after the 
-        call, in addition to the current streams in the session, should be muted (True) or not (False).
+        :param active Whether streams published after the call, in addition to the current streams
+        in the session, should be muted (True) or not (False).
 
         :param options is an empty dictonary representing the payload of the request,
         whose contents will get populated inside the function
@@ -1684,9 +1681,9 @@ class OpenTok(Client):
             elif response.status_code == 400:
                 raise GetStreamError("Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.")
             elif response.status_code == 403:
-                raise AuthError("Failed to create session, invalid credentials")
+                raise AuthError("Failed to mute, invalid credentials.")
             elif response.status_code == 404:
-                raise NotFoundError("Mute not found")
+                raise NotFoundError("The session or a stream is not found.")
         except Exception as e:
             raise OpenTokException(
                 ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} and excludedStreamIds (if exists) {1} are valid").format(
@@ -1696,12 +1693,11 @@ class OpenTok(Client):
 
     def mute_stream(self, session_id: str, stream_id: str, options: dict = {}) -> requests.Response:
         """
-        Use this method so the moderator can mute a single stream for OpenTok.
-        This function stays in the OpenTok class and inherits from the Client class.
+        Mutes a single stream in an OpenTok session.
 
-        :param session_id gets the session id from another function called get_session()
+        :param session_id The session ID.
 
-        :param stream_id gets a single stream id
+        :param stream_id The stream iD.
 
         :param options is an empty dictonary representing the payload of the request,
         whose contents will get populated inside the function
@@ -1718,7 +1714,7 @@ class OpenTok(Client):
             elif response.status_code == 400:
                 raise GetStreamError("Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.")
             elif response.status_code == 403:
-                raise AuthError("Failed to create session, invalid credentials")
+                raise AuthError("Failed to mute, invalid credentials.")
             elif response.status_code == 404:
                 raise NotFoundError("Mute not found")
         except Exception as e:
