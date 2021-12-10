@@ -1644,8 +1644,7 @@ class OpenTok(Client):
     def mute_all(self, 
                 session_id: str, 
                 excludedStreamIds: Optional[List[str]], 
-                active: bool= True, 
-                options: dict = {}) -> requests.Response:
+                active: bool= True) -> requests.Response:
 
         """
         Mutes all streams in an OpenTok session.
@@ -1659,11 +1658,9 @@ class OpenTok(Client):
 
         :param active Whether streams published after the call, in addition to the current streams
         in the session, should be muted (True) or not (False).
-
-        :param options is an empty dictonary representing the payload of the request,
-        whose contents will get populated inside the function
         """
 
+        options = {}
         url = self.endpoints.get_mute_all_url(session_id)
 
         try:
@@ -1691,23 +1688,20 @@ class OpenTok(Client):
 
         
 
-    def mute_stream(self, session_id: str, stream_id: str, options: dict = {}) -> requests.Response:
+    def mute_stream(self, session_id: str, stream_id: str) -> requests.Response:
         """
         Mutes a single stream in an OpenTok session.
 
         :param session_id The session ID.
 
         :param stream_id The stream iD.
-
-        :param options is an empty dictonary representing the payload of the request,
-        whose contents will get populated inside the function
         """
 
         try:
             if stream_id:
                 url = self.endpoints.get_stream_url(session_id, stream_id) + "/mute"
 
-            response = requests.post(url, headers=self.get_headers(), data=json.dumps(options))
+            response = requests.post(url, headers=self.get_headers())
 
             if response:
                     return response
