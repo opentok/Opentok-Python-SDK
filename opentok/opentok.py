@@ -1,4 +1,5 @@
 from datetime import datetime  # generate_token
+from typing import List, Optional # imports List, Optional type hint
 import calendar  # generate_token
 import base64  # generate_token
 import random  # generate_token
@@ -1152,6 +1153,7 @@ class Client(object):
                     }
                 }
 
+
         :rtype: A SipCall object, which contains data of the SIP call: id, connectionId and streamId. 
         This is what the response body should look like after returning with a status code of 200:
 
@@ -1639,45 +1641,81 @@ class OpenTok(Client):
             app_version=app_version
         )
 
+    def mute_all(self, 
+                session_id: str, 
+                excludedStreamIds: Optional[List[str]], 
+                active: bool= True) -> requests.Response:
 
-
-    def mute(self, session_id: str, stream_id: str= "", options: dict = {}) -> requests.Response:
         """
-        Use this method so the moderator can mute all streams or a specific stream for OpenTok.
-        Please note that a client is able to unmute themselves.
-        This function stays in the OpenTok class and inherits from the Client class.
+        Mutes all streams in an OpenTok session.
 
-        :param session_id gets the session id from another function called get_session()
+        You can include an optional list of streams IDs to exclude from being muted. 
 
-        :param stream_id gets the stream id from another function called get_stream(). Note
-        that this variable is set to an empty string in the function definition as a specific
-        stream may not be chosen.
-   
+        :param session_id The session ID
+
+        :param excludedStreamIds A list of stream IDs for streams that should not be muted. 
+        This is an optional property. If you omit this property, all streams in the session will be muted.
+
+        :param active Whether streams published after the call, in addition to the current streams
+        in the session, should be muted (True) or not (False).
         """
-        
+
+        options = {}
+        url = self.endpoints.get_mute_all_url(session_id)
+
         try:
-            if not stream_id:
-                url = self.endpoints.get_mute_all_url(session_id)
-                data = {'excludedStream': stream_id}
+            if excludedStreamIds:
+                if active:
+                    options = {'active': active, 'excludedStreams': excludedStreamIds }
             else:
-                url = self.endpoints.get_stream_url(session_id, stream_id) + "/mute"
-                data = None
-            
-            
-            response = requests.post(url, headers=self.get_headers(), data=data)
+                active = False
+                options = {'active': active, 'excludedStreams': []}
+  
+            response = requests.post(url, headers=self.get_headers(), data=json.dumps(options))
 
             if response:
                 return response
             elif response.status_code == 400:
                 raise GetStreamError("Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.")
             elif response.status_code == 403:
-                raise AuthError("Failed to create session, invalid credentials")
+                raise AuthError("Failed to mute, invalid credentials.")
+            elif response.status_code == 404:
+                raise NotFoundError("The session or a stream is not found.")
+        except Exception as e:
+            raise OpenTokException(
+                ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} and excludedStreamIds (if exists) {1} are valid").format(
+                    session_id, excludedStreamIds))
+
+        
+
+    def mute_stream(self, session_id: str, stream_id: str) -> requests.Response:
+        """
+        Mutes a single stream in an OpenTok session.
+
+        :param session_id The session ID.
+
+        :param stream_id The stream iD.
+        """
+
+        try:
+            if stream_id:
+                url = self.endpoints.get_stream_url(session_id, stream_id) + "/mute"
+
+            response = requests.post(url, headers=self.get_headers())
+
+            if response:
+                    return response
+            elif response.status_code == 400:
+                raise GetStreamError("Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.")
+            elif response.status_code == 403:
+                raise AuthError("Failed to mute, invalid credentials.")
             elif response.status_code == 404:
                 raise NotFoundError("Mute not found")
         except Exception as e:
             raise OpenTokException(
-                ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} and stream_id (if exists) {1} are valid").format(
+                ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} and stream_id {1} are valid").format(
                     session_id, stream_id))
+
 
     def play_dtmf(self, session_id: str, connection_id: str, digits: str, options: dict = {}) -> requests.Response:
         """
