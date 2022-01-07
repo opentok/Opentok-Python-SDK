@@ -1657,7 +1657,7 @@ class OpenTok(Client):
         This is an optional property. If you omit this property, all streams in the session will be muted.
 
         :param active Whether streams published after the call, in addition to the current streams
-        in the session, should be muted (True) or not (False).
+        in the session, should be muted (True).
         """
 
         options = {}
@@ -1665,10 +1665,8 @@ class OpenTok(Client):
 
         try:
             if excludedStreamIds:
-                if active:
-                    options = {'active': active, 'excludedStreams': excludedStreamIds }
+                options = {'active': active, 'excludedStreams': excludedStreamIds }
             else:
-                active = False
                 options = {'active': active, 'excludedStreams': []}
   
             response = requests.post(url, headers=self.get_headers(), data=json.dumps(options))
@@ -1687,6 +1685,35 @@ class OpenTok(Client):
                     session_id, excludedStreamIds))
 
         
+    def disable_force_mute(self, session_id: str, active: bool= False) -> requests.Response:
+        """
+        Disables the mute all streams in an OpenTok session.
+
+        :param session_id The session ID.
+
+        :param active Whether streams published after the call, in addition to the current streams
+        in the session, should not be muted (False).
+        """
+
+        url = self.endpoints.get_mute_all_url(session_id)
+
+        response = requests.post(url, headers=self.get_headers())
+
+
+        try:
+            if response:
+                    return response
+            elif response.status_code == 400:
+                raise GetStreamError("Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.")
+            elif response.status_code == 403:
+                raise AuthError("Failed to mute, invalid credentials.")
+            elif response.status_code == 404:
+                raise NotFoundError("The session or a stream is not found.")
+        except Exception as e:
+            raise OpenTokException(
+                ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} is valid").format(
+                    session_id))
+
 
     def mute_stream(self, session_id: str, stream_id: str) -> requests.Response:
         """
