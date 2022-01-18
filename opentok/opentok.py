@@ -1649,7 +1649,7 @@ class OpenTok(Client):
         """
         Mutes all streams in an OpenTok session.
 
-        You can include an optional list of streams IDs to exclude from being muted. 
+        You can include an optional list of streams IDs to exclude from being muted.
 
         :param session_id The session ID
 
@@ -1713,7 +1713,7 @@ class OpenTok(Client):
             raise OpenTokException(
                 ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} is valid").format(
                     session_id))
-
+            
 
     def mute_stream(self, session_id: str, stream_id: str) -> requests.Response:
         """

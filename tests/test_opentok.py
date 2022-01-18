@@ -74,6 +74,7 @@ class OpenTokTest(unittest.TestCase):
         response.headers["x-opentok-auth"].should.equal(self.jwt_token_string)
         response.headers["Content-Type"].should.equal("application/json")
 
+
     @httpretty.activate
     def test_mute_single_stream(self):
         self.url = "https://api.opentok.com/v2/project/{0}/session/{1}/stream/{2}/mute".format(
