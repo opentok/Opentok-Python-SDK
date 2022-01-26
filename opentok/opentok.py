@@ -1120,15 +1120,14 @@ class Client(object):
                 }
 
             Boolean 'secure': A Boolean flag that indicates whether the media must be transmitted
-            encrypted (true) or not (false, the default)
+            encrypted (true) or not (False, the default)
 
-            Boolean 'observeForceMute': A Boolean flag that determines whether the SIP endpoint should
-            honor the force mute action. The force mute action allows a moderator to force clients to
-            mute audio in streams they publish. It defaults to False if moderator does not want to observe
-            force mute a stream and set to True if the moderator wants to observe force mute a stream.
+            Boolean 'observeForceMute': Whether the SIP endpoint should honor a force mute action
+            (True) or not (False, the default). A force mute action allows a moderator to force clients to
+            mute audio in streams they publish.
 
-            Boolean 'video': A Boolean flag that indicates whether the SIP call will include video(true)
-            or not(false, which is the default). With video included, the SIP client's video is included
+            Boolean 'video': Whether the SIP call will include video (true)
+            or not (False, the default). With video included, the SIP client's video is included
             in the OpenTok stream that is sent to the OpenTok session. The SIP client will receive a single
             composed video of the published streams in the OpenTok session.
 
@@ -1650,6 +1649,10 @@ class OpenTok(Client):
 
         You can include an optional list of streams IDs to exclude from being muted.
 
+        In addition to existing streams, any streams that are published after the call to
+        this method are published with audio muted. You can remove the mute state of a session
+        by calling the OpenTok.disableForceMute() method.
+
         :param session_id The session ID
 
         :param excludedStreamIds A list of stream IDs for streams that should not be muted.
@@ -1683,7 +1686,13 @@ class OpenTok(Client):
 
     def disable_force_mute(self, session_id: str) -> requests.Response:
         """
-        Disables the mute all streams in an OpenTok session.
+        Disables the active mute state of the session. After you call this method, new streams
+        published to the session will no longer have audio muted.
+
+        After you call the mute_all() method, any streams published after
+        the call are published with audio muted. Call the OpenTok.disable_force_mute() method
+        to remove the mute state of a session, so that new published streams are not
+        automatically muted.
 
         :param session_id The session ID.
         """
@@ -1715,7 +1724,7 @@ class OpenTok(Client):
 
         :param session_id The session ID.
 
-        :param stream_id The stream iD.
+        :param stream_id The stream ID.
         """
 
         try:
