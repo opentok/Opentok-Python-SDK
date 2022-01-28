@@ -53,6 +53,29 @@ class OpenTokTest(unittest.TestCase):
         response.headers["Content-Type"].should.equal("application/json")
 
     @httpretty.activate
+    def test_disable_force_mute(self):
+        self.url = "https://api.opentok.com/v2/project/{0}/session/{1}/mute".format(
+                                                                                self.api_key, 
+                                                                                self.session_id)
+
+        httpretty.register_uri(httpretty.POST, 
+                                        self.url, 
+                                        responses=[
+                                            httpretty.Response(body='{}',
+                                                                content_type="application/json",
+                                                                adding_headers= {"x-opentok-auth": self.jwt_token_string},
+                                                                status=201)
+                                        ])
+
+    
+        response = requests.post(self.url)
+
+        response.text.should.equal('{}')
+        response.headers["x-opentok-auth"].should.equal(self.jwt_token_string)
+        response.headers["Content-Type"].should.equal("application/json")
+
+
+    @httpretty.activate
     def test_mute_single_stream(self):
         self.url = "https://api.opentok.com/v2/project/{0}/session/{1}/stream/{2}/mute".format(
                                                                                 self.api_key, 

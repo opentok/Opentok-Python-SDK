@@ -407,7 +407,7 @@ class Client(object):
                 proxies=self.proxies,
                 timeout=self.timeout,
             )
-           
+
             response.encoding = "utf-8"
 
             if response.status_code == 403:
@@ -754,13 +754,13 @@ class Client(object):
         return self.get_archives(offset, count, session_id)
 
     def add_archive_stream(
-        self, 
+        self,
         archive_id: str,
         stream_id: str,
         has_audio: bool = True,
-        has_video: bool = True    
+        has_video: bool = True
         ) -> requests.Response:
-        
+
         """
         This method will add streams to the archive with addStream for new participant(choosing audio, video or both).
 
@@ -1120,16 +1120,15 @@ class Client(object):
                 }
 
             Boolean 'secure': A Boolean flag that indicates whether the media must be transmitted
-            encrypted (true) or not (false, the default)
+            encrypted (true) or not (False, the default)
 
-            Boolean 'observeForceMute': A Boolean flag that determines whether the SIP endpoint should 
-            honor the force mute action. The force mute action allows a moderator to force clients to 
-            mute audio in streams they publish. It defaults to False if moderator does not want to observe 
-            force mute a stream and set to True if the moderator wants to observe force mute a stream.
+            Boolean 'observeForceMute': Whether the SIP endpoint should honor a force mute action
+            (True) or not (False, the default). A force mute action allows a moderator to force clients to
+            mute audio in streams they publish.
 
-            Boolean 'video': A Boolean flag that indicates whether the SIP call will include video(true)
-            or not(false, which is the default). With video included, the SIP client's video is included 
-            in the OpenTok stream that is sent to the OpenTok session. The SIP client will receive a single 
+            Boolean 'video': Whether the SIP call will include video (true)
+            or not (False, the default). With video included, the SIP client's video is included
+            in the OpenTok stream that is sent to the OpenTok session. The SIP client will receive a single
             composed video of the published streams in the OpenTok session.
 
             This is an example of what the payload POST data body could look like:
@@ -1154,7 +1153,7 @@ class Client(object):
                 }
 
 
-        :rtype: A SipCall object, which contains data of the SIP call: id, connectionId and streamId. 
+        :rtype: A SipCall object, which contains data of the SIP call: id, connectionId and streamId.
         This is what the response body should look like after returning with a status code of 200:
 
         {
@@ -1184,7 +1183,7 @@ class Client(object):
         if "observeForceMute" in options:
             observeForceMute = True
             payload["sip"]["observeForceMute"] = options["observeForceMute"]
-        
+
         if "video" in options:
             video = True
             payload["sip"]["video"] = options["video"]
@@ -1382,7 +1381,7 @@ class Client(object):
             self.json_headers(),
             self.proxies,
         )
-    
+
         response = requests.post(
             endpoint,
             headers=self.get_json_headers(),
@@ -1408,13 +1407,13 @@ class Client(object):
             raise RequestError("OpenTok server error.", response.status_code)
 
     def add_broadcast_stream(
-        self, 
+        self,
         broadcast_id: str,
         stream_id: str,
         has_audio: bool = True,
-        has_video: bool = True    
+        has_video: bool = True
         ) -> requests.Response:
-        
+
         """
         This method will add streams to the broadcast with addStream for new participant(choosing audio, video or both).
 
@@ -1462,7 +1461,7 @@ class Client(object):
         else:
             raise RequestError("OpenTok server error.", response.status_code)
 
-    
+
     def remove_broadcast_stream(self, broadcast_id: str, stream_id: str) -> requests.Response:
         """
         This method will remove streams from the broadcast with removeStream.
@@ -1616,8 +1615,8 @@ class Client(object):
         }
 
         return jwt.encode(payload, self.api_secret, algorithm="HS256")
-                
-  
+
+
 
 class OpenTok(Client):
     def __init__(
@@ -1641,23 +1640,23 @@ class OpenTok(Client):
             app_version=app_version
         )
 
-    def mute_all(self, 
-                session_id: str, 
-                excludedStreamIds: Optional[List[str]], 
-                active: bool= True) -> requests.Response:
+    def mute_all(self,
+                session_id: str,
+                excludedStreamIds: Optional[List[str]]) -> requests.Response:
 
         """
         Mutes all streams in an OpenTok session.
 
-        You can include an optional list of streams IDs to exclude from being muted. 
+        You can include an optional list of streams IDs to exclude from being muted.
+
+        In addition to existing streams, any streams that are published after the call to
+        this method are published with audio muted. You can remove the mute state of a session
+        by calling the OpenTok.disableForceMute() method.
 
         :param session_id The session ID
 
-        :param excludedStreamIds A list of stream IDs for streams that should not be muted. 
+        :param excludedStreamIds A list of stream IDs for streams that should not be muted.
         This is an optional property. If you omit this property, all streams in the session will be muted.
-
-        :param active Whether streams published after the call, in addition to the current streams
-        in the session, should be muted (True) or not (False).
         """
 
         options = {}
@@ -1665,12 +1664,10 @@ class OpenTok(Client):
 
         try:
             if excludedStreamIds:
-                if active:
-                    options = {'active': active, 'excludedStreams': excludedStreamIds }
+                options = {'active': True, 'excludedStreams': excludedStreamIds }
             else:
-                active = False
-                options = {'active': active, 'excludedStreams': []}
-  
+                options = {'active': True, 'excludedStreams': []}
+
             response = requests.post(url, headers=self.get_headers(), data=json.dumps(options))
 
             if response:
@@ -1686,7 +1683,40 @@ class OpenTok(Client):
                 ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} and excludedStreamIds (if exists) {1} are valid").format(
                     session_id, excludedStreamIds))
 
-        
+
+    def disable_force_mute(self, session_id: str) -> requests.Response:
+        """
+        Disables the active mute state of the session. After you call this method, new streams
+        published to the session will no longer have audio muted.
+
+        After you call the mute_all() method, any streams published after
+        the call are published with audio muted. Call the OpenTok.disable_force_mute() method
+        to remove the mute state of a session, so that new published streams are not
+        automatically muted.
+
+        :param session_id The session ID.
+        """
+
+        options = {'active': False}
+        url = self.endpoints.get_mute_all_url(session_id)
+
+        response = requests.post(url, headers=self.get_headers(), data=json.dumps(options))
+
+
+        try:
+            if response:
+                    return response
+            elif response.status_code == 400:
+                raise GetStreamError("Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.")
+            elif response.status_code == 403:
+                raise AuthError("Failed to mute, invalid credentials.")
+            elif response.status_code == 404:
+                raise NotFoundError("The session or a stream is not found.")
+        except Exception as e:
+            raise OpenTokException(
+                ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} is valid").format(
+                    session_id))
+
 
     def mute_stream(self, session_id: str, stream_id: str) -> requests.Response:
         """
@@ -1694,7 +1724,7 @@ class OpenTok(Client):
 
         :param session_id The session ID.
 
-        :param stream_id The stream iD.
+        :param stream_id The stream ID.
         """
 
         try:
@@ -1754,4 +1784,3 @@ class OpenTok(Client):
         except Exception as e:
             raise OpenTokException(
                 (f"There was an error thrown by the OpenTok SDK, please check that your session_id: {session_id}, connection_id (if exists): {connection_id} and digits: {digits} are valid"))
-
