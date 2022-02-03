@@ -1,3 +1,13 @@
+# Release v3.2.0
+
+## Added
+
+- Mute all and mute stream functionality [#192](https://github.com/opentok/Opentok-Python-SDK/pull/192), [#197](https://github.com/opentok/Opentok-Python-SDK/pull/197), [#199](https://github.com/opentok/Opentok-Python-SDK/pull/199)
+- Added selective stream feature to `Archive` and `Broadcast` objects. [#196](https://github.com/opentok/Opentok-Python-SDK/pull/196)
+- Added PlayDTMF functionality to `SipCall` object [#194](https://github.com/opentok/Opentok-Python-SDK/pull/194)
+- Added SIP video outbound flag to `SipCall.dial` method [#194](https://github.com/opentok/Opentok-Python-SDK/pull/194)
+- Added the ObserveForceMute flag to `SipCall.dial` method [#193](https://github.com/opentok/Opentok-Python-SDK/pull/193)
+
 # 3.2.0b1
 
 ## Added
