@@ -130,6 +130,7 @@ class Endpoints(object):
             url = url + "/stop"
         if layout:
             url = url + "/layout"
+            
         return url
 
     def get_mute_all_url(self, session_id):
@@ -143,3 +144,59 @@ class Endpoints(object):
             + "/mute"
 
         )
+
+        return url
+
+    def get_dtmf_all_url(self, session_id):
+        """ this method returns the url for Play DTMF to all clients in the session """
+        url = (
+            self.api_url
+            + "/v2/project/" 
+            + self.api_key
+            + "/session/"
+            + session_id
+            + "/play-dtmf"
+        )
+
+        return url
+
+    def get_dtmf_specific_url(self, session_id, connection_id):
+        """ this method returns the url for Play DTMF to a specific client connection"""
+        url = (
+            self.api_url
+            + "/v2/project/"
+            + self.api_key
+            + "/session/"
+            + session_id
+            + "/connection/"
+            + connection_id
+            + "/play-dtmf"
+        )
+
+        return url
+
+    def get_archive_stream(self, archive_id=None):
+        """ this method returns urls for working with streamModes in archives """
+        url = (
+            self.api_url
+            + "/v2/project/"
+            + self.api_key
+            + "archive/"
+            + archive_id
+            + "/streams"
+        )
+
+        return url
+
+    def get_broadcast_stream(self, broadcast_id=None):
+        """ this method returns urls for working with streamModes in broadcasts """
+        url = (
+            self.api_url
+            + "/v2/partner/"
+            + self.api_key
+            + "broadcast/"
+            + broadcast_id
+            + "/streams"
+        )
+
+        return url
