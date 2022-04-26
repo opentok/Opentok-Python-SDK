@@ -195,7 +195,7 @@ filter by session ID. This method returns an instance of the ``ArchiveList`` cla
 
 .. code:: python
 
-  archive_list = opentok.list_archive()
+  archive_list = opentok.list_archives()
 
   # Get a specific Archive from the list
   archive = archive_list.items[i]

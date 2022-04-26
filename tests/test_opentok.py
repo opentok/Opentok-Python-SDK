@@ -10,11 +10,7 @@ from sure import expect
 import random
 import string
 
-import json
-
-import opentok
-from opentok import Client, OpenTok
-
+from opentok import Client
 
 class OpenTokTest(unittest.TestCase):  
     def setUp(self):

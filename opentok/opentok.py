@@ -1615,30 +1615,7 @@ class Client(object):
         }
 
         return jwt.encode(payload, self.api_secret, algorithm="HS256")
-
-
-
-class OpenTok(Client):
-    def __init__(
-        self,
-        api_key,
-        api_secret,
-        api_url="https://api.opentok.com",
-        timeout=None,
-        app_version=None,
-    ):
-        warnings.warn(
-            "OpenTok class is deprecated (Use Client class instead)",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        super(OpenTok, self).__init__(
-            api_key,
-            api_secret,
-            api_url=api_url,
-            timeout=timeout,
-            app_version=app_version
-        )
+        
 
     def mute_all(self,
                 session_id: str,
@@ -1755,7 +1732,7 @@ class OpenTok(Client):
         will join
 
         :param connection_id An optional parameter used to send the DTMF tones to a specific
-        connectoiin in a session.
+        connection in a session.
 
         :param digits DTMF digits to play
         Valid DTMF digits are 0-9, p, #, and * digits. 'p' represents a 500ms pause if a delay is
