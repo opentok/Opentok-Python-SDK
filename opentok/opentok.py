@@ -700,7 +700,7 @@ class Client(object):
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 
-    def get_archives(self, offset=None, count=None, session_id=None):
+    def list_archives(self, offset=None, count=None, session_id=None):
         """Returns an ArchiveList, which is an array of archives that are completed and in-progress,
         for your API key.
 
@@ -745,13 +745,6 @@ class Client(object):
             raise NotFoundError("Archive not found")
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
-
-    def list_archives(self, offset=None, count=None, session_id=None):
-        """
-        New method to get archive list, it's alternative to 'get_archives()',
-        both methods exist to have backwards compatible
-        """
-        return self.get_archives(offset, count, session_id)
 
     def add_archive_stream(
         self,

@@ -835,7 +835,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
             content_type=u("application/json"),
         )
 
-        archive_list = self.opentok.get_archives()
+        archive_list = self.opentok.list_archives()
 
         validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
         expect(httpretty.last_request().headers[u("user-agent")]).to(
@@ -907,7 +907,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
             content_type=u("application/json"),
         )
 
-        archive_list = self.opentok.get_archives(offset=3)
+        archive_list = self.opentok.list_archives(offset=3)
 
         validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
         expect(httpretty.last_request().headers[u("user-agent")]).to(
@@ -969,7 +969,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
             content_type=u("application/json"),
         )
 
-        archive_list = self.opentok.get_archives(count=2)
+        archive_list = self.opentok.list_archives(count=2)
 
         validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
         expect(httpretty.last_request().headers[u("user-agent")]).to(
@@ -1057,7 +1057,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
             content_type=u("application/json"),
         )
 
-        archive_list = self.opentok.get_archives(count=4, offset=2)
+        archive_list = self.opentok.list_archives(count=4, offset=2)
 
         validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
         expect(httpretty.last_request().headers[u("user-agent")]).to(
@@ -1078,7 +1078,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
     @httpretty.activate
     def test_find_archives_with_sessionid(self):
-        """ Test get_archives method using session_id parameter """
+        """ Test list_archives method using session_id parameter """
         httpretty.register_uri(
             httpretty.GET,
             u("https://api.opentok.com/v2/project/{0}/archive").format(self.api_key),
@@ -1148,7 +1148,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
             content_type=u("application/json"),
         )
 
-        archive_list = self.opentok.get_archives(session_id="SESSIONID")
+        archive_list = self.opentok.list_archives(session_id="SESSIONID")
 
         validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
         expect(httpretty.last_request().headers[u("user-agent")]).to(
@@ -1166,7 +1166,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
     @httpretty.activate
     def test_find_archives_with_offset_count_sessionId(self):
-        """ Test get_archives method using all parameters: offset, count and sessionId """
+        """ Test list_archives method using all parameters: offset, count and sessionId """
         httpretty.register_uri(
             httpretty.GET,
             u("https://api.opentok.com/v2/project/{0}/archive").format(self.api_key),
@@ -1210,7 +1210,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
             content_type=u("application/json"),
         )
 
-        archive_list = self.opentok.get_archives(
+        archive_list = self.opentok.list_archives(
             offset=2, count=2, session_id="SESSIONID"
         )
 
