@@ -1,6 +1,6 @@
 import json
 from enum import Enum
-from six import iteritems, u
+from six import u
 
 
 class Broadcast(object):

@@ -34,6 +34,7 @@ from .sip_call import SipCall
 from .broadcast import Broadcast, BroadcastStreamModes
 from .exceptions import (
     ArchiveStreamModeError,
+    BroadcastHLSOptionsError,
     BroadcastStreamModeError,
     OpenTokException,
     RequestError,
@@ -47,6 +48,7 @@ from .exceptions import (
     SetStreamClassError,
     BroadcastError,
     DTMFError
+
 )
 
 
@@ -1302,7 +1304,8 @@ class Client(object):
             If you include RTMP streaming, you can specify up to five target RTMP streams. For
             each RTMP stream, specify 'serverUrl' (the RTMP server URL), 'streamName' (the stream
             name, such as the YouTube Live stream name or the Facebook stream key), and
-            (optionally) 'id' (a unique ID for the stream)
+            (optionally) 'id' (a unique ID for the stream). You can optionally specify lowLatency or
+            DVR mode, but these options are mutually exclusive.
 
             String 'resolution' optional: The resolution of the broadcast, either "640x480"
             (SD, the default) or "1280x720" (HD)
@@ -1315,6 +1318,13 @@ class Client(object):
         :rtype A Broadcast object, which contains information of the broadcast: id, sessionId
         projectId, createdAt, updatedAt, resolution, status and broadcastUrls
         """
+
+        if options['outputs']['hls']:
+            if options['outputs']['hls']['lowLatency'] and options['outputs']['hls']['dvr']:
+                raise BroadcastHLSOptionsError(
+                    'HLS options "lowLatency" and "dvr" cannot both be set to "True".'
+                    )
+
         payload = {
                     "sessionId": session_id,
                     "streamMode": stream_mode.value
