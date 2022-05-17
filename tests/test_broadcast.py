@@ -8,6 +8,7 @@ from sure import expect
 from six import u, PY2, PY3
 from expects import *
 from opentok import Client, Broadcast, __version__, BroadcastError
+from opentok.exceptions import BroadcastHLSOptionsError
 from .validate_jwt import validate_jwt_header
 
 
@@ -653,3 +654,38 @@ class OpenTokBroadcastTest(unittest.TestCase):
             broadcast_id,
             "horizontalPresentation",
         )
+
+    def test_broadcast_hls_mutually_exclusive_options_error(self):
+        """
+        Test invalid options in start_broadcast() method raises a BroadcastHLSOptionsError.
+        """
+        
+        options = {
+            "layout": {
+                "type": "custom",
+                "stylesheet": "the layout stylesheet (only used with type == custom)",
+            },
+            "maxDuration": 5400,
+            "outputs": {
+                "hls": {
+                    "lowLatency": True,
+                    "dvr": True
+                    },
+                "rtmp": [
+                    {
+                        "id": "foo",
+                        "serverUrl": "rtmp://myfooserver/myfooapp",
+                        "streamName": "myfoostream",
+                    },
+                    {
+                        "id": "bar",
+                        "serverUrl": "rtmp://mybarserver/mybarapp",
+                        "streamName": "mybarstream",
+                    },
+                ],
+            },
+            "resolution": "640x480",
+        }
+
+        with self.assertRaises(BroadcastHLSOptionsError):
+            self.opentok.start_broadcast(self.session_id, options)

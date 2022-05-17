@@ -1318,12 +1318,13 @@ class Client(object):
         :rtype A Broadcast object, which contains information of the broadcast: id, sessionId
         projectId, createdAt, updatedAt, resolution, status and broadcastUrls
         """
-
-        if options['outputs']['hls']:
-            if options['outputs']['hls']['lowLatency'] and options['outputs']['hls']['dvr']:
-                raise BroadcastHLSOptionsError(
-                    'HLS options "lowLatency" and "dvr" cannot both be set to "True".'
-                    )
+        
+        if 'hls' in options['outputs']:
+            if 'lowLatency' in options['outputs']['hls'] and 'dvr' in options['outputs']['hls']:
+                if options['outputs']['hls']['lowLatency'] == True and options['outputs']['hls']['dvr'] == True:
+                    raise BroadcastHLSOptionsError(
+                        'HLS options "lowLatency" and "dvr" cannot both be set to "True".'
+                        )
 
         payload = {
                     "sessionId": session_id,
