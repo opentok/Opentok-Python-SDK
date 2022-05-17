@@ -1318,7 +1318,7 @@ class Client(object):
         :rtype A Broadcast object, which contains information of the broadcast: id, sessionId
         projectId, createdAt, updatedAt, resolution, status and broadcastUrls
         """
-        
+
         if 'hls' in options['outputs']:
             if 'lowLatency' in options['outputs']['hls'] and 'dvr' in options['outputs']['hls']:
                 if options['outputs']['hls']['lowLatency'] == True and options['outputs']['hls']['dvr'] == True:
@@ -1632,7 +1632,7 @@ class Client(object):
 
         In addition to existing streams, any streams that are published after the call to
         this method are published with audio muted. You can remove the mute state of a session
-        by calling the OpenTok.disableForceMute() method.
+        by calling the OpenTok.disable_force_mute() method.
 
         :param session_id The session ID
 
