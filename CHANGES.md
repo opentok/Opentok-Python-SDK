@@ -155,4 +155,4 @@ work with OpenTok 1.0 archives.)
 The `OpenTok.create_session()` method now includes a `media_mode` parameter, instead of a `p2p` parameter.
 
 For details, see the reference documentation at
-http://www.tokbox.com/opentok/libraries/server/python/reference/index.html.
+https://tokbox.com/developer/sdks/python/reference/.
