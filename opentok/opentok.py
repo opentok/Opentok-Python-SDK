@@ -1269,8 +1269,8 @@ class Client(object):
 
     def start_broadcast(self, session_id, options, stream_mode=BroadcastStreamModes.auto):
         """
-        Use this method to start a live streaming for an OpenTok session. This broadcasts the
-        session to an HLS (HTTP live streaming) or to RTMP streams. To successfully start
+        Use this method to start a live streaming broadcast for an OpenTok session. This broadcasts
+        the session to an HLS (HTTP live streaming) or to RTMP streams. To successfully start
         broadcasting a session, at least one client must be connected to the session. You can only
         start live streaming for sessions that use the OpenTok Media Router (with the media mode set
         to routed); you cannot use live streaming with sessions that have the media mode set to
