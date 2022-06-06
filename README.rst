@@ -418,6 +418,15 @@ The live streaming broadcast can target one HLS endpoint and up to five RTMP ser
 
   broadcast = opentok.start_broadcast(session_id, options)
 
+You can specify the following broadcast resolutions:
+
+* [default resolution] 640x480 (SD landscape)
+* 480x640 (SD portrait)
+* 1280x720 (HD landscape)
+* 720x1280 (HD portrait)
+* 1920x1080 (FHD landscape)
+* 1080x1920 (FHD portrait)
+
 You can stop a started Broadcast using the ``opentok.stop_broadcast(broadcast_id)`` method.
 
 .. code:: python
