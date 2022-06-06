@@ -420,7 +420,7 @@ The live streaming broadcast can target one HLS endpoint and up to five RTMP ser
 
 You can specify the following broadcast resolutions:
 
-* [default resolution] 640x480 (SD landscape)
+* 640x480 (SD landscape, default resolution)
 * 480x640 (SD portrait)
 * 1280x720 (HD landscape)
 * 720x1280 (HD portrait)
