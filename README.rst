@@ -161,11 +161,20 @@ To remove a stream from an archive, use the ``opentok.remove_archive_stream()`` 
 
 Composed archives (output_mode=OutputModes.composed) have an optional ``resolution`` parameter.
 If no value is supplied, the archive will use the default resolution, "640x480".
-You can set this to "1280x720" by setting the
+You can set this to another resolution by setting the
 ``resolution`` parameter of the ``opentok.start_archive()`` method.
 
+You can specify the following archive resolutions:
+
+* "640x480" (SD landscape, default resolution)
+* "480x640" (SD portrait)
+* "1280x720" (HD landscape)
+* "720x1280" (HD portrait)
+* "1920x1080" (FHD landscape)
+* "1080x1920" (FHD portrait)
+
 Setting the ``resolution`` parameter while setting the ``output_mode`` parameter to
-OutputModes.individual, results in an error.
+``OutputModes.individual`` results in an error.
 
 .. code:: python
 
