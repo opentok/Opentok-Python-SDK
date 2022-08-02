@@ -1765,3 +1765,158 @@ class Client(object):
         except Exception as e:
             raise OpenTokException(
                 (f"There was an error thrown by the OpenTok SDK, please check that your session_id: {session_id}, connection_id (if exists): {connection_id} and digits: {digits} are valid"))
+
+class OpenTok(Client):
+    def __init__(
+        self,
+        api_key,
+        api_secret,
+        api_url="https://api.opentok.com",
+        timeout=None,
+        app_version=None,
+    ):
+        warnings.warn(
+            "OpenTok class is deprecated (Use Client class instead)",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        super(OpenTok, self).__init__(
+            api_key,
+            api_secret,
+            api_url=api_url,
+            timeout=timeout,
+            app_version=app_version
+        )
+
+    def mute_all(self,
+                session_id: str,
+                excludedStreamIds: Optional[List[str]]) -> requests.Response:
+
+        """
+        Mutes all streams in an OpenTok session.
+        You can include an optional list of streams IDs to exclude from being muted.
+        In addition to existing streams, any streams that are published after the call to
+        this method are published with audio muted. You can remove the mute state of a session
+        by calling the OpenTok.disableForceMute() method.
+        :param session_id The session ID
+        :param excludedStreamIds A list of stream IDs for streams that should not be muted.
+        This is an optional property. If you omit this property, all streams in the session will be muted.
+        """
+
+        options = {}
+        url = self.endpoints.get_mute_all_url(session_id)
+
+        try:
+            if excludedStreamIds:
+                options = {'active': True, 'excludedStreams': excludedStreamIds }
+            else:
+                options = {'active': True, 'excludedStreams': []}
+
+            response = requests.post(url, headers=self.get_headers(), data=json.dumps(options))
+
+            if response:
+                return response
+            elif response.status_code == 400:
+                raise GetStreamError("Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.")
+            elif response.status_code == 403:
+                raise AuthError("Failed to mute, invalid credentials.")
+            elif response.status_code == 404:
+                raise NotFoundError("The session or a stream is not found.")
+        except Exception as e:
+            raise OpenTokException(
+                ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} and excludedStreamIds (if exists) {1} are valid").format(
+                    session_id, excludedStreamIds))
+
+
+    def disable_force_mute(self, session_id: str) -> requests.Response:
+        """
+        Disables the active mute state of the session. After you call this method, new streams
+        published to the session will no longer have audio muted.
+        After you call the mute_all() method, any streams published after
+        the call are published with audio muted. Call the OpenTok.disable_force_mute() method
+        to remove the mute state of a session, so that new published streams are not
+        automatically muted.
+        :param session_id The session ID.
+        """
+
+        options = {'active': False}
+        url = self.endpoints.get_mute_all_url(session_id)
+
+        response = requests.post(url, headers=self.get_headers(), data=json.dumps(options))
+
+
+        try:
+            if response:
+                    return response
+            elif response.status_code == 400:
+                raise GetStreamError("Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.")
+            elif response.status_code == 403:
+                raise AuthError("Failed to mute, invalid credentials.")
+            elif response.status_code == 404:
+                raise NotFoundError("The session or a stream is not found.")
+        except Exception as e:
+            raise OpenTokException(
+                ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} is valid").format(
+                    session_id))
+
+
+    def mute_stream(self, session_id: str, stream_id: str) -> requests.Response:
+        """
+        Mutes a single stream in an OpenTok session.
+        :param session_id The session ID.
+        :param stream_id The stream ID.
+        """
+
+        try:
+            if stream_id:
+                url = self.endpoints.get_stream_url(session_id, stream_id) + "/mute"
+
+            response = requests.post(url, headers=self.get_headers())
+
+            if response:
+                    return response
+            elif response.status_code == 400:
+                raise GetStreamError("Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.")
+            elif response.status_code == 403:
+                raise AuthError("Failed to mute, invalid credentials.")
+            elif response.status_code == 404:
+                raise NotFoundError("Mute not found")
+        except Exception as e:
+            raise OpenTokException(
+                ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} and stream_id {1} are valid").format(
+                    session_id, stream_id))
+
+
+    def play_dtmf(self, session_id: str, connection_id: str, digits: str, options: dict = {}) -> requests.Response:
+        """
+        Plays a DTMF string into a session or to a specific connection
+        :param session_id The ID of the OpenTok session that the participant being called
+        will join
+        :param connection_id An optional parameter used to send the DTMF tones to a specific
+        connectoiin in a session.
+        :param digits DTMF digits to play
+        Valid DTMF digits are 0-9, p, #, and * digits. 'p' represents a 500ms pause if a delay is
+        needed during the input process.
+        """
+
+        try:
+            if not connection_id:
+                url = self.endpoints.get_dtmf_all_url(session_id)
+                payload = {"digits": digits}
+            else:
+                url = self.endpoints.get_dtmf_specific_url(session_id, connection_id)
+                payload = {"digits": digits}
+
+            response = requests.post(url, headers=self.get_json_headers(), data=json.dumps(payload))
+
+            if response.status_code == 200:
+                return response
+            elif response.status_code == 400:
+                raise DTMFError("One of the properties digits, sessionId or connectionId is invalid.")
+            elif response.status_code == 403:
+                raise AuthError("Failed to create session, invalid credentials. Please check your OpenTok API Key or JSON web token")
+            elif response.status_code == 404:
+                raise NotFoundError("The session does not exists or the client specified by the connection_id is not connected to the session")
+        except Exception as e:
+            raise OpenTokException(
+                (f"There was an error thrown by the OpenTok SDK, please check that your session_id: {session_id}, connection_id (if exists): {connection_id} and digits: {digits} are valid"))
