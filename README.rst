@@ -160,6 +160,13 @@ Warning: This value cannot be set for Individual output mode, an error will be t
   # Store this archive_id in the database
   archive_id = archive.id
 
+You can enable multiple simultaneous archives by specifying a unique value for the ``multi_archive_tag`` 
+parameter in the ``start_archive`` method.
+
+.. code:: python
+
+  archive = opentok.start_archive(session_id, name=u'Important Presentation', multi_archive_tag='MyArchiveTag')
+
 You can stop the recording of a started Archive using the ``opentok.stop_archive(archive_id)``
 method. You can also do this using the ``archive.stop()`` method of an ``Archive`` instance.
 
@@ -381,6 +388,36 @@ The live streaming broadcast can target one HLS endpoint and up to five RTMP ser
 
   session_id = 'SESSIONID'
   options = {
+    'layout': {
+      'type': 'custom',
+      'stylesheet': 'the layout stylesheet (only used with type == custom)'
+    },
+    'maxDuration': 5400,
+    'outputs': {
+      'hls': {},
+      'rtmp': [{
+        'id': 'foo',
+        'serverUrl': 'rtmp://myfooserver/myfooapp',
+        'streamName': 'myfoostream'
+      }, {
+        'id': 'bar',
+        'serverUrl': 'rtmp://mybarserver/mybarapp',
+        'streamName': 'mybarstream'
+      }]
+    },
+    'resolution': '640x480'
+  }
+
+  broadcast = opentok.start_broadcast(session_id, options)
+
+To enable multiple simultaneous broadcasts on the same session, specify a unique value for the 
+``multiBroadcastTag`` parameter in ``options`` when calling the ``opentok.start_broadcast`` method.
+
+.. code:: python
+
+  session_id = 'SESSIONID'
+  options = {
+    'multiBroadcastTag': 'unique_broadcast_tag'
     'layout': {
       'type': 'custom',
       'stylesheet': 'the layout stylesheet (only used with type == custom)'

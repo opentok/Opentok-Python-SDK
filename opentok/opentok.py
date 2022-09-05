@@ -484,7 +484,8 @@ class Client(object):
         output_mode=OutputModes.composed,
         stream_mode=StreamModes.auto,
         resolution=None,
-        layout=None
+        layout=None,
+        multi_archive_tag=None
     ):
         """
         Starts archiving an OpenTok session.
@@ -535,6 +536,8 @@ class Client(object):
         StreamModes.manual to explicitly select streams to include in the the archive, using the
         OpenTok.add_archive_stream() and OpenTok.remove_archive_stream() methods.
 
+        :param String multi_archive_tag (Optional): If specified, triggers a new simultaneous archive on the session. 
+
         :rtype: The Archive object, which includes properties defining the archive,
           including the archive ID.
         """
@@ -559,7 +562,8 @@ class Client(object):
             "hasVideo": has_video,
             "outputMode": output_mode.value,
             "resolution": resolution,
-            "streamMode": stream_mode.value
+            "streamMode": stream_mode.value,
+            "multiArchiveTag": multi_archive_tag
         }
 
         if layout is not None:
@@ -1313,6 +1317,8 @@ class Client(object):
 
             String 'resolution' optional: The resolution of the broadcast, either "640x480"
             (SD, the default) or "1280x720" (HD)
+
+            String 'multiBroadcastTag' optional: If specified, triggers a new simultaneous broadcast on the session.
 
         :param BroadcastStreamModes stream_mode (Optional): Determines the broadcast stream handling mode.
         Set this to BroadcastStreamModes.auto (the default) to have streams added automatically. Set this to
