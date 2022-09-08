@@ -1,3 +1,4 @@
+from lib2to3.pgen2 import token
 import unittest
 import textwrap
 import httpretty
@@ -6,84 +7,49 @@ from sure import expect
 
 from six import u, PY2, PY3
 from expects import *
-from opentok import Client, Render, __version__,
+from opentok import Client, Render, __version__
 from .validate_jwt import validate_jwt_header
 
 
-class OpenTokBroadcastTest(unittest.TestCase):
+class OpenTokRenderTest(unittest.TestCase):
     def setUp(self):
         self.api_key = u("123456")
         self.api_secret = u("1234567890abcdef1234567890abcdef1234567890")
         self.opentok = Client(self.api_key, self.api_secret)
         self.session_id = u("2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4")
-        self.stream1 = "kjhk-09898-kjn"
-        self.stream2 = "jnn-99kjk-88734r"
+        self.token = u("1234-5678-9012")
+        self.render_id = u("80abaf0d-25a3-4efc-968f-6268d620668d")
 
     @httpretty.activate
-    def test_start_broadcast(self):
-        """
-        Test start_broadcast() method
-        """
+    def test_start_render(self):
         httpretty.register_uri(
             httpretty.POST,
-            u("https://api.opentok.com/v2/project/{0}/broadcast").format(self.api_key),
+            u("https://api.opentok.com/v2/project/{0}/render").format(self.api_key),
             body=textwrap.dedent(
                 u(
                     """\
                         {
-                            "id": "1748b7070a81464c9759c46ad10d3734",
+                            "id": "1248e7070b81464c9789f46ad10e7764",
                             "sessionId": "2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4",
-                            "projectId": 100,
+                            "projectId": "e2343f23456g34709d2443a234",
                             "createdAt": 1437676551000,
                             "updatedAt": 1437676551000,
-                            "resolution": "640x480",
+                            "url": "https://webapp.customer.com",
+                            "resolution": "1280x720",
                             "status": "started",
-                            "broadcastUrls": {
-                                "hls" : "http://server/fakepath/playlist.m3u8",
-                                "rtmp": {
-                                    "foo": {
-                                        "serverUrl": "rtmp://myfooserver/myfooapp",
-                                        "streamName": "myfoostream"
-                                    },
-                                    "bar": {
-                                        "serverUrl": "rtmp://mybarserver/mybarapp",
-                                        "streamName": "mybarstream"
-                                    }
-                                }
-                            }
+                            "streamId": "e32445b743678c98230f238" 
                         }
                     """
                 )
             ),
-            status=200,
+            status=202,
             content_type=u("application/json"),
         )
 
-        options = {
-            "layout": {
-                "type": "custom",
-                "stylesheet": "the layout stylesheet (only used with type == custom)",
-            },
-            "maxDuration": 5400,
-            "outputs": {
-                "hls": {},
-                "rtmp": [
-                    {
-                        "id": "foo",
-                        "serverUrl": "rtmp://myfooserver/myfooapp",
-                        "streamName": "myfoostream",
-                    },
-                    {
-                        "id": "bar",
-                        "serverUrl": "rtmp://mybarserver/mybarapp",
-                        "streamName": "mybarstream",
-                    },
-                ],
-            },
-            "resolution": "640x480",
-        }
+        url = "https://webapp.customer.com"
 
-        broadcast = self.opentok.start_broadcast(self.session_id, options)
+        render = self.opentok.start_render(self.session_id, self.token, url)
+        
         validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
@@ -98,98 +64,18 @@ class OpenTokBroadcastTest(unittest.TestCase):
         if PY3:
             body = json.loads(httpretty.last_request().body.decode("utf-8"))
 
-        expect(body).to(have_key(u("layout")))
-        expect(broadcast).to(be_an(Broadcast))
-        expect(broadcast).to(
-            have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734"))
+        expect(body).to(have_key(u("token")))
+        expect(render).to(be_a(Render))
+        expect(render).to(
+            have_property(u("id"), u("1248e7070b81464c9789f46ad10e7764"))
         )
-        expect(broadcast).to(
+        expect(render).to(
             have_property(u("sessionId"), u("2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4"))
         )
-        expect(broadcast).to(have_property(u("projectId"), 100))
-        expect(broadcast).to(have_property(u("createdAt"), 1437676551000))
-        expect(broadcast).to(have_property(u("updatedAt"), 1437676551000))
-        expect(broadcast).to(have_property(u("resolution"), u("640x480")))
-        expect(broadcast).to(have_property(u("status"), u("started")))
-        expect(list(broadcast.broadcastUrls)).to(have_length(2))
-        expect(list(broadcast.broadcastUrls["rtmp"])).to(have_length(2))
-
-    @httpretty.activate
-    def test_start_broadcast_only_one_rtmp(self):
-        """
-        Test start_broadcast() method with only one rtmp
-        """
-        httpretty.register_uri(
-            httpretty.POST,
-            u("https://api.opentok.com/v2/project/{0}/broadcast").format(self.api_key),
-            body=textwrap.dedent(
-                u(
-                    """\
-                        {
-                            "id": "1748b7070a81464c9759c46ad10d3734",
-                            "sessionId": "2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4",
-                            "projectId": 100,
-                            "createdAt": 1437676551000,
-                            "updatedAt": 1437676551000,
-                            "resolution": "640x480",
-                            "status": "started",
-                            "broadcastUrls": {
-                                "hls" : "http://server/fakepath/playlist.m3u8",
-                                "rtmp": {
-                                    "foo": {
-                                        "serverUrl": "rtmp://myfooserver/myfooapp",
-                                        "streamName": "myfoostream"
-                                    },
-                                    "bar": {
-                                        "serverUrl": "rtmp://mybarserver/mybarapp",
-                                        "streamName": "mybarstream"
-                                    }
-                                }
-                            }
-                        }
-                    """
-                )
-            ),
-            status=200,
-            content_type=u("application/json"),
-        )
-
-        options = {
-            "sessionId": "2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ",
-            "layout": {
-                "type": "custom",
-                "stylesheet": "the layout stylesheet (only used with type == custom)",
-            },
-            "maxDuration": 5400,
-            "outputs": {
-                "rtmp": {
-                    "id": "my-id",
-                    "serverUrl": "rtmp://myserver/myapp",
-                    "streamName": "my-stream-name",
-                }
-            },
-            "resolution": "640x480",
-        }
-
-        broadcast = self.opentok.start_broadcast(self.session_id, options)
-        validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
-        expect(httpretty.last_request().headers[u("user-agent")]).to(
-            contain(u("OpenTok-Python-SDK/") + __version__)
-        )
-        expect(httpretty.last_request().headers[u("content-type")]).to(
-            equal(u("application/json"))
-        )
-        expect(broadcast).to(be_an(Broadcast))
-        expect(broadcast).to(
-            have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734"))
-        )
-        expect(broadcast).to(
-            have_property(u("sessionId"), u("2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4"))
-        )
-        expect(broadcast).to(have_property(u("projectId"), 100))
-        expect(broadcast).to(have_property(u("createdAt"), 1437676551000))
-        expect(broadcast).to(have_property(u("updatedAt"), 1437676551000))
-        expect(broadcast).to(have_property(u("resolution"), u("640x480")))
-        expect(broadcast).to(have_property(u("status"), u("started")))
-        expect(list(broadcast.broadcastUrls)).to(have_length(2))
-        expect(list(broadcast.broadcastUrls["rtmp"])).to(have_length(2))
+        expect(render).to(have_property(u("projectId"), u("e2343f23456g34709d2443a234")))
+        expect(render).to(have_property(u("createdAt"), 1437676551000))
+        expect(render).to(have_property(u("updatedAt"), 1437676551000))
+        expect(render).to(have_property(u("resolution"), u("1280x720")))
+        expect(render).to(have_property(u("status"), u("started")))
+        expect(render).to(have_property(u("streamId"), u("e32445b743678c98230f238")))
+    

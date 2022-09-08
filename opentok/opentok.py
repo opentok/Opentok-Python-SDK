@@ -1640,7 +1640,7 @@ class Client(object):
         )
 
         if response and response.status_code == 202:
-            return Render(self, response.json())
+            return Render(response.json())
         elif response.status_code == 400:
             """
             The HTTP response has a 400 status code in the following cases:
