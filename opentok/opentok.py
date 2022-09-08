@@ -28,7 +28,7 @@ from .version import __version__
 from .endpoints import Endpoints
 from .session import Session
 from .archives import Archive, ArchiveList, OutputModes, StreamModes
-from .render import Render
+from .render import Render, RenderList
 from .stream import Stream
 from .streamlist import StreamList
 from .sip_call import SipCall
@@ -1709,7 +1709,7 @@ class Client(object):
         )
 
         if response.status_code == 200:
-            return "Render has been stopped successfully."
+            return response
         elif response.status_code == 400:
             raise RequestError(
                 "Invalid request. This response may indicate that data in your request is invalid JSON. Or it may indicate that you do not pass in a session ID."
@@ -1740,7 +1740,7 @@ class Client(object):
         )
 
         response = requests.get(
-            self.endpoints.get_render_url() + "&count:",
+            self.endpoints.get_render_url(),
             headers=self.get_headers(),
             params=query_params,
             proxies=self.proxies,
@@ -1748,15 +1748,13 @@ class Client(object):
         )
 
         if response.status_code == 200:
-            return Render(response.json())
+            return RenderList(self, response.json())
         elif response.status_code == 400:
             raise RequestError(
                 "Invalid request. This response may indicate that data in your request is invalid JSON. Or it may indicate that you do not pass in a session ID."
             )
         elif response.status_code == 403:
             raise AuthError("You passed in an invalid OpenTok API key or JWT token.")
-        elif response.status_code == 404:
-            raise NotFoundError("No render matching the specified render ID was found.")
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 
