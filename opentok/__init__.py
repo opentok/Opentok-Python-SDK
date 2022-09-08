@@ -14,3 +14,4 @@ from .stream import Stream
 from .streamlist import StreamList
 from .sip_call import SipCall
 from .broadcast import Broadcast, BroadcastStreamModes
+from .render import Render

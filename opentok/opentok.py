@@ -28,6 +28,7 @@ from .version import __version__
 from .endpoints import Endpoints
 from .session import Session
 from .archives import Archive, ArchiveList, OutputModes, StreamModes
+from .render import Render
 from .stream import Stream
 from .streamlist import StreamList
 from .sip_call import SipCall
@@ -1598,6 +1599,166 @@ class Client(object):
             raise AuthError("Authentication error.")
         else:
             raise RequestError("OpenTok server error.", response.status_code)
+
+    def start_render(self, session_id, opentok_token, url, max_duration=7200, resolution="1280x720", status_callback_url=None, properties: dict = None):
+        """
+        This method starts a render for the specified session.
+
+        :param String 'session_id': The ID of a session (generated with the same `APIKEY` as specified in the URL) which you wish to start rendering into.
+        :param String 'token': A valid OpenTok token with a Publisher role and (optionally) connection data to be associated with the output stream.
+        :param String 'url': A publically reachable URL controlled by the customer and capable of generating the content to be rendered without user intervention.
+        :param Integer 'maxDuration' Optional: The maximum time allowed for the Render, in seconds. After this time, the Render will be stopped automatically, if it is still running.
+        :param String 'resolution' Optional: Resolution of the display area for the composition.
+        :param String 'statusCallbackUrl' Optional: URL of the customer service where the callbacks will be received. 
+        :param Dictionary 'properties' Optional: Initial configuration of Publisher properties for the composed output stream.
+            String name Optional: The name of the composed output stream which will be published to the session.
+        """
+        payload = {
+            "sessionId": session_id,
+            "token": opentok_token,
+            "url": url,
+            "maxDuration": max_duration,
+            "resolution": resolution,
+            "statusCallbackUrl": status_callback_url,
+            "properties": properties
+        }
+
+        logger.debug(
+            "POST to %r with params %r, headers %r, proxies %r",
+            self.endpoints.get_render_url(),
+            json.dumps(payload),
+            self.get_json_headers(),
+            self.proxies,
+        )
+
+        response = requests.post(
+            self.endpoints.get_render_url(),
+            json=payload,
+            headers=self.get_json_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout,
+        )
+
+        if response and response.status_code == 202:
+            return Render(self, response.json())
+        elif response.status_code == 400:
+            """
+            The HTTP response has a 400 status code in the following cases:
+            You do not pass in a session ID or you pass in an invalid session ID.
+            You specify an invalid value for input parameters.
+            """
+            raise RequestError(response.json().get("message"))
+        elif response.status_code == 403:
+            raise AuthError("You passed in an invalid OpenTok API key or JWT token.")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+
+    def get_render_status(self, render_id):
+        """
+        This method allows you to see the status of a render, which can be one of the following:
+            ['starting', 'started', 'stopped', 'failed']
+
+        :param String 'render_id': The ID of a specific render. 
+        """
+        logger.debug(
+            "GET to %r with headers %r, proxies %r",
+            self.endpoints.get_render_url(render_id=render_id),
+            self.get_json_headers(),
+            self.proxies,
+        )
+
+        response = requests.get(
+            self.endpoints.get_render_url(render_id=render_id),
+            headers=self.get_json_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout,
+        )
+
+        if response.status_code == 200:
+            return Render(response.json())
+        elif response.status_code == 400:
+            raise RequestError(
+                "Invalid request. This response may indicate that data in your request is invalid JSON. Or it may indicate that you do not pass in a session ID."
+            )
+        elif response.status_code == 403:
+            raise AuthError("You passed in an invalid OpenTok API key or JWT token.")
+        elif response.status_code == 404:
+            raise NotFoundError("No render matching the specified render ID was found.")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+    def stop_render(self, render_id):
+        """
+        This method stops a render.
+
+        :param String 'render_id': The ID of a specific render. 
+        """
+        logger.debug(
+            "DELETE to %r with headers %r, proxies %r",
+            self.endpoints.get_render_url(render_id=render_id),
+            self.get_headers(),
+            self.proxies,
+        )
+
+        response = requests.delete(
+            self.endpoints.get_render_url(render_id=render_id),
+            headers=self.get_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout,
+        )
+
+        if response.status_code == 200:
+            return "Render has been stopped successfully."
+        elif response.status_code == 400:
+            raise RequestError(
+                "Invalid request. This response may indicate that data in your request is invalid JSON. Or it may indicate that you do not pass in a session ID."
+            )
+        elif response.status_code == 403:
+            raise AuthError("You passed in an invalid OpenTok API key or JWT token.")
+        elif response.status_code == 404:
+            raise NotFoundError("No render matching the specified render ID was found.")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+    def list_renders(self, offset=0, count=50):
+        """
+        List existing renders associated with the project's API key.
+
+        :param Integer 'offset' Optional: Start offset in the list of existing renders.
+        :param Integer 'count' Optional: Number of renders to retrieve, starting at 'offset'. 
+        """
+
+        query_params = {"offset": offset, "count": count}
+
+        logger.debug(
+            "GET to %r with headers %r, params %r, proxies %r",
+            self.endpoints.get_render_url(),
+            self.get_headers(),
+            query_params,
+            self.proxies,
+        )
+
+        response = requests.get(
+            self.endpoints.get_render_url() + "&count:",
+            headers=self.get_headers(),
+            params=query_params,
+            proxies=self.proxies,
+            timeout=self.timeout,
+        )
+
+        if response.status_code == 200:
+            return Render(response.json())
+        elif response.status_code == 400:
+            raise RequestError(
+                "Invalid request. This response may indicate that data in your request is invalid JSON. Or it may indicate that you do not pass in a session ID."
+            )
+        elif response.status_code == 403:
+            raise AuthError("You passed in an invalid OpenTok API key or JWT token.")
+        elif response.status_code == 404:
+            raise NotFoundError("No render matching the specified render ID was found.")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
 
     def _sign_string(self, string, secret):
         return hmac.new(
