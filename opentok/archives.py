@@ -4,6 +4,8 @@ import json
 import pytz
 from enum import Enum
 
+from .exceptions import ArchiveError
+
 if PY3:
     from datetime import timezone
 
