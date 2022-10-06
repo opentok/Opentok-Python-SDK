@@ -31,7 +31,8 @@ install_requires = [
     'requests',
     'six',
     'pytz',
-    'python-jose'
+    'python-jose',
+    'rsa>=4.7'
 ]
 
 setup(
