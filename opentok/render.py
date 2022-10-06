@@ -2,7 +2,7 @@ import json
 from six import iteritems
 
 class Render:
-    """Represents a render of an OpenTok session."""
+    """Represents an Experience Composer render of an OpenTok session."""
 
     def __init__(self, kwargs):
         self.id = kwargs.get("id")
