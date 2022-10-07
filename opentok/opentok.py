@@ -1324,7 +1324,11 @@ class Client(object):
             String 'resolution' optional: The resolution of the broadcast, either "640x480"
             (SD, the default) or "1280x720" (HD)
 
-            String 'multiBroadcastTag' optional: If specified, triggers a new simultaneous broadcast on the session.
+            String 'multiBroadcastTag' optional: Set this to support multiple broadcasts for the same session simultaneously. 
+            Set this to a unique string for each simultaneous broadcast of an ongoing session. 
+            Note that the multiBroadcastTag value is not included in the response for the methods to list live streaming 
+            broadcasts and get information about a live streaming broadcast. 
+            For more information, see https://tokbox.com/developer/guides/broadcast/live-streaming#simultaneous-broadcasts. 
 
         :param BroadcastStreamModes stream_mode (Optional): Determines the broadcast stream handling mode.
         Set this to BroadcastStreamModes.auto (the default) to have streams added automatically. Set this to
