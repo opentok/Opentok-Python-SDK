@@ -106,7 +106,7 @@ class OpenTokRenderTest(unittest.TestCase):
             content_type=u("application/json"),
         )
 
-        render = self.opentok.get_render_status(self.render_id)
+        render = self.opentok.get_render(self.render_id)
         
         validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
         expect(httpretty.last_request().headers[u("user-agent")]).to(
