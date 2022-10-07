@@ -1602,16 +1602,17 @@ class Client(object):
 
     def start_render(self, session_id, opentok_token, url, max_duration=7200, resolution="1280x720", status_callback_url=None, properties: dict = None):
         """
-        This method starts a render for the specified session.
+        Starts an Experience Composer for the specified OpenTok session.
+        For more information, see the
+       `Experience Composer developer guide <https://tokbox.com/developer/guides/experience-composer>`_.
 
-        :param String 'session_id': The ID of a session (generated with the same `APIKEY` as specified in the URL) which you wish to start rendering into.
+        :param String 'session_id': The session ID of the OpenTok session that will include the Experience Composer stream.
         :param String 'token': A valid OpenTok token with a Publisher role and (optionally) connection data to be associated with the output stream.
         :param String 'url': A publically reachable URL controlled by the customer and capable of generating the content to be rendered without user intervention.
-        :param Integer 'maxDuration' Optional: The maximum time allowed for the Render, in seconds. After this time, the Render will be stopped automatically, if it is still running.
-        :param String 'resolution' Optional: Resolution of the display area for the composition.
-        :param String 'statusCallbackUrl' Optional: URL of the customer service where the callbacks will be received. 
+        :param Integer 'maxDuration' Optional: The maximum time allowed for the Experience Composer, in seconds. After this time, it is stopped automatically, if it is still running. The maximum value is 36000 (10 hours), the minimum value is 60 (1 minute), and the default value is 7200 (2 hours). When the Experience Composer ends, its stream is unpublished and an event is posted to the callback URL, if configured in the Account Portal.
+        :param String 'resolution' Optional: The resolution of the Experience Composer, either "640x480" (SD landscape), "480x640" (SD portrait), "1280x720" (HD landscape), "720x1280" (HD portrait), "1920x1080" (FHD landscape), or "1080x1920" (FHD portrait). By default, this resolution is "1280x720" (HD landscape, the default).
         :param Dictionary 'properties' Optional: Initial configuration of Publisher properties for the composed output stream.
-            String name Optional: The name of the composed output stream which will be published to the session.
+            String name Optional: The name of the composed output stream which will be published to the session. The name must have a minimum length of 1 and a maximum length of 200.
         """
         payload = {
             "sessionId": session_id,
@@ -1619,7 +1620,6 @@ class Client(object):
             "url": url,
             "maxDuration": max_duration,
             "resolution": resolution,
-            "statusCallbackUrl": status_callback_url,
             "properties": properties
         }
 
@@ -1654,7 +1654,7 @@ class Client(object):
             raise RequestError("An unexpected error occurred", response.status_code)
 
 
-    def get_render_status(self, render_id):
+    def get_render(self, render_id):
         """
         This method allows you to see the status of a render, which can be one of the following:
             ['starting', 'started', 'stopped', 'failed']
