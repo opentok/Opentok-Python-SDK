@@ -108,6 +108,15 @@ class Archive(object):
        "available"; for other archives, (including archives with the status "uploaded") this property is
        set to null. The download URL is obfuscated, and the file is only available from the URL for
        10 minutes. To generate a new URL, call the Archive.listArchives() or OpenTok.getArchive() method.
+
+    :ivar multi_archive_tag:
+        Set this to support recording multiple archives for the same session simultaneously. 
+        Set this to a unique string for each simultaneous archive of an ongoing session. 
+        You must also set this option when manually starting an archive that is automatically archived. 
+        Note that the multiArchiveTag value is not included in the response for the methods to list archives and 
+        retrieve archive information. If you do not specify a unique multi_archive_tag, you can only record one archive 
+        at a time for a given session. 
+        For more information, see simultaneous archives: https://tokbox.com/developer/guides/archiving/#simultaneous-archives. 
     """
 
     def __init__(self, sdk, values):

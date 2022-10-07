@@ -536,7 +536,13 @@ class Client(object):
         StreamModes.manual to explicitly select streams to include in the the archive, using the
         OpenTok.add_archive_stream() and OpenTok.remove_archive_stream() methods.
 
-        :param String multi_archive_tag (Optional): If specified, triggers a new simultaneous archive on the session. 
+        :param String multi_archive_tag (Optional): Set this to support recording multiple archives for the same 
+        session simultaneously. Set this to a unique string for each simultaneous archive of an ongoing session. 
+        You must also set this option when manually starting an archive that is automatically archived. 
+        Note that the multiArchiveTag value is not included in the response for the methods to list archives and 
+        retrieve archive information. If you do not specify a unique multi_archive_tag, you can only record one archive 
+        at a time for a given session. 
+        For more information, see simultaneous archives: https://tokbox.com/developer/guides/archiving/#simultaneous-archives. 
 
         :rtype: The Archive object, which includes properties defining the archive,
           including the archive ID.
