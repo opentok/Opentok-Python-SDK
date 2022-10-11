@@ -982,6 +982,8 @@ class Client(object):
 
         if response.status_code == 200:
             return StreamList(response.json())
+        elif response.status_code == 404
+            return StreamList({"count": 0, "items": []})
         elif response.status_code == 400:
             raise GetStreamError(
                 "Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID."
