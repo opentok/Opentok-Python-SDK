@@ -11,7 +11,7 @@ test:
 	nosetests -v
 
 dist:
-	python setup.py sdist --formats zip,gztar bdist_wheel
+	python setup.py sdist --formats gztar bdist_wheel
 
 release:
 	twine upload dist/*
