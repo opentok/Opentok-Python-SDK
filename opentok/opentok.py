@@ -1001,6 +1001,8 @@ class Client(object):
             )
         elif response.status_code == 403:
             raise AuthError("You passed in an invalid OpenTok API key or JWT token.")
+        elif response.status_code == 404:
+            return StreamList({"count": 0, "items": []})
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 
