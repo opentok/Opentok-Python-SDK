@@ -538,11 +538,13 @@ You can dynamically change the layout type of a live streaming broadcast.
 You can add streams to a broadcast using the ``opentok.add_broadcast_stream()`` method:
 
 .. code:: python
+
   opentok.add_broadcast_stream(broadcast_id, stream_id)
 
 Conversely, streams can be removed from a broadcast with the ``opentok.remove_broadcast_stream()`` method.
 
 .. code:: python
+
   opentok.remove_broadcast_stream(broadcast_id, stream_id)
 
 For more information about OpenTok live streaming broadcasts, see the
@@ -569,6 +571,7 @@ Muting streams
 You can mute all streams in a session using the ``opentok.mute_all()`` method:
 
 .. code:: python
+
   opentok.mute_all(session_id)
 
   # You can also specify streams to exclude (e.g. main presenter)
@@ -580,6 +583,7 @@ this method are published with audio muted. You can remove the mute state of a s
 by calling the ``opentok.disableForceMute()`` method:
 
 .. code:: python
+
   opentok.disable_force_mute(session_id)
 
 After calling the ``opentok.disableForceMute()`` method, new streams that are published
@@ -588,6 +592,7 @@ to the session will not be muted.
 You can mute a single stream using the ``opentok.mute_stream()`` method:
 
 .. code:: python
+
   opentok.mute_stream(session_id, stream_id)
 
 DTMF
@@ -597,6 +602,7 @@ You can send dual-tone multi-frequency (DTMF) digits to SIP endpoints. You can p
 to all clients connected to session or to a specific connection:
 
 .. code:: python
+  
   digits = '12345'
   opentok.play_dtmf(session_id, digits)
 
