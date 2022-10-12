@@ -1,3 +1,11 @@
+# Release v3.3.0
+
+- Support for Experience Composer (Render) API
+- Support for multiple archives and broadcasts in the `start_archive` and `start_broadcast` methods
+- Support for low latency and DVR modes
+- Documented more methods in README
+- Updated some out-of-date dependencies
+
 # Release v3.2.0
 
 ## Added

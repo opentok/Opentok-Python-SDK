@@ -3,7 +3,7 @@ from six import text_type, u, b, PY2, PY3
 from nose.tools import raises
 from expects import *
 
-from opentok import OpenTok, __version__
+from opentok import Client, __version__
 import time
 from jose import jwt
 
@@ -15,7 +15,7 @@ class JwtCustomClaimsTest(unittest.TestCase):
         self.session_id = u(
             "1_MX4xMjM0NTZ-flNhdCBNYXIgMTUgMTQ6NDI6MjMgUERUIDIwMTR-MC40OTAxMzAyNX4"
         )
-        self.opentok = OpenTok(self.api_key, self.api_secret)
+        self.opentok = Client(self.api_key, self.api_secret)
 
     def test_livetime_custom_claim(self):
         self.opentok.jwt_livetime = 5  # Token will expire 5 minutes in the future

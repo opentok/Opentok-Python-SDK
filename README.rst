@@ -146,12 +146,35 @@ streams in the session to individual files (instead of a single composed file) b
   # Store this archive_id in the database
   archive_id = archive.id
 
+To add an individual stream to an archive, use the
+``opentok.add_archive_stream(archive_id, stream_id, has_audio, has_video)`` method:
+
+.. code:: python
+
+  opentok.add_archive_stream(archive.id, stream_id, has_audio=True, has_video=True)
+
+To remove a stream from an archive, use the ``opentok.remove_archive_stream()`` method:
+
+.. code:: python
+
+  opentok.remove_archive_stream(archive.id, stream_id)
+
 Composed archives (output_mode=OutputModes.composed) have an optional ``resolution`` parameter.
-If no value is supplied the opentok platform will use the default resolution "640x480".
-You can set this to "1280x720" by setting the
+If no value is supplied, the archive will use the default resolution, "640x480".
+You can set this to another resolution by setting the
 ``resolution`` parameter of the ``opentok.start_archive()`` method.
 
-Warning: This value cannot be set for Individual output mode, an error will be thrown.
+You can specify the following archive resolutions:
+
+* "640x480" (SD landscape, default resolution)
+* "480x640" (SD portrait)
+* "1280x720" (HD landscape)
+* "720x1280" (HD portrait)
+* "1920x1080" (FHD landscape)
+* "1080x1920" (FHD portrait)
+
+Setting the ``resolution`` parameter while setting the ``output_mode`` parameter to
+``OutputModes.individual`` results in an error.
 
 .. code:: python
 
@@ -160,8 +183,15 @@ Warning: This value cannot be set for Individual output mode, an error will be t
   # Store this archive_id in the database
   archive_id = archive.id
 
-You can stop the recording of a started Archive using the ``opentok.stop_archive(archive_id)``
-method. You can also do this using the ``archive.stop()`` method of an ``Archive`` instance.
+You can enable multiple simultaneous archives by specifying a unique value for the ``multi_archive_tag`` 
+parameter in the ``start_archive`` method.
+
+.. code:: python
+
+  archive = opentok.start_archive(session_id, name=u'Important Presentation', multi_archive_tag='MyArchiveTag')
+
+You can stop the recording of a started Archive using the ``opentok.stop_archive(archive_id)``method. 
+You can also do this using the ``archive.stop()`` method of an ``Archive`` instance.
 
 .. code:: python
 
@@ -195,7 +225,7 @@ filter by session ID. This method returns an instance of the ``ArchiveList`` cla
 
 .. code:: python
 
-  archive_list = opentok.list_archive()
+  archive_list = opentok.list_archives()
 
   # Get a specific Archive from the list
   archive = archive_list.items[i]
@@ -371,7 +401,8 @@ Working with Broadcasts
 
 OpenTok broadcast lets you share live OpenTok sessions with many viewers.
 
-You can use the ``opentok.start_broadcast()`` method to start a live streaming for an OpenTok session. This broadcasts the session to an HLS (HTTP live streaming) or to RTMP streams.
+You can use the ``opentok.start_broadcast()`` method to start a live stream for an OpenTok session.
+This broadcasts the session to HLS (HTTP live streaming) or to RTMP streams.
 
 To successfully start broadcasting a session, at least one client must be connected to the session.
 
@@ -402,6 +433,45 @@ The live streaming broadcast can target one HLS endpoint and up to five RTMP ser
   }
 
   broadcast = opentok.start_broadcast(session_id, options)
+
+You can specify the following broadcast resolutions:
+
+* "640x480" (SD landscape, default resolution)
+* "480x640" (SD portrait)
+* "1280x720" (HD landscape)
+* "720x1280" (HD portrait)
+* "1920x1080" (FHD landscape)
+* "1080x1920" (FHD portrait)
+
+.. code:: python
+
+  session_id = 'SESSIONID'
+  options = {
+    'multiBroadcastTag': 'unique_broadcast_tag'
+    'layout': {
+      'type': 'custom',
+      'stylesheet': 'the layout stylesheet (only used with type == custom)'
+    },
+    'maxDuration': 5400,
+    'outputs': {
+      'hls': {},
+      'rtmp': [{
+        'id': 'foo',
+        'serverUrl': 'rtmp://myfooserver/myfooapp',
+        'streamName': 'myfoostream'
+      }, {
+        'id': 'bar',
+        'serverUrl': 'rtmp://mybarserver/mybarapp',
+        'streamName': 'mybarstream'
+      }]
+    },
+    'resolution': '640x480'
+  }
+
+  broadcast = opentok.start_broadcast(session_id, options)
+  
+To enable multiple simultaneous broadcasts on the same session, specify a unique value for the 
+``multiBroadcastTag`` parameter in ``options`` when calling the ``opentok.start_broadcast`` method.
 
 You can stop a started Broadcast using the ``opentok.stop_broadcast(broadcast_id)`` method.
 
@@ -465,6 +535,16 @@ You can dynamically change the layout type of a live streaming broadcast.
       'stream.instructor {position: absolute; width: 100%;  height:50%;}'
   )
 
+You can add streams to a broadcast using the ``opentok.add_broadcast_stream()`` method:
+
+.. code:: python
+  opentok.add_broadcast_stream(broadcast_id, stream_id)
+
+Conversely, streams can be removed from a broadcast with the ``opentok.remove_broadcast_stream()`` method.
+
+.. code:: python
+  opentok.remove_broadcast_stream(broadcast_id, stream_id)
+
 For more information about OpenTok live streaming broadcasts, see the
 `Broadcast developer guide <https://tokbox.com/developer/guides/broadcast/>`_.
 
@@ -483,6 +563,46 @@ And then proceed to change the value with
 
 ``opentok.timeout = value``
 
+Muting streams
+--------------
+
+You can mute all streams in a session using the ``opentok.mute_all()`` method:
+
+.. code:: python
+  opentok.mute_all(session_id)
+
+  # You can also specify streams to exclude (e.g. main presenter)
+  excluded_stream_ids = ['1234', '5678']
+  opentok.mute_all(session_id, excluded_stream_ids)
+
+In addition to existing streams, any streams that are published after the call to
+this method are published with audio muted. You can remove the mute state of a session
+by calling the ``opentok.disableForceMute()`` method:
+
+.. code:: python
+  opentok.disable_force_mute(session_id)
+
+After calling the ``opentok.disableForceMute()`` method, new streams that are published
+to the session will not be muted.
+
+You can mute a single stream using the ``opentok.mute_stream()`` method:
+
+.. code:: python
+  opentok.mute_stream(session_id, stream_id)
+
+DTMF
+------
+
+You can send dual-tone multi-frequency (DTMF) digits to SIP endpoints. You can play DTMF tones
+to all clients connected to session or to a specific connection:
+
+.. code:: python
+  digits = '12345'
+  opentok.play_dtmf(session_id, digits)
+
+  # To a specific connection
+  opentok.play_dtmf(session_id, connection_id, digits)
+
 Samples
 -------
 
@@ -495,7 +615,7 @@ repository and follow the Walkthroughs:
 Documentation
 -------------
 
-Reference documentation is available at http://www.tokbox.com/opentok/libraries/server/python/reference/index.html.
+Reference documentation is available at https://tokbox.com/developer/sdks/python/reference/.
 
 Requirements
 ------------
@@ -532,7 +652,7 @@ The Client.create_session() method now includes a media_mode parameter, instead 
 This version of the SDK includes significant improvements such as top level entity naming, where the Opentok class is now `Client`.  We also implemented a standardised logging module, improved naming conventions and JWT generation to make developer experience more rewarding.
 
 For details, see the reference documentation at
-http://www.tokbox.com/opentok/libraries/server/python/reference/index.html.
+https://tokbox.com/developer/sdks/python/reference/.
 
 Development and Contributing
 ----------------------------

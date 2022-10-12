@@ -200,3 +200,11 @@ class Endpoints(object):
         )
 
         return url
+
+    def get_render_url(self, render_id: str = None):
+        "Returns URLs for working with the Render API."""
+        url = self.api_url + "/v2/project/" + self.api_key + "/render"
+        if render_id:
+            url += "/" + render_id
+
+        return url

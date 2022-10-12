@@ -28,12 +28,14 @@ from .version import __version__
 from .endpoints import Endpoints
 from .session import Session
 from .archives import Archive, ArchiveList, OutputModes, StreamModes
+from .render import Render, RenderList
 from .stream import Stream
 from .streamlist import StreamList
 from .sip_call import SipCall
 from .broadcast import Broadcast, BroadcastStreamModes
 from .exceptions import (
     ArchiveStreamModeError,
+    BroadcastHLSOptionsError,
     BroadcastStreamModeError,
     OpenTokException,
     RequestError,
@@ -47,6 +49,7 @@ from .exceptions import (
     SetStreamClassError,
     BroadcastError,
     DTMFError
+
 )
 
 
@@ -484,7 +487,8 @@ class Client(object):
         output_mode=OutputModes.composed,
         stream_mode=StreamModes.auto,
         resolution=None,
-        layout=None
+        layout=None,
+        multi_archive_tag=None
     ):
         """
         Starts archiving an OpenTok session.
@@ -535,6 +539,14 @@ class Client(object):
         StreamModes.manual to explicitly select streams to include in the the archive, using the
         OpenTok.add_archive_stream() and OpenTok.remove_archive_stream() methods.
 
+        :param String multi_archive_tag (Optional): Set this to support recording multiple archives for the same 
+        session simultaneously. Set this to a unique string for each simultaneous archive of an ongoing session. 
+        You must also set this option when manually starting an archive that is automatically archived. 
+        Note that the multiArchiveTag value is not included in the response for the methods to list archives and 
+        retrieve archive information. If you do not specify a unique multi_archive_tag, you can only record one archive 
+        at a time for a given session. 
+        For more information, see simultaneous archives: https://tokbox.com/developer/guides/archiving/#simultaneous-archives. 
+
         :rtype: The Archive object, which includes properties defining the archive,
           including the archive ID.
         """
@@ -559,7 +571,8 @@ class Client(object):
             "hasVideo": has_video,
             "outputMode": output_mode.value,
             "resolution": resolution,
-            "streamMode": stream_mode.value
+            "streamMode": stream_mode.value,
+            "multiArchiveTag": multi_archive_tag
         }
 
         if layout is not None:
@@ -988,6 +1001,8 @@ class Client(object):
             )
         elif response.status_code == 403:
             raise AuthError("You passed in an invalid OpenTok API key or JWT token.")
+        elif response.status_code == 404:
+            return StreamList({"count": 0, "items": []})
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 
@@ -1274,8 +1289,8 @@ class Client(object):
 
     def start_broadcast(self, session_id, options, stream_mode=BroadcastStreamModes.auto):
         """
-        Use this method to start a live streaming for an OpenTok session. This broadcasts the
-        session to an HLS (HTTP live streaming) or to RTMP streams. To successfully start
+        Use this method to start a live streaming broadcast for an OpenTok session. This broadcasts
+        the session to an HLS (HTTP live streaming) or to RTMP streams. To successfully start
         broadcasting a session, at least one client must be connected to the session. You can only
         start live streaming for sessions that use the OpenTok Media Router (with the media mode set
         to routed); you cannot use live streaming with sessions that have the media mode set to
@@ -1309,10 +1324,34 @@ class Client(object):
             If you include RTMP streaming, you can specify up to five target RTMP streams. For
             each RTMP stream, specify 'serverUrl' (the RTMP server URL), 'streamName' (the stream
             name, such as the YouTube Live stream name or the Facebook stream key), and
-            (optionally) 'id' (a unique ID for the stream)
+            (optionally) 'id' (a unique ID for the stream). You can optionally specify lowLatency or
+            DVR mode, but these options are mutually exclusive. For example:
+
+                'outputs': {
+                    'hls': {
+                        'lowLatency': True,
+                        'dvr': False
+                    },
+                    'rtmp': [
+                        {
+                            'id': 'foo',
+                            'serverUrl': 'rtmp://myfooserver/myfooapp',
+                            'streamName': 'myfoostream'
+                    }, {
+                        'id': 'bar',
+                        'serverUrl': 'rtmp://mybarserver/mybarapp',
+                        'streamName': 'mybarstream'
+                    }]
+                }
 
             String 'resolution' optional: The resolution of the broadcast, either "640x480"
             (SD, the default) or "1280x720" (HD)
+
+            String 'multiBroadcastTag' optional: Set this to support multiple broadcasts for the same session simultaneously. 
+            Set this to a unique string for each simultaneous broadcast of an ongoing session. 
+            Note that the multiBroadcastTag value is not included in the response for the methods to list live streaming 
+            broadcasts and get information about a live streaming broadcast. 
+            For more information, see https://tokbox.com/developer/guides/broadcast/live-streaming#simultaneous-broadcasts. 
 
         :param BroadcastStreamModes stream_mode (Optional): Determines the broadcast stream handling mode.
         Set this to BroadcastStreamModes.auto (the default) to have streams added automatically. Set this to
@@ -1322,6 +1361,14 @@ class Client(object):
         :rtype A Broadcast object, which contains information of the broadcast: id, sessionId
         projectId, createdAt, updatedAt, resolution, status and broadcastUrls
         """
+
+        if 'hls' in options['outputs']:
+            if 'lowLatency' in options['outputs']['hls'] and 'dvr' in options['outputs']['hls']:
+                if options['outputs']['hls']['lowLatency'] == True and options['outputs']['hls']['dvr'] == True:
+                    raise BroadcastHLSOptionsError(
+                        'HLS options "lowLatency" and "dvr" cannot both be set to "True".'
+                        )
+
         payload = {
                     "sessionId": session_id,
                     "streamMode": stream_mode.value
@@ -1599,6 +1646,164 @@ class Client(object):
         else:
             raise RequestError("OpenTok server error.", response.status_code)
 
+    def start_render(self, session_id, opentok_token, url, max_duration=7200, resolution="1280x720", status_callback_url=None, properties: dict = None):
+        """
+        Starts an Experience Composer for the specified OpenTok session.
+        For more information, see the
+       `Experience Composer developer guide <https://tokbox.com/developer/guides/experience-composer>`_.
+
+        :param String 'session_id': The session ID of the OpenTok session that will include the Experience Composer stream.
+        :param String 'token': A valid OpenTok token with a Publisher role and (optionally) connection data to be associated with the output stream.
+        :param String 'url': A publically reachable URL controlled by the customer and capable of generating the content to be rendered without user intervention.
+        :param Integer 'maxDuration' Optional: The maximum time allowed for the Experience Composer, in seconds. After this time, it is stopped automatically, if it is still running. The maximum value is 36000 (10 hours), the minimum value is 60 (1 minute), and the default value is 7200 (2 hours). When the Experience Composer ends, its stream is unpublished and an event is posted to the callback URL, if configured in the Account Portal.
+        :param String 'resolution' Optional: The resolution of the Experience Composer, either "640x480" (SD landscape), "480x640" (SD portrait), "1280x720" (HD landscape), "720x1280" (HD portrait), "1920x1080" (FHD landscape), or "1080x1920" (FHD portrait). By default, this resolution is "1280x720" (HD landscape, the default).
+        :param Dictionary 'properties' Optional: Initial configuration of Publisher properties for the composed output stream.
+            String name Optional: The name of the composed output stream which will be published to the session. The name must have a minimum length of 1 and a maximum length of 200.
+        """
+        payload = {
+            "sessionId": session_id,
+            "token": opentok_token,
+            "url": url,
+            "maxDuration": max_duration,
+            "resolution": resolution,
+            "properties": properties
+        }
+
+        logger.debug(
+            "POST to %r with params %r, headers %r, proxies %r",
+            self.endpoints.get_render_url(),
+            json.dumps(payload),
+            self.get_json_headers(),
+            self.proxies,
+        )
+
+        response = requests.post(
+            self.endpoints.get_render_url(),
+            json=payload,
+            headers=self.get_json_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout,
+        )
+
+        if response and response.status_code == 202:
+            return Render(response.json())
+        elif response.status_code == 400:
+            """
+            The HTTP response has a 400 status code in the following cases:
+            You do not pass in a session ID or you pass in an invalid session ID.
+            You specify an invalid value for input parameters.
+            """
+            raise RequestError(response.json().get("message"))
+        elif response.status_code == 403:
+            raise AuthError("You passed in an invalid OpenTok API key or JWT token.")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+
+    def get_render(self, render_id):
+        """
+        This method allows you to see the status of a render, which can be one of the following:
+            ['starting', 'started', 'stopped', 'failed']
+
+        :param String 'render_id': The ID of a specific render. 
+        """
+        logger.debug(
+            "GET to %r with headers %r, proxies %r",
+            self.endpoints.get_render_url(render_id=render_id),
+            self.get_json_headers(),
+            self.proxies,
+        )
+
+        response = requests.get(
+            self.endpoints.get_render_url(render_id=render_id),
+            headers=self.get_json_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout,
+        )
+
+        if response.status_code == 200:
+            return Render(response.json())
+        elif response.status_code == 400:
+            raise RequestError(
+                "Invalid request. This response may indicate that data in your request is invalid JSON. Or it may indicate that you do not pass in a session ID."
+            )
+        elif response.status_code == 403:
+            raise AuthError("You passed in an invalid OpenTok API key or JWT token.")
+        elif response.status_code == 404:
+            raise NotFoundError("No render matching the specified render ID was found.")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+    def stop_render(self, render_id):
+        """
+        This method stops a render.
+
+        :param String 'render_id': The ID of a specific render. 
+        """
+        logger.debug(
+            "DELETE to %r with headers %r, proxies %r",
+            self.endpoints.get_render_url(render_id=render_id),
+            self.get_headers(),
+            self.proxies,
+        )
+
+        response = requests.delete(
+            self.endpoints.get_render_url(render_id=render_id),
+            headers=self.get_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout,
+        )
+
+        if response.status_code == 200:
+            return response
+        elif response.status_code == 400:
+            raise RequestError(
+                "Invalid request. This response may indicate that data in your request is invalid JSON. Or it may indicate that you do not pass in a session ID."
+            )
+        elif response.status_code == 403:
+            raise AuthError("You passed in an invalid OpenTok API key or JWT token.")
+        elif response.status_code == 404:
+            raise NotFoundError("No render matching the specified render ID was found.")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+    def list_renders(self, offset=0, count=50):
+        """
+        List existing renders associated with the project's API key.
+
+        :param Integer 'offset' Optional: Start offset in the list of existing renders.
+        :param Integer 'count' Optional: Number of renders to retrieve, starting at 'offset'. 
+        """
+
+        query_params = {"offset": offset, "count": count}
+
+        logger.debug(
+            "GET to %r with headers %r, params %r, proxies %r",
+            self.endpoints.get_render_url(),
+            self.get_headers(),
+            query_params,
+            self.proxies,
+        )
+
+        response = requests.get(
+            self.endpoints.get_render_url(),
+            headers=self.get_headers(),
+            params=query_params,
+            proxies=self.proxies,
+            timeout=self.timeout,
+        )
+
+        if response.status_code == 200:
+            return RenderList(self, response.json())
+        elif response.status_code == 400:
+            raise RequestError(
+                "Invalid request. This response may indicate that data in your request is invalid JSON. Or it may indicate that you do not pass in a session ID."
+            )
+        elif response.status_code == 403:
+            raise AuthError("You passed in an invalid OpenTok API key or JWT token.")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
     def _sign_string(self, string, secret):
         return hmac.new(
             secret.encode("utf-8"), string.encode("utf-8"), hashlib.sha1
@@ -1615,30 +1820,7 @@ class Client(object):
         }
 
         return jwt.encode(payload, self.api_secret, algorithm="HS256")
-
-
-
-class OpenTok(Client):
-    def __init__(
-        self,
-        api_key,
-        api_secret,
-        api_url="https://api.opentok.com",
-        timeout=None,
-        app_version=None,
-    ):
-        warnings.warn(
-            "OpenTok class is deprecated (Use Client class instead)",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        super(OpenTok, self).__init__(
-            api_key,
-            api_secret,
-            api_url=api_url,
-            timeout=timeout,
-            app_version=app_version
-        )
+        
 
     def mute_all(self,
                 session_id: str,
@@ -1651,7 +1833,7 @@ class OpenTok(Client):
 
         In addition to existing streams, any streams that are published after the call to
         this method are published with audio muted. You can remove the mute state of a session
-        by calling the OpenTok.disableForceMute() method.
+        by calling the OpenTok.disable_force_mute() method.
 
         :param session_id The session ID
 
@@ -1755,12 +1937,167 @@ class OpenTok(Client):
         will join
 
         :param connection_id An optional parameter used to send the DTMF tones to a specific
-        connectoiin in a session.
+        connection in a session.
 
         :param digits DTMF digits to play
         Valid DTMF digits are 0-9, p, #, and * digits. 'p' represents a 500ms pause if a delay is
         needed during the input process.
 
+        """
+
+        try:
+            if not connection_id:
+                url = self.endpoints.get_dtmf_all_url(session_id)
+                payload = {"digits": digits}
+            else:
+                url = self.endpoints.get_dtmf_specific_url(session_id, connection_id)
+                payload = {"digits": digits}
+
+            response = requests.post(url, headers=self.get_json_headers(), data=json.dumps(payload))
+
+            if response.status_code == 200:
+                return response
+            elif response.status_code == 400:
+                raise DTMFError("One of the properties digits, sessionId or connectionId is invalid.")
+            elif response.status_code == 403:
+                raise AuthError("Failed to create session, invalid credentials. Please check your OpenTok API Key or JSON web token")
+            elif response.status_code == 404:
+                raise NotFoundError("The session does not exists or the client specified by the connection_id is not connected to the session")
+        except Exception as e:
+            raise OpenTokException(
+                (f"There was an error thrown by the OpenTok SDK, please check that your session_id: {session_id}, connection_id (if exists): {connection_id} and digits: {digits} are valid"))
+
+class OpenTok(Client):
+    def __init__(
+        self,
+        api_key,
+        api_secret,
+        api_url="https://api.opentok.com",
+        timeout=None,
+        app_version=None,
+    ):
+        warnings.warn(
+            "OpenTok class is deprecated (Use Client class instead)",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        super(OpenTok, self).__init__(
+            api_key,
+            api_secret,
+            api_url=api_url,
+            timeout=timeout,
+            app_version=app_version
+        )
+
+    def mute_all(self,
+                session_id: str,
+                excludedStreamIds: Optional[List[str]]) -> requests.Response:
+
+        """
+        Mutes all streams in an OpenTok session.
+        You can include an optional list of streams IDs to exclude from being muted.
+        In addition to existing streams, any streams that are published after the call to
+        this method are published with audio muted. You can remove the mute state of a session
+        by calling the OpenTok.disableForceMute() method.
+        :param session_id The session ID
+        :param excludedStreamIds A list of stream IDs for streams that should not be muted.
+        This is an optional property. If you omit this property, all streams in the session will be muted.
+        """
+
+        options = {}
+        url = self.endpoints.get_mute_all_url(session_id)
+
+        try:
+            if excludedStreamIds:
+                options = {'active': True, 'excludedStreams': excludedStreamIds }
+            else:
+                options = {'active': True, 'excludedStreams': []}
+
+            response = requests.post(url, headers=self.get_headers(), data=json.dumps(options))
+
+            if response:
+                return response
+            elif response.status_code == 400:
+                raise GetStreamError("Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.")
+            elif response.status_code == 403:
+                raise AuthError("Failed to mute, invalid credentials.")
+            elif response.status_code == 404:
+                raise NotFoundError("The session or a stream is not found.")
+        except Exception as e:
+            raise OpenTokException(
+                ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} and excludedStreamIds (if exists) {1} are valid").format(
+                    session_id, excludedStreamIds))
+
+
+    def disable_force_mute(self, session_id: str) -> requests.Response:
+        """
+        Disables the active mute state of the session. After you call this method, new streams
+        published to the session will no longer have audio muted.
+        After you call the mute_all() method, any streams published after
+        the call are published with audio muted. Call the OpenTok.disable_force_mute() method
+        to remove the mute state of a session, so that new published streams are not
+        automatically muted.
+        :param session_id The session ID.
+        """
+
+        options = {'active': False}
+        url = self.endpoints.get_mute_all_url(session_id)
+
+        response = requests.post(url, headers=self.get_headers(), data=json.dumps(options))
+
+
+        try:
+            if response:
+                    return response
+            elif response.status_code == 400:
+                raise GetStreamError("Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.")
+            elif response.status_code == 403:
+                raise AuthError("Failed to mute, invalid credentials.")
+            elif response.status_code == 404:
+                raise NotFoundError("The session or a stream is not found.")
+        except Exception as e:
+            raise OpenTokException(
+                ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} is valid").format(
+                    session_id))
+
+
+    def mute_stream(self, session_id: str, stream_id: str) -> requests.Response:
+        """
+        Mutes a single stream in an OpenTok session.
+        :param session_id The session ID.
+        :param stream_id The stream ID.
+        """
+
+        try:
+            if stream_id:
+                url = self.endpoints.get_stream_url(session_id, stream_id) + "/mute"
+
+            response = requests.post(url, headers=self.get_headers())
+
+            if response:
+                    return response
+            elif response.status_code == 400:
+                raise GetStreamError("Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.")
+            elif response.status_code == 403:
+                raise AuthError("Failed to mute, invalid credentials.")
+            elif response.status_code == 404:
+                raise NotFoundError("Mute not found")
+        except Exception as e:
+            raise OpenTokException(
+                ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} and stream_id {1} are valid").format(
+                    session_id, stream_id))
+
+
+    def play_dtmf(self, session_id: str, connection_id: str, digits: str, options: dict = {}) -> requests.Response:
+        """
+        Plays a DTMF string into a session or to a specific connection
+        :param session_id The ID of the OpenTok session that the participant being called
+        will join
+        :param connection_id An optional parameter used to send the DTMF tones to a specific
+        connectoiin in a session.
+        :param digits DTMF digits to play
+        Valid DTMF digits are 0-9, p, #, and * digits. 'p' represents a 500ms pause if a delay is
+        needed during the input process.
         """
 
         try:
