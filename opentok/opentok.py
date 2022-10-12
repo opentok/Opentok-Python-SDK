@@ -1312,7 +1312,24 @@ class Client(object):
             each RTMP stream, specify 'serverUrl' (the RTMP server URL), 'streamName' (the stream
             name, such as the YouTube Live stream name or the Facebook stream key), and
             (optionally) 'id' (a unique ID for the stream). You can optionally specify lowLatency or
-            DVR mode, but these options are mutually exclusive.
+            DVR mode, but these options are mutually exclusive. For example:
+
+                'outputs': {
+                    'hls': {
+                        'lowLatency': True,
+                        'dvr': False
+                    },
+                    'rtmp': [
+                        {
+                            'id': 'foo',
+                            'serverUrl': 'rtmp://myfooserver/myfooapp',
+                            'streamName': 'myfoostream'
+                    }, {
+                        'id': 'bar',
+                        'serverUrl': 'rtmp://mybarserver/mybarapp',
+                        'streamName': 'mybarstream'
+                    }]
+                }
 
             String 'resolution' optional: The resolution of the broadcast, either "640x480"
             (SD, the default) or "1280x720" (HD)
