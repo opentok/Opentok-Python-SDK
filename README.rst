@@ -183,8 +183,15 @@ Setting the ``resolution`` parameter while setting the ``output_mode`` parameter
   # Store this archive_id in the database
   archive_id = archive.id
 
-To stop the recording of a started archive, call the ``opentok.stop_archive(archive_id)``
-method. You can also do this using the ``archive.stop()`` method of an ``Archive`` instance.
+You can enable multiple simultaneous archives by specifying a unique value for the ``multi_archive_tag`` 
+parameter in the ``start_archive`` method.
+
+.. code:: python
+
+  archive = opentok.start_archive(session_id, name=u'Important Presentation', multi_archive_tag='MyArchiveTag')
+
+You can stop the recording of a started Archive using the ``opentok.stop_archive(archive_id)``method. 
+You can also do this using the ``archive.stop()`` method of an ``Archive`` instance.
 
 .. code:: python
 
@@ -435,6 +442,36 @@ You can specify the following broadcast resolutions:
 * "720x1280" (HD portrait)
 * "1920x1080" (FHD landscape)
 * "1080x1920" (FHD portrait)
+
+.. code:: python
+
+  session_id = 'SESSIONID'
+  options = {
+    'multiBroadcastTag': 'unique_broadcast_tag'
+    'layout': {
+      'type': 'custom',
+      'stylesheet': 'the layout stylesheet (only used with type == custom)'
+    },
+    'maxDuration': 5400,
+    'outputs': {
+      'hls': {},
+      'rtmp': [{
+        'id': 'foo',
+        'serverUrl': 'rtmp://myfooserver/myfooapp',
+        'streamName': 'myfoostream'
+      }, {
+        'id': 'bar',
+        'serverUrl': 'rtmp://mybarserver/mybarapp',
+        'streamName': 'mybarstream'
+      }]
+    },
+    'resolution': '640x480'
+  }
+
+  broadcast = opentok.start_broadcast(session_id, options)
+  
+To enable multiple simultaneous broadcasts on the same session, specify a unique value for the 
+``multiBroadcastTag`` parameter in ``options`` when calling the ``opentok.start_broadcast`` method.
 
 You can stop a started Broadcast using the ``opentok.stop_broadcast(broadcast_id)`` method.
 
