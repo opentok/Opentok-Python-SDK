@@ -1,19 +1,11 @@
 import unittest
-from requests.models import Response
-
-from six import text_type, u, b, PY2, PY3
-from nose.tools import raises
 
 import requests
 import httpretty
-from sure import expect
 import random
 import string
 
-import json
-
-import opentok
-from opentok import Client, OpenTok
+from opentok import Client
 
 
 class OpenTokTest(unittest.TestCase):  

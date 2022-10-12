@@ -108,3 +108,11 @@ class BroadcastStreamModeError(OpenTokException):
     """
 
     pass
+
+
+class BroadcastHLSOptionsError(OpenTokException):
+    """
+    Indicates that HLS options have been set incorrectly. 
+    
+    dvr and lowLatency modes cannot both be set to true in a broadcast.
+    """
