@@ -28,6 +28,7 @@ from .version import __version__
 from .endpoints import Endpoints
 from .session import Session
 from .archives import Archive, ArchiveList, OutputModes, StreamModes
+from .render import Render, RenderList
 from .stream import Stream
 from .streamlist import StreamList
 from .sip_call import SipCall
@@ -1614,6 +1615,164 @@ class Client(object):
             raise AuthError("Authentication error.")
         else:
             raise RequestError("OpenTok server error.", response.status_code)
+
+    def start_render(self, session_id, opentok_token, url, max_duration=7200, resolution="1280x720", status_callback_url=None, properties: dict = None):
+        """
+        Starts an Experience Composer for the specified OpenTok session.
+        For more information, see the
+       `Experience Composer developer guide <https://tokbox.com/developer/guides/experience-composer>`_.
+
+        :param String 'session_id': The session ID of the OpenTok session that will include the Experience Composer stream.
+        :param String 'token': A valid OpenTok token with a Publisher role and (optionally) connection data to be associated with the output stream.
+        :param String 'url': A publically reachable URL controlled by the customer and capable of generating the content to be rendered without user intervention.
+        :param Integer 'maxDuration' Optional: The maximum time allowed for the Experience Composer, in seconds. After this time, it is stopped automatically, if it is still running. The maximum value is 36000 (10 hours), the minimum value is 60 (1 minute), and the default value is 7200 (2 hours). When the Experience Composer ends, its stream is unpublished and an event is posted to the callback URL, if configured in the Account Portal.
+        :param String 'resolution' Optional: The resolution of the Experience Composer, either "640x480" (SD landscape), "480x640" (SD portrait), "1280x720" (HD landscape), "720x1280" (HD portrait), "1920x1080" (FHD landscape), or "1080x1920" (FHD portrait). By default, this resolution is "1280x720" (HD landscape, the default).
+        :param Dictionary 'properties' Optional: Initial configuration of Publisher properties for the composed output stream.
+            String name Optional: The name of the composed output stream which will be published to the session. The name must have a minimum length of 1 and a maximum length of 200.
+        """
+        payload = {
+            "sessionId": session_id,
+            "token": opentok_token,
+            "url": url,
+            "maxDuration": max_duration,
+            "resolution": resolution,
+            "properties": properties
+        }
+
+        logger.debug(
+            "POST to %r with params %r, headers %r, proxies %r",
+            self.endpoints.get_render_url(),
+            json.dumps(payload),
+            self.get_json_headers(),
+            self.proxies,
+        )
+
+        response = requests.post(
+            self.endpoints.get_render_url(),
+            json=payload,
+            headers=self.get_json_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout,
+        )
+
+        if response and response.status_code == 202:
+            return Render(response.json())
+        elif response.status_code == 400:
+            """
+            The HTTP response has a 400 status code in the following cases:
+            You do not pass in a session ID or you pass in an invalid session ID.
+            You specify an invalid value for input parameters.
+            """
+            raise RequestError(response.json().get("message"))
+        elif response.status_code == 403:
+            raise AuthError("You passed in an invalid OpenTok API key or JWT token.")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+
+    def get_render(self, render_id):
+        """
+        This method allows you to see the status of a render, which can be one of the following:
+            ['starting', 'started', 'stopped', 'failed']
+
+        :param String 'render_id': The ID of a specific render. 
+        """
+        logger.debug(
+            "GET to %r with headers %r, proxies %r",
+            self.endpoints.get_render_url(render_id=render_id),
+            self.get_json_headers(),
+            self.proxies,
+        )
+
+        response = requests.get(
+            self.endpoints.get_render_url(render_id=render_id),
+            headers=self.get_json_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout,
+        )
+
+        if response.status_code == 200:
+            return Render(response.json())
+        elif response.status_code == 400:
+            raise RequestError(
+                "Invalid request. This response may indicate that data in your request is invalid JSON. Or it may indicate that you do not pass in a session ID."
+            )
+        elif response.status_code == 403:
+            raise AuthError("You passed in an invalid OpenTok API key or JWT token.")
+        elif response.status_code == 404:
+            raise NotFoundError("No render matching the specified render ID was found.")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+    def stop_render(self, render_id):
+        """
+        This method stops a render.
+
+        :param String 'render_id': The ID of a specific render. 
+        """
+        logger.debug(
+            "DELETE to %r with headers %r, proxies %r",
+            self.endpoints.get_render_url(render_id=render_id),
+            self.get_headers(),
+            self.proxies,
+        )
+
+        response = requests.delete(
+            self.endpoints.get_render_url(render_id=render_id),
+            headers=self.get_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout,
+        )
+
+        if response.status_code == 200:
+            return response
+        elif response.status_code == 400:
+            raise RequestError(
+                "Invalid request. This response may indicate that data in your request is invalid JSON. Or it may indicate that you do not pass in a session ID."
+            )
+        elif response.status_code == 403:
+            raise AuthError("You passed in an invalid OpenTok API key or JWT token.")
+        elif response.status_code == 404:
+            raise NotFoundError("No render matching the specified render ID was found.")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+    def list_renders(self, offset=0, count=50):
+        """
+        List existing renders associated with the project's API key.
+
+        :param Integer 'offset' Optional: Start offset in the list of existing renders.
+        :param Integer 'count' Optional: Number of renders to retrieve, starting at 'offset'. 
+        """
+
+        query_params = {"offset": offset, "count": count}
+
+        logger.debug(
+            "GET to %r with headers %r, params %r, proxies %r",
+            self.endpoints.get_render_url(),
+            self.get_headers(),
+            query_params,
+            self.proxies,
+        )
+
+        response = requests.get(
+            self.endpoints.get_render_url(),
+            headers=self.get_headers(),
+            params=query_params,
+            proxies=self.proxies,
+            timeout=self.timeout,
+        )
+
+        if response.status_code == 200:
+            return RenderList(self, response.json())
+        elif response.status_code == 400:
+            raise RequestError(
+                "Invalid request. This response may indicate that data in your request is invalid JSON. Or it may indicate that you do not pass in a session ID."
+            )
+        elif response.status_code == 403:
+            raise AuthError("You passed in an invalid OpenTok API key or JWT token.")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
 
     def _sign_string(self, string, secret):
         return hmac.new(
