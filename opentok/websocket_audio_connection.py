@@ -17,4 +17,3 @@ class WebsocketAudioConnection:
         Returns a dictionary of the websocket audio connection's attributes.
         """
         return dict((k, v) for k, v in iteritems(self.__dict__))
-        

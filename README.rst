@@ -562,7 +562,7 @@ For more information, see the
   websocket_options = {"uri": "wss://service.com/ws-endpoint"}
   websocket_audio_connection = opentok.stream_audio_to_websocket(session_id, opentok_token, websocket_options)
 
-Additionally, you can specify only the streams you want to send to the websocket, and/or the additional headers that are sent, 
+Additionally, you can list only the specific streams you want to send to the websocket, and/or the additional headers that are sent, 
 by adding these fields to the ``websocket_options`` object.
 
 .. code:: python
