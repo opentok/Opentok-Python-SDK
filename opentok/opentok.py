@@ -16,7 +16,6 @@ from jose import jwt  # _create_jwt_auth_header
 import random  # _create_jwt_auth_header
 import logging  # logging
 import warnings  # Native. Used for notifying deprecations
-import os
 
 
 # compat
@@ -33,6 +32,7 @@ from .stream import Stream
 from .streamlist import StreamList
 from .sip_call import SipCall
 from .broadcast import Broadcast, BroadcastStreamModes
+from .webhook_audio_connection import WebhookAudioConnection
 from .exceptions import (
     ArchiveStreamModeError,
     BroadcastHLSOptionsError,
@@ -48,8 +48,9 @@ from .exceptions import (
     SipDialError,
     SetStreamClassError,
     BroadcastError,
-    DTMFError
-
+    DTMFError,
+    InvalidWebsocketOptionsError,
+    InvalidMediaModeError  
 )
 
 
@@ -1653,7 +1654,7 @@ class Client(object):
        `Experience Composer developer guide <https://tokbox.com/developer/guides/experience-composer>`_.
 
         :param String 'session_id': The session ID of the OpenTok session that will include the Experience Composer stream.
-        :param String 'token': A valid OpenTok token with a Publisher role and (optionally) connection data to be associated with the output stream.
+        :param String 'opentok_token': A valid OpenTok token with a Publisher role and (optionally) connection data to be associated with the output stream.
         :param String 'url': A publically reachable URL controlled by the customer and capable of generating the content to be rendered without user intervention.
         :param Integer 'maxDuration' Optional: The maximum time allowed for the Experience Composer, in seconds. After this time, it is stopped automatically, if it is still running. The maximum value is 36000 (10 hours), the minimum value is 60 (1 minute), and the default value is 7200 (2 hours). When the Experience Composer ends, its stream is unpublished and an event is posted to the callback URL, if configured in the Account Portal.
         :param String 'resolution' Optional: The resolution of the Experience Composer, either "640x480" (SD landscape), "480x640" (SD portrait), "1280x720" (HD landscape), "720x1280" (HD portrait), "1920x1080" (FHD landscape), or "1080x1920" (FHD portrait). By default, this resolution is "1280x720" (HD landscape, the default).
@@ -1698,7 +1699,6 @@ class Client(object):
             raise AuthError("You passed in an invalid OpenTok API key or JWT token.")
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
-
 
     def get_render(self, render_id):
         """
@@ -1803,6 +1803,64 @@ class Client(object):
             raise AuthError("You passed in an invalid OpenTok API key or JWT token.")
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
+
+    def stream_audio_to_websocket(self, session_id: str, opentok_token: str, websocket_options: dict):
+        """
+        Connects audio streams to a specified webhook URI.
+        For more information, see the `Audio Streamer developer guide <https://tokbox.com/developer/guides/audio-streamer/>`.
+
+        :param String 'session_id': The OpenTok session ID that includes the OpenTok streams you want to include in the WebSocket stream. The Audio Streamer feature is only supported in routed sessions (sessions that use the OpenTok Media Router).
+        :param String 'opentok_token': The OpenTok token to be used for the Audio Streamer connection to the OpenTok session.
+        :param Dictionary 'websocket_options': Included options for the websocket.
+            String 'uri': A publicly reachable WebSocket URI to be used for the destination of the audio stream (such as "wss://example.com/ws-endpoint").
+            List 'streams' Optional: A list of stream IDs for the OpenTok streams you want to include in the WebSocket audio. If you omit this property, all streams in the session will be included.
+            Dictionary 'headers' Optional: An object of key-value pairs of headers to be sent to your WebSocket server with each message, with a maximum length of 512 bytes.
+        """
+        self.validate_websocket_options(websocket_options)
+        
+        payload = {
+            "sessionId": session_id,
+            "token": opentok_token,
+            "websocket": websocket_options
+        }
+
+        logger.debug(
+            "POST to %r with params %r, headers %r, proxies %r",
+            self.endpoints.get_audio_streamer_url(),
+            json.dumps(payload),
+            self.get_json_headers(),
+            self.proxies,
+        )
+
+        response = requests.post(
+            self.endpoints.get_audio_streamer_url(),
+            json=payload,
+            headers=self.get_json_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout,
+        )
+
+        if response and response.status_code == 200:
+            return WebhookAudioConnection(response.json())
+        elif response.status_code == 400:
+            """
+            The HTTP response has a 400 status code in the following cases:
+            You did not pass in a session ID or you pass in an invalid session ID.
+            You specified an invalid value for input parameters.
+            """
+            raise RequestError(response.json().get("message"))
+        elif response.status_code == 403:
+            raise AuthError("You passed in an invalid OpenTok API key or JWT token.")
+        elif response.status_code == 409:
+            raise InvalidMediaModeError("Only routed sessions are allowed to initiate Audio Streamer WebSocket connections.")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+    def validate_websocket_options(self, options):
+        if type(options) is not dict:
+            raise InvalidWebsocketOptionsError('Must pass websocket options as a dictionary.')
+        if 'uri' not in options:
+            raise InvalidWebsocketOptionsError('Provide a webhook URI.')
 
     def _sign_string(self, string, secret):
         return hmac.new(
