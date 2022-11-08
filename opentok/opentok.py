@@ -32,7 +32,7 @@ from .stream import Stream
 from .streamlist import StreamList
 from .sip_call import SipCall
 from .broadcast import Broadcast, BroadcastStreamModes
-from .webhook_audio_connection import WebhookAudioConnection
+from .websocket_audio_connection import WebsocketAudioConnection
 from .exceptions import (
     ArchiveStreamModeError,
     BroadcastHLSOptionsError,
@@ -1806,7 +1806,7 @@ class Client(object):
 
     def stream_audio_to_websocket(self, session_id: str, opentok_token: str, websocket_options: dict):
         """
-        Connects audio streams to a specified webhook URI.
+        Connects audio streams to a specified websocket URI.
         For more information, see the `Audio Streamer developer guide <https://tokbox.com/developer/guides/audio-streamer/>`.
 
         :param String 'session_id': The OpenTok session ID that includes the OpenTok streams you want to include in the WebSocket stream. The Audio Streamer feature is only supported in routed sessions (sessions that use the OpenTok Media Router).
@@ -1841,7 +1841,7 @@ class Client(object):
         )
 
         if response and response.status_code == 200:
-            return WebhookAudioConnection(response.json())
+            return WebsocketAudioConnection(response.json())
         elif response.status_code == 400:
             """
             The HTTP response has a 400 status code in the following cases:
@@ -1860,7 +1860,7 @@ class Client(object):
         if type(options) is not dict:
             raise InvalidWebsocketOptionsError('Must pass websocket options as a dictionary.')
         if 'uri' not in options:
-            raise InvalidWebsocketOptionsError('Provide a webhook URI.')
+            raise InvalidWebsocketOptionsError('Provide a websocket URI.')
 
     def _sign_string(self, string, secret):
         return hmac.new(

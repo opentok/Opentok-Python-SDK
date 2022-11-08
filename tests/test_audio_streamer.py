@@ -6,7 +6,7 @@ from sure import expect
 
 from six import u, PY2, PY3
 from expects import *
-from opentok import Client, WebhookAudioConnection, __version__
+from opentok import Client, WebsocketAudioConnection, __version__
 from opentok.exceptions import InvalidWebsocketOptionsError, InvalidMediaModeError
 from .validate_jwt import validate_jwt_header
 
@@ -43,7 +43,7 @@ class OpenTokAudioStreamerLiteTest(unittest.TestCase):
             "uri": "wss://service.com/ws-endpoint"
         }
 
-        webhook_audio_connection = self.opentok.stream_audio_to_websocket(self.session_id, self.token, websocket_options)
+        websocket_audio_connection = self.opentok.stream_audio_to_websocket(self.session_id, self.token, websocket_options)
                 
         validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
         expect(httpretty.last_request().headers[u("user-agent")]).to(
@@ -60,11 +60,11 @@ class OpenTokAudioStreamerLiteTest(unittest.TestCase):
             body = json.loads(httpretty.last_request().body.decode("utf-8"))
 
         expect(body).to(have_key(u("token")))
-        expect(webhook_audio_connection).to(be_a(WebhookAudioConnection))
-        expect(webhook_audio_connection).to(
+        expect(websocket_audio_connection).to(be_a(WebsocketAudioConnection))
+        expect(websocket_audio_connection).to(
             have_property(u("id"), u("b0a5a8c7-dc38-459f-a48d-a7f2008da853"))
         )
-        expect(webhook_audio_connection).to(
+        expect(websocket_audio_connection).to(
             have_property(u("connectionId"), u("e9f8c166-6c67-440d-994a-04fb6dfed007"))
         )
 
@@ -86,7 +86,7 @@ class OpenTokAudioStreamerLiteTest(unittest.TestCase):
             }
         }
 
-        webhook_audio_connection = self.opentok.stream_audio_to_websocket(self.session_id, self.token, websocket_options)
+        websocket_audio_connection = self.opentok.stream_audio_to_websocket(self.session_id, self.token, websocket_options)
                 
         validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
         expect(httpretty.last_request().headers[u("user-agent")]).to(
@@ -103,11 +103,11 @@ class OpenTokAudioStreamerLiteTest(unittest.TestCase):
             body = json.loads(httpretty.last_request().body.decode("utf-8"))
 
         expect(body).to(have_key(u("token")))
-        expect(webhook_audio_connection).to(be_a(WebhookAudioConnection))
-        expect(webhook_audio_connection).to(
+        expect(websocket_audio_connection).to(be_a(WebsocketAudioConnection))
+        expect(websocket_audio_connection).to(
             have_property(u("id"), u("b0a5a8c7-dc38-459f-a48d-a7f2008da853"))
         )
-        expect(webhook_audio_connection).to(
+        expect(websocket_audio_connection).to(
             have_property(u("connectionId"), u("e9f8c166-6c67-440d-994a-04fb6dfed007"))
         )
 
@@ -149,4 +149,4 @@ class OpenTokAudioStreamerLiteTest(unittest.TestCase):
         websocket_options = {}
         with self.assertRaises(InvalidWebsocketOptionsError) as context:
             self.opentok.stream_audio_to_websocket(self.session_id, self.token, websocket_options)
-        self.assertTrue("Provide a webhook URI." in str(context.exception))
+        self.assertTrue("Provide a websocket URI." in str(context.exception))
