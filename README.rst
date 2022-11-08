@@ -554,11 +554,29 @@ For more information about OpenTok live streaming broadcasts, see the
 Streaming audio to a websocket
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 You can stream audio to a websocket with the ``opentok.stream_audio_to_websocket`` method.
+For more information, see the
+`Audio Streamer developer guide <https://tokbox.com/developer/guides/audio-streamer/>`_.
 
 .. code:: python
 
   websocket_options = {"uri": "wss://service.com/ws-endpoint"}
-  websocketopentok.stream_audio_to_websocket(session_id, opentok_token, websocket_options)
+  websocket_audio_connection = opentok.stream_audio_to_websocket(session_id, opentok_token, websocket_options)
+
+Additionally, you can specify only the streams you want to send to the websocket, and/or the additional headers that are sent, 
+by adding these fields to the ``websocket_options`` object.
+
+.. code:: python
+
+  websocket_options = {
+    "uri": "wss://service.com/ws-endpoint",
+    "streams": [
+      "streamId-1",
+      "streamId-2"
+    ],
+    "headers": {
+      "headerKey": "headerValue"
+    }
+  }
 
 Configuring Timeout
 -------------------
