@@ -1,3 +1,7 @@
+# Release v3.4.0
+
+- Support for Audio Streamer (lite) API via `stream_audio_to_websocket` method
+
 # Release v3.3.0
 
 - Support for Experience Composer (Render) API
