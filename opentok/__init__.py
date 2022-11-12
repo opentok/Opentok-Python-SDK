@@ -15,4 +15,4 @@ from .streamlist import StreamList
 from .sip_call import SipCall
 from .broadcast import Broadcast, BroadcastStreamModes
 from .render import Render, RenderList
-from .websocket_audio_connection import WebsocketAudioConnection
+from .websocket_audio_connection import WebSocketAudioConnection

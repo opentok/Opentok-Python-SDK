@@ -107,8 +107,6 @@ class BroadcastStreamModeError(OpenTokException):
     Indicates that the broadcast is configured with a streamMode that does not support stream manipulation.
     """
 
-    pass
-
 
 class BroadcastHLSOptionsError(OpenTokException):
     """
@@ -118,9 +116,9 @@ class BroadcastHLSOptionsError(OpenTokException):
     """
 
 
-class InvalidWebsocketOptionsError(OpenTokException):
+class InvalidWebSocketOptionsError(OpenTokException):
     """
-    Indicates that the websocket options selected are invalid.
+    Indicates that the WebSocket options selected are invalid.
     """
 
 

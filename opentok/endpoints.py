@@ -209,8 +209,8 @@ class Endpoints(object):
 
         return url
 
-    def get_audio_streamer_url(self):
-        """Returns URLs for working with the Audio Streamer (lite) API."""
+    def get_audio_connector_url(self):
+        """Returns URLs for working with the Audio Connector API."""
         url = self.api_url + "/v2/project/" + self.api_key + "/connect"
         
         return url
