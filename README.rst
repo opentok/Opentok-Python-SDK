@@ -551,11 +551,11 @@ For more information about OpenTok live streaming broadcasts, see the
 `Broadcast developer guide <https://tokbox.com/developer/guides/broadcast/>`_.
 
 
-Streaming audio to a WebSocket
+Connecting audio to a WebSocket
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-You can stream audio to a WebSocket with the ``opentok.connect_audio_to_websocket`` method.
+You can send audio to a WebSocket with the ``opentok.connect_audio_to_websocket`` method.
 For more information, see the
-`Audio Connector developer guide <https://tokbox.com/developer/guides/audio-streamer/>`_.
+`Audio Connector developer guide <https://tokbox.com/developer/guides/audio-connector/>`_.
 
 .. code:: python
 
