@@ -367,11 +367,23 @@ class Client(object):
         # build options
         options = {}
         if not isinstance(media_mode, MediaModes):
-            raise OpenTokException(u("Cannot create session, {0} is not a valid media mode").format(media_mode))
+            raise OpenTokException(
+                u("Cannot create session, {0} is not a valid media mode").format(
+                    media_mode
+                )
+            )
         if not isinstance(archive_mode, ArchiveModes):
-            raise OpenTokException(u("Cannot create session, {0} is not a valid archive mode").format(archive_mode))
+            raise OpenTokException(
+                u("Cannot create session, {0} is not a valid archive mode").format(
+                    archive_mode
+                )
+            )        
         if archive_mode == ArchiveModes.always and media_mode != MediaModes.routed:
-            raise OpenTokException(u("A session with always archive mode must also have the routed media mode."))
+            raise OpenTokException(
+                u(
+                    "A session with always archive mode must also have the routed media mode."
+                )
+            )
         options[u("p2p.preference")] = media_mode.value
         options[u("archiveMode")] = archive_mode.value
         if location:
@@ -380,9 +392,9 @@ class Client(object):
                 inet_aton(location)
             except:
                 raise OpenTokException(
-                    u("Cannot create session. Location must be either None or a valid IPv4 address {0}").format(
-                        location
-                    )
+                    u(
+                        "Cannot create session. Location must be either None or a valid IPv4 address {0}"
+                    ).format(location)
                 )
             options[u("location")] = location
         options["e2ee"] = e2ee
@@ -402,7 +414,6 @@ class Client(object):
                 proxies=self.proxies,
                 timeout=self.timeout,
             )
-            
             response.encoding = "utf-8"
 
             if response.status_code == 403:
@@ -433,31 +444,6 @@ class Client(object):
                 media_mode=media_mode,
                 archive_mode=archive_mode,
                 e2ee=e2ee,
-            )
-        except Exception as e:
-            raise OpenTokException("Failed to generate session: %s" % str(e))
-
-        try:
-            error = dom.getElementsByTagName("error")
-            if error:
-                error = error[0]
-                raise AuthError(
-                    "Failed to create session (code=%s): %s"
-                    % (
-                        error.attributes["code"].value,
-                        error.firstChild.attributes["message"].value,
-                    )
-                )
-
-            session_id = (
-                dom.getElementsByTagName("session_id")[0].childNodes[0].nodeValue
-            )
-            return Session(
-                self,
-                session_id,
-                location=location,
-                media_mode=media_mode,
-                archive_mode=archive_mode,
             )
         except Exception as e:
             raise OpenTokException("Failed to generate session: %s" % str(e))
