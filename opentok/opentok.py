@@ -377,7 +377,7 @@ class Client(object):
                 u("Cannot create session, {0} is not a valid archive mode").format(
                     archive_mode
                 )
-            )        
+            )
         if archive_mode == ArchiveModes.always and media_mode != MediaModes.routed:
             raise OpenTokException(
                 u(
@@ -414,6 +414,7 @@ class Client(object):
                 proxies=self.proxies,
                 timeout=self.timeout,
             )
+
             response.encoding = "utf-8"
 
             if response.status_code == 403:
@@ -436,7 +437,9 @@ class Client(object):
                     )
                 )
 
-            session_id = dom.getElementsByTagName("session_id")[0].childNodes[0].nodeValue
+            session_id = (
+                dom.getElementsByTagName("session_id")[0].childNodes[0].nodeValue
+            )            
             return Session(
                 self,
                 session_id,
