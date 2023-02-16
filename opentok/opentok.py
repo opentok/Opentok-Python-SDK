@@ -1,5 +1,5 @@
 from datetime import datetime  # generate_token
-from typing import List, Optional # imports List, Optional type hint
+from typing import List, Optional  # imports List, Optional type hint
 import calendar  # generate_token
 import base64  # generate_token
 import random  # generate_token
@@ -48,8 +48,7 @@ from .exceptions import (
     SipDialError,
     SetStreamClassError,
     BroadcastError,
-    DTMFError
-
+    DTMFError,
 )
 
 
@@ -90,6 +89,7 @@ class ArchiveModes(Enum):
 
 
 logger = logging.getLogger("opentok")
+
 
 class Client(object):
 
@@ -197,78 +197,46 @@ class Client(object):
                 try:
                     expire_time = int(expire_time)
                 except (ValueError, TypeError):
-                    raise OpenTokException(
-                        u("Cannot generate token, invalid expire time {0}").format(
-                            expire_time
-                        )
-                    )
+                    raise OpenTokException(u("Cannot generate token, invalid expire time {0}").format(expire_time))
         else:
             expire_time = int(time.time()) + (60 * 60 * 24)  # 1 day
 
         # validations
         if not text_type(session_id):
-            raise OpenTokException(
-                u("Cannot generate token, session_id was not valid {0}").format(
-                    session_id
-                )
-            )
+            raise OpenTokException(u("Cannot generate token, session_id was not valid {0}").format(session_id))
         if not isinstance(role, Roles):
-            raise OpenTokException(
-                u("Cannot generate token, {0} is not a valid role").format(role)
-            )
+            raise OpenTokException(u("Cannot generate token, {0} is not a valid role").format(role))
         now = int(time.time())
         if expire_time < now:
-            raise OpenTokException(
-                u("Cannot generate token, expire_time is not in the future {0}").format(
-                    expire_time
-                )
-            )
+            raise OpenTokException(u("Cannot generate token, expire_time is not in the future {0}").format(expire_time))
         if expire_time > now + (60 * 60 * 24 * 30):  # 30 days
             raise OpenTokException(
-                u(
-                    "Cannot generate token, expire_time is not in the next 30 days {0}"
-                ).format(expire_time)
+                u("Cannot generate token, expire_time is not in the next 30 days {0}").format(expire_time)
             )
         if data and len(data) > 1000:
-            raise OpenTokException(
-                u("Cannot generate token, data must be less than 1000 characters")
-            )
-        if initial_layout_class_list and not all(
-            text_type(c) for c in initial_layout_class_list
-        ):
-            raise OpenTokException(
-                u(
-                    "Cannot generate token, all items in initial_layout_class_list must be strings"
-                )
-            )
+            raise OpenTokException(u("Cannot generate token, data must be less than 1000 characters"))
+        if initial_layout_class_list and not all(text_type(c) for c in initial_layout_class_list):
+            raise OpenTokException(u("Cannot generate token, all items in initial_layout_class_list must be strings"))
         initial_layout_class_list_serialized = u(" ").join(initial_layout_class_list)
         if len(initial_layout_class_list_serialized) > 1000:
             raise OpenTokException(
-                u(
-                    "Cannot generate token, initial_layout_class_list must be less than 1000 characters"
-                )
+                u("Cannot generate token, initial_layout_class_list must be less than 1000 characters")
             )
 
         # decode session id to verify api_key
         sub_session_id = session_id[2:]
         sub_session_id_bytes = sub_session_id.encode("utf-8")
-        sub_session_id_bytes_padded = sub_session_id_bytes + (
-            b("=") * (-len(sub_session_id_bytes) % 4)
-        )
+        sub_session_id_bytes_padded = sub_session_id_bytes + (b("=") * (-len(sub_session_id_bytes) % 4))
         try:
             decoded_session_id = base64.b64decode(sub_session_id_bytes_padded, b("-_"))
             parts = decoded_session_id.decode("utf-8").split(u("~"))
         except Exception as e:
-            raise OpenTokException(
-                u("Cannot generate token, the session_id {0} was not valid").format(
-                    session_id
-                )
-            )
+            raise OpenTokException(u("Cannot generate token, the session_id {0} was not valid").format(session_id))
         if self.api_key not in parts:
             raise OpenTokException(
-                u(
-                    "Cannot generate token, the session_id {0} does not belong to the api_key {1}"
-                ).format(session_id, self.api_key)
+                u("Cannot generate token, the session_id {0} does not belong to the api_key {1}").format(
+                    session_id, self.api_key
+                )
             )
 
         data_params = dict(
@@ -300,6 +268,7 @@ class Client(object):
         location=None,
         media_mode=MediaModes.relayed,
         archive_mode=ArchiveModes.manual,
+        e2ee=False,
     ):
         """
         Creates a new OpenTok session and returns the session ID, which uniquely identifies
@@ -358,29 +327,19 @@ class Client(object):
             situate the session in its global network. If you do not set a location hint,
             the OpenTok servers will be based on the first client connecting to the session.
 
+        :param Boolean e2ee: Whether to enable end-to-end encryption for the OpenTok session.
+
         :rtype: The Session object. The session_id property of the object is the session ID.
         """
 
         # build options
         options = {}
         if not isinstance(media_mode, MediaModes):
-            raise OpenTokException(
-                u("Cannot create session, {0} is not a valid media mode").format(
-                    media_mode
-                )
-            )
+            raise OpenTokException(u("Cannot create session, {0} is not a valid media mode").format(media_mode))
         if not isinstance(archive_mode, ArchiveModes):
-            raise OpenTokException(
-                u("Cannot create session, {0} is not a valid archive mode").format(
-                    archive_mode
-                )
-            )
+            raise OpenTokException(u("Cannot create session, {0} is not a valid archive mode").format(archive_mode))
         if archive_mode == ArchiveModes.always and media_mode != MediaModes.routed:
-            raise OpenTokException(
-                u(
-                    "A session with always archive mode must also have the routed media mode."
-                )
-            )
+            raise OpenTokException(u("A session with always archive mode must also have the routed media mode."))
         options[u("p2p.preference")] = media_mode.value
         options[u("archiveMode")] = archive_mode.value
         if location:
@@ -389,11 +348,12 @@ class Client(object):
                 inet_aton(location)
             except:
                 raise OpenTokException(
-                    u(
-                        "Cannot create session. Location must be either None or a valid IPv4 address {0}"
-                    ).format(location)
+                    u("Cannot create session. Location must be either None or a valid IPv4 address {0}").format(
+                        location
+                    )
                 )
             options[u("location")] = location
+        options["e2ee"] = e2ee
 
         try:
             logger.debug(
@@ -433,9 +393,7 @@ class Client(object):
                     )
                 )
 
-            session_id = (
-                dom.getElementsByTagName("session_id")[0].childNodes[0].nodeValue
-            )
+            session_id = dom.getElementsByTagName("session_id")[0].childNodes[0].nodeValue
             return Session(
                 self,
                 session_id,
@@ -449,10 +407,7 @@ class Client(object):
     def get_headers(self):
         """For internal use."""
         return {
-            "User-Agent": "OpenTok-Python-SDK/"
-            + self.app_version
-            + " python/"
-            + platform.python_version(),
+            "User-Agent": "OpenTok-Python-SDK/" + self.app_version + " python/" + platform.python_version(),
             "X-OPENTOK-AUTH": self._create_jwt_auth_header(),
         }
 
@@ -488,7 +443,7 @@ class Client(object):
         stream_mode=StreamModes.auto,
         resolution=None,
         layout=None,
-        multi_archive_tag=None
+        multi_archive_tag=None,
     ):
         """
         Starts archiving an OpenTok session.
@@ -539,30 +494,22 @@ class Client(object):
         StreamModes.manual to explicitly select streams to include in the the archive, using the
         OpenTok.add_archive_stream() and OpenTok.remove_archive_stream() methods.
 
-        :param String multi_archive_tag (Optional): Set this to support recording multiple archives for the same 
-        session simultaneously. Set this to a unique string for each simultaneous archive of an ongoing session. 
-        You must also set this option when manually starting an archive that is automatically archived. 
-        Note that the multiArchiveTag value is not included in the response for the methods to list archives and 
-        retrieve archive information. If you do not specify a unique multi_archive_tag, you can only record one archive 
-        at a time for a given session. 
-        For more information, see simultaneous archives: https://tokbox.com/developer/guides/archiving/#simultaneous-archives. 
+        :param String multi_archive_tag (Optional): Set this to support recording multiple archives for the same
+        session simultaneously. Set this to a unique string for each simultaneous archive of an ongoing session.
+        You must also set this option when manually starting an archive that is automatically archived.
+        Note that the multiArchiveTag value is not included in the response for the methods to list archives and
+        retrieve archive information. If you do not specify a unique multi_archive_tag, you can only record one archive
+        at a time for a given session.
+        For more information, see simultaneous archives: https://tokbox.com/developer/guides/archiving/#simultaneous-archives.
 
         :rtype: The Archive object, which includes properties defining the archive,
           including the archive ID.
         """
         if not isinstance(output_mode, OutputModes):
-            raise OpenTokException(
-                u("Cannot start archive, {0} is not a valid output mode").format(
-                    output_mode
-                )
-            )
+            raise OpenTokException(u("Cannot start archive, {0} is not a valid output mode").format(output_mode))
 
         if resolution and output_mode == OutputModes.individual:
-            raise OpenTokException(
-                u(
-                    "Invalid parameters: Resolution cannot be supplied for individual output mode."
-                )
-            )
+            raise OpenTokException(u("Invalid parameters: Resolution cannot be supplied for individual output mode."))
 
         payload = {
             "name": name,
@@ -572,7 +519,7 @@ class Client(object):
             "outputMode": output_mode.value,
             "resolution": resolution,
             "streamMode": stream_mode.value,
-            "multiArchiveTag": multi_archive_tag
+            "multiArchiveTag": multi_archive_tag,
         }
 
         if layout is not None:
@@ -767,12 +714,8 @@ class Client(object):
         return self.get_archives(offset, count, session_id)
 
     def add_archive_stream(
-        self,
-        archive_id: str,
-        stream_id: str,
-        has_audio: bool = True,
-        has_video: bool = True
-        ) -> requests.Response:
+        self, archive_id: str, stream_id: str, has_audio: bool = True, has_video: bool = True
+    ) -> requests.Response:
 
         """
         This method will add streams to the archive with addStream for new participant(choosing audio, video or both).
@@ -789,11 +732,7 @@ class Client(object):
 
         endpoint = self.endpoints.get_archive_stream(archive_id)
 
-        streams = {
-            "hasAudio": has_audio,
-            "hasVideo": has_video,
-            "addStream": stream_id
-        }
+        streams = {"hasAudio": has_audio, "hasVideo": has_video, "addStream": stream_id}
 
         response = requests.patch(
             endpoint,
@@ -819,7 +758,9 @@ class Client(object):
         elif response.status_code == 404:
             raise NotFoundError("Archive or Stream not found")
         elif response.status_code == 405:
-            raise ArchiveStreamModeError("Your archive is configured with a streamMode that does not support stream manipulation.")
+            raise ArchiveStreamModeError(
+                "Your archive is configured with a streamMode that does not support stream manipulation."
+            )
         elif response.status_code == 409:
             raise ArchiveError(response.json().get("message"))
         else:
@@ -835,9 +776,7 @@ class Client(object):
 
         endpoint = self.endpoints.get_archive_stream(archive_id)
 
-        streams = {
-            "removeStream": stream_id
-        }
+        streams = {"removeStream": stream_id}
 
         response = requests.patch(
             endpoint,
@@ -863,13 +802,13 @@ class Client(object):
         elif response.status_code == 404:
             raise NotFoundError("Archive or Stream not found")
         elif response.status_code == 405:
-            raise ArchiveStreamModeError("Your archive is configured with a streamMode that does not support stream manipulation.")
+            raise ArchiveStreamModeError(
+                "Your archive is configured with a streamMode that does not support stream manipulation."
+            )
         elif response.status_code == 409:
             raise ArchiveError(response.json().get("message"))
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
-
-
 
     def send_signal(self, session_id, payload, connection_id=None):
         """
@@ -905,17 +844,11 @@ class Client(object):
         if response.status_code == 204:
             pass
         elif response.status_code == 400:
-            raise SignalingError(
-                "One of the signal properties - data, type, sessionId or connectionId - is invalid."
-            )
+            raise SignalingError("One of the signal properties - data, type, sessionId or connectionId - is invalid.")
         elif response.status_code == 403:
-            raise AuthError(
-                "You are not authorized to send the signal. Check your authentication credentials."
-            )
+            raise AuthError("You are not authorized to send the signal. Check your authentication credentials.")
         elif response.status_code == 404:
-            raise SignalingError(
-                "The client specified by the connectionId property is not connected to the session."
-            )
+            raise SignalingError("The client specified by the connectionId property is not connected to the session.")
         elif response.status_code == 413:
             raise SignalingError(
                 "The type string exceeds the maximum length (128 bytes), or the data string exceeds the maximum size (8 kB)."
@@ -1034,13 +967,9 @@ class Client(object):
         if response.status_code == 204:
             pass
         elif response.status_code == 400:
-            raise ForceDisconnectError(
-                "One of the arguments - sessionId or connectionId - is invalid."
-            )
+            raise ForceDisconnectError("One of the arguments - sessionId or connectionId - is invalid.")
         elif response.status_code == 403:
-            raise AuthError(
-                "You are not authorized to forceDisconnect, check your authentication credentials."
-            )
+            raise AuthError("You are not authorized to forceDisconnect, check your authentication credentials.")
         elif response.status_code == 404:
             raise ForceDisconnectError(
                 "The client specified by the connectionId property is not connected to the session."
@@ -1231,8 +1160,7 @@ class Client(object):
             raise SipDialError("The session does not exist.")
         elif response.status_code == 409:
             raise SipDialError(
-                "You attempted to start a SIP call for a session that "
-                "does not use the OpenTok Media Router."
+                "You attempted to start a SIP call for a session that " "does not use the OpenTok Media Router."
             )
         else:
             raise RequestError("OpenTok server error.", response.status_code)
@@ -1347,11 +1275,11 @@ class Client(object):
             String 'resolution' optional: The resolution of the broadcast, either "640x480"
             (SD, the default) or "1280x720" (HD)
 
-            String 'multiBroadcastTag' optional: Set this to support multiple broadcasts for the same session simultaneously. 
-            Set this to a unique string for each simultaneous broadcast of an ongoing session. 
-            Note that the multiBroadcastTag value is not included in the response for the methods to list live streaming 
-            broadcasts and get information about a live streaming broadcast. 
-            For more information, see https://tokbox.com/developer/guides/broadcast/live-streaming#simultaneous-broadcasts. 
+            String 'multiBroadcastTag' optional: Set this to support multiple broadcasts for the same session simultaneously.
+            Set this to a unique string for each simultaneous broadcast of an ongoing session.
+            Note that the multiBroadcastTag value is not included in the response for the methods to list live streaming
+            broadcasts and get information about a live streaming broadcast.
+            For more information, see https://tokbox.com/developer/guides/broadcast/live-streaming#simultaneous-broadcasts.
 
         :param BroadcastStreamModes stream_mode (Optional): Determines the broadcast stream handling mode.
         Set this to BroadcastStreamModes.auto (the default) to have streams added automatically. Set this to
@@ -1365,14 +1293,9 @@ class Client(object):
         if 'hls' in options['outputs']:
             if 'lowLatency' in options['outputs']['hls'] and 'dvr' in options['outputs']['hls']:
                 if options['outputs']['hls']['lowLatency'] == True and options['outputs']['hls']['dvr'] == True:
-                    raise BroadcastHLSOptionsError(
-                        'HLS options "lowLatency" and "dvr" cannot both be set to "True".'
-                        )
+                    raise BroadcastHLSOptionsError('HLS options "lowLatency" and "dvr" cannot both be set to "True".')
 
-        payload = {
-                    "sessionId": session_id,
-                    "streamMode": stream_mode.value
-                  }
+        payload = {"sessionId": session_id, "streamMode": stream_mode.value}
 
         payload.update(options)
 
@@ -1440,26 +1363,18 @@ class Client(object):
             return Broadcast(response.json())
         elif response.status_code == 400:
             raise BroadcastError(
-                "Invalid request. This response may indicate that data in your request "
-                "data is invalid JSON."
+                "Invalid request. This response may indicate that data in your request " "data is invalid JSON."
             )
         elif response.status_code == 403:
             raise AuthError("Authentication error.")
         elif response.status_code == 409:
-            raise BroadcastError(
-                "The broadcast (with the specified ID) was not found or it has already "
-                "stopped."
-            )
+            raise BroadcastError("The broadcast (with the specified ID) was not found or it has already " "stopped.")
         else:
             raise RequestError("OpenTok server error.", response.status_code)
 
     def add_broadcast_stream(
-        self,
-        broadcast_id: str,
-        stream_id: str,
-        has_audio: bool = True,
-        has_video: bool = True
-        ) -> requests.Response:
+        self, broadcast_id: str, stream_id: str, has_audio: bool = True, has_video: bool = True
+    ) -> requests.Response:
 
         """
         This method will add streams to the broadcast with addStream for new participant(choosing audio, video or both).
@@ -1476,11 +1391,7 @@ class Client(object):
 
         endpoint = self.endpoints.get_broadcast_stream(broadcast_id)
 
-        streams = {
-            "hasAudio": has_audio,
-            "hasVideo": has_video,
-            "addStream": stream_id
-        }
+        streams = {"hasAudio": has_audio, "hasVideo": has_video, "addStream": stream_id}
 
         response = requests.patch(
             endpoint,
@@ -1502,12 +1413,13 @@ class Client(object):
         elif response.status_code == 403:
             raise AuthError("Authentication error.")
         elif response.status_code == 405:
-            raise BroadcastStreamModeError("Your broadcast is configured with a streamMode that does not support stream manipulation.")
+            raise BroadcastStreamModeError(
+                "Your broadcast is configured with a streamMode that does not support stream manipulation."
+            )
         elif response.status_code == 409:
             raise BroadcastError("The broadcast has already started for the session.")
         else:
             raise RequestError("OpenTok server error.", response.status_code)
-
 
     def remove_broadcast_stream(self, broadcast_id: str, stream_id: str) -> requests.Response:
         """
@@ -1519,9 +1431,7 @@ class Client(object):
 
         endpoint = self.endpoints.get_broadcast_stream(broadcast_id)
 
-        streams = {
-            "removeStream": stream_id
-        }
+        streams = {"removeStream": stream_id}
 
         response = requests.patch(
             endpoint,
@@ -1543,12 +1453,13 @@ class Client(object):
         elif response.status_code == 403:
             raise AuthError("Authentication error.")
         elif response.status_code == 405:
-            raise BroadcastStreamModeError("Your broadcast is configured with a streamMode that does not support stream manipulation.")
+            raise BroadcastStreamModeError(
+                "Your broadcast is configured with a streamMode that does not support stream manipulation."
+            )
         elif response.status_code == 409:
             raise BroadcastError("The broadcast has already started for the session.")
         else:
             raise RequestError("OpenTok server error.", response.status_code)
-
 
     def get_broadcast(self, broadcast_id):
         """
@@ -1580,8 +1491,7 @@ class Client(object):
             return Broadcast(response.json())
         elif response.status_code == 400:
             raise BroadcastError(
-                "Invalid request. This response may indicate that data in your request "
-                "data is invalid JSON."
+                "Invalid request. This response may indicate that data in your request " "data is invalid JSON."
             )
         elif response.status_code == 403:
             raise AuthError("Authentication error.")
@@ -1646,19 +1556,28 @@ class Client(object):
         else:
             raise RequestError("OpenTok server error.", response.status_code)
 
-    def start_render(self, session_id, opentok_token, url, max_duration=7200, resolution="1280x720", status_callback_url=None, properties: dict = None):
+    def start_render(
+        self,
+        session_id,
+        opentok_token,
+        url,
+        max_duration=7200,
+        resolution="1280x720",
+        status_callback_url=None,
+        properties: dict = None,
+    ):
         """
-        Starts an Experience Composer for the specified OpenTok session.
-        For more information, see the
-       `Experience Composer developer guide <https://tokbox.com/developer/guides/experience-composer>`_.
+         Starts an Experience Composer for the specified OpenTok session.
+         For more information, see the
+        `Experience Composer developer guide <https://tokbox.com/developer/guides/experience-composer>`_.
 
-        :param String 'session_id': The session ID of the OpenTok session that will include the Experience Composer stream.
-        :param String 'token': A valid OpenTok token with a Publisher role and (optionally) connection data to be associated with the output stream.
-        :param String 'url': A publically reachable URL controlled by the customer and capable of generating the content to be rendered without user intervention.
-        :param Integer 'maxDuration' Optional: The maximum time allowed for the Experience Composer, in seconds. After this time, it is stopped automatically, if it is still running. The maximum value is 36000 (10 hours), the minimum value is 60 (1 minute), and the default value is 7200 (2 hours). When the Experience Composer ends, its stream is unpublished and an event is posted to the callback URL, if configured in the Account Portal.
-        :param String 'resolution' Optional: The resolution of the Experience Composer, either "640x480" (SD landscape), "480x640" (SD portrait), "1280x720" (HD landscape), "720x1280" (HD portrait), "1920x1080" (FHD landscape), or "1080x1920" (FHD portrait). By default, this resolution is "1280x720" (HD landscape, the default).
-        :param Dictionary 'properties' Optional: Initial configuration of Publisher properties for the composed output stream.
-            String name Optional: The name of the composed output stream which will be published to the session. The name must have a minimum length of 1 and a maximum length of 200.
+         :param String 'session_id': The session ID of the OpenTok session that will include the Experience Composer stream.
+         :param String 'token': A valid OpenTok token with a Publisher role and (optionally) connection data to be associated with the output stream.
+         :param String 'url': A publically reachable URL controlled by the customer and capable of generating the content to be rendered without user intervention.
+         :param Integer 'maxDuration' Optional: The maximum time allowed for the Experience Composer, in seconds. After this time, it is stopped automatically, if it is still running. The maximum value is 36000 (10 hours), the minimum value is 60 (1 minute), and the default value is 7200 (2 hours). When the Experience Composer ends, its stream is unpublished and an event is posted to the callback URL, if configured in the Account Portal.
+         :param String 'resolution' Optional: The resolution of the Experience Composer, either "640x480" (SD landscape), "480x640" (SD portrait), "1280x720" (HD landscape), "720x1280" (HD portrait), "1920x1080" (FHD landscape), or "1080x1920" (FHD portrait). By default, this resolution is "1280x720" (HD landscape, the default).
+         :param Dictionary 'properties' Optional: Initial configuration of Publisher properties for the composed output stream.
+             String name Optional: The name of the composed output stream which will be published to the session. The name must have a minimum length of 1 and a maximum length of 200.
         """
         payload = {
             "sessionId": session_id,
@@ -1666,7 +1585,7 @@ class Client(object):
             "url": url,
             "maxDuration": max_duration,
             "resolution": resolution,
-            "properties": properties
+            "properties": properties,
         }
 
         logger.debug(
@@ -1699,13 +1618,12 @@ class Client(object):
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 
-
     def get_render(self, render_id):
         """
         This method allows you to see the status of a render, which can be one of the following:
             ['starting', 'started', 'stopped', 'failed']
 
-        :param String 'render_id': The ID of a specific render. 
+        :param String 'render_id': The ID of a specific render.
         """
         logger.debug(
             "GET to %r with headers %r, proxies %r",
@@ -1738,7 +1656,7 @@ class Client(object):
         """
         This method stops a render.
 
-        :param String 'render_id': The ID of a specific render. 
+        :param String 'render_id': The ID of a specific render.
         """
         logger.debug(
             "DELETE to %r with headers %r, proxies %r",
@@ -1772,7 +1690,7 @@ class Client(object):
         List existing renders associated with the project's API key.
 
         :param Integer 'offset' Optional: Start offset in the list of existing renders.
-        :param Integer 'count' Optional: Number of renders to retrieve, starting at 'offset'. 
+        :param Integer 'count' Optional: Number of renders to retrieve, starting at 'offset'.
         """
 
         query_params = {"offset": offset, "count": count}
@@ -1805,26 +1723,20 @@ class Client(object):
             raise RequestError("An unexpected error occurred", response.status_code)
 
     def _sign_string(self, string, secret):
-        return hmac.new(
-            secret.encode("utf-8"), string.encode("utf-8"), hashlib.sha1
-        ).hexdigest()
+        return hmac.new(secret.encode("utf-8"), string.encode("utf-8"), hashlib.sha1).hexdigest()
 
     def _create_jwt_auth_header(self):
         payload = {
             "ist": "project",
             "iss": self.api_key,
             "iat": int(time.time()),  # current time in unix time (seconds)
-            "exp": int(time.time())
-            + (60 * self._jwt_livetime),  # 3 minutes in the future (seconds)
+            "exp": int(time.time()) + (60 * self._jwt_livetime),  # 3 minutes in the future (seconds)
             "jti": "{0}".format(0, random.random()),
         }
 
         return jwt.encode(payload, self.api_secret, algorithm="HS256")
-        
 
-    def mute_all(self,
-                session_id: str,
-                excludedStreamIds: Optional[List[str]]) -> requests.Response:
+    def mute_all(self, session_id: str, excludedStreamIds: Optional[List[str]]) -> requests.Response:
 
         """
         Mutes all streams in an OpenTok session.
@@ -1846,7 +1758,7 @@ class Client(object):
 
         try:
             if excludedStreamIds:
-                options = {'active': True, 'excludedStreams': excludedStreamIds }
+                options = {'active': True, 'excludedStreams': excludedStreamIds}
             else:
                 options = {'active': True, 'excludedStreams': []}
 
@@ -1855,16 +1767,19 @@ class Client(object):
             if response:
                 return response
             elif response.status_code == 400:
-                raise GetStreamError("Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.")
+                raise GetStreamError(
+                    "Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID."
+                )
             elif response.status_code == 403:
                 raise AuthError("Failed to mute, invalid credentials.")
             elif response.status_code == 404:
                 raise NotFoundError("The session or a stream is not found.")
         except Exception as e:
             raise OpenTokException(
-                ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} and excludedStreamIds (if exists) {1} are valid").format(
-                    session_id, excludedStreamIds))
-
+                (
+                    "There was an error thrown by the OpenTok SDK, please check that your session_id {0} and excludedStreamIds (if exists) {1} are valid"
+                ).format(session_id, excludedStreamIds)
+            )
 
     def disable_force_mute(self, session_id: str) -> requests.Response:
         """
@@ -1884,12 +1799,13 @@ class Client(object):
 
         response = requests.post(url, headers=self.get_headers(), data=json.dumps(options))
 
-
         try:
             if response:
-                    return response
+                return response
             elif response.status_code == 400:
-                raise GetStreamError("Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.")
+                raise GetStreamError(
+                    "Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID."
+                )
             elif response.status_code == 403:
                 raise AuthError("Failed to mute, invalid credentials.")
             elif response.status_code == 404:
@@ -1897,8 +1813,9 @@ class Client(object):
         except Exception as e:
             raise OpenTokException(
                 ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} is valid").format(
-                    session_id))
-
+                    session_id
+                )
+            )
 
     def mute_stream(self, session_id: str, stream_id: str) -> requests.Response:
         """
@@ -1916,18 +1833,21 @@ class Client(object):
             response = requests.post(url, headers=self.get_headers())
 
             if response:
-                    return response
+                return response
             elif response.status_code == 400:
-                raise GetStreamError("Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.")
+                raise GetStreamError(
+                    "Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID."
+                )
             elif response.status_code == 403:
                 raise AuthError("Failed to mute, invalid credentials.")
             elif response.status_code == 404:
                 raise NotFoundError("Mute not found")
         except Exception as e:
             raise OpenTokException(
-                ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} and stream_id {1} are valid").format(
-                    session_id, stream_id))
-
+                (
+                    "There was an error thrown by the OpenTok SDK, please check that your session_id {0} and stream_id {1} are valid"
+                ).format(session_id, stream_id)
+            )
 
     def play_dtmf(self, session_id: str, connection_id: str, digits: str, options: dict = {}) -> requests.Response:
         """
@@ -1960,12 +1880,20 @@ class Client(object):
             elif response.status_code == 400:
                 raise DTMFError("One of the properties digits, sessionId or connectionId is invalid.")
             elif response.status_code == 403:
-                raise AuthError("Failed to create session, invalid credentials. Please check your OpenTok API Key or JSON web token")
+                raise AuthError(
+                    "Failed to create session, invalid credentials. Please check your OpenTok API Key or JSON web token"
+                )
             elif response.status_code == 404:
-                raise NotFoundError("The session does not exists or the client specified by the connection_id is not connected to the session")
+                raise NotFoundError(
+                    "The session does not exists or the client specified by the connection_id is not connected to the session"
+                )
         except Exception as e:
             raise OpenTokException(
-                (f"There was an error thrown by the OpenTok SDK, please check that your session_id: {session_id}, connection_id (if exists): {connection_id} and digits: {digits} are valid"))
+                (
+                    f"There was an error thrown by the OpenTok SDK, please check that your session_id: {session_id}, connection_id (if exists): {connection_id} and digits: {digits} are valid"
+                )
+            )
+
 
 class OpenTok(Client):
     def __init__(
@@ -1981,17 +1909,9 @@ class OpenTok(Client):
             DeprecationWarning,
             stacklevel=2,
         )
-        super(OpenTok, self).__init__(
-            api_key,
-            api_secret,
-            api_url=api_url,
-            timeout=timeout,
-            app_version=app_version
-        )
+        super(OpenTok, self).__init__(api_key, api_secret, api_url=api_url, timeout=timeout, app_version=app_version)
 
-    def mute_all(self,
-                session_id: str,
-                excludedStreamIds: Optional[List[str]]) -> requests.Response:
+    def mute_all(self, session_id: str, excludedStreamIds: Optional[List[str]]) -> requests.Response:
 
         """
         Mutes all streams in an OpenTok session.
@@ -2009,7 +1929,7 @@ class OpenTok(Client):
 
         try:
             if excludedStreamIds:
-                options = {'active': True, 'excludedStreams': excludedStreamIds }
+                options = {'active': True, 'excludedStreams': excludedStreamIds}
             else:
                 options = {'active': True, 'excludedStreams': []}
 
@@ -2018,16 +1938,19 @@ class OpenTok(Client):
             if response:
                 return response
             elif response.status_code == 400:
-                raise GetStreamError("Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.")
+                raise GetStreamError(
+                    "Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID."
+                )
             elif response.status_code == 403:
                 raise AuthError("Failed to mute, invalid credentials.")
             elif response.status_code == 404:
                 raise NotFoundError("The session or a stream is not found.")
         except Exception as e:
             raise OpenTokException(
-                ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} and excludedStreamIds (if exists) {1} are valid").format(
-                    session_id, excludedStreamIds))
-
+                (
+                    "There was an error thrown by the OpenTok SDK, please check that your session_id {0} and excludedStreamIds (if exists) {1} are valid"
+                ).format(session_id, excludedStreamIds)
+            )
 
     def disable_force_mute(self, session_id: str) -> requests.Response:
         """
@@ -2045,12 +1968,13 @@ class OpenTok(Client):
 
         response = requests.post(url, headers=self.get_headers(), data=json.dumps(options))
 
-
         try:
             if response:
-                    return response
+                return response
             elif response.status_code == 400:
-                raise GetStreamError("Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.")
+                raise GetStreamError(
+                    "Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID."
+                )
             elif response.status_code == 403:
                 raise AuthError("Failed to mute, invalid credentials.")
             elif response.status_code == 404:
@@ -2058,8 +1982,9 @@ class OpenTok(Client):
         except Exception as e:
             raise OpenTokException(
                 ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} is valid").format(
-                    session_id))
-
+                    session_id
+                )
+            )
 
     def mute_stream(self, session_id: str, stream_id: str) -> requests.Response:
         """
@@ -2075,18 +2000,21 @@ class OpenTok(Client):
             response = requests.post(url, headers=self.get_headers())
 
             if response:
-                    return response
+                return response
             elif response.status_code == 400:
-                raise GetStreamError("Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID.")
+                raise GetStreamError(
+                    "Invalid request. This response may indicate that data in your request data is invalid JSON. Or it may indicate that you do not pass in a session ID or you passed in an invalid stream ID."
+                )
             elif response.status_code == 403:
                 raise AuthError("Failed to mute, invalid credentials.")
             elif response.status_code == 404:
                 raise NotFoundError("Mute not found")
         except Exception as e:
             raise OpenTokException(
-                ("There was an error thrown by the OpenTok SDK, please check that your session_id {0} and stream_id {1} are valid").format(
-                    session_id, stream_id))
-
+                (
+                    "There was an error thrown by the OpenTok SDK, please check that your session_id {0} and stream_id {1} are valid"
+                ).format(session_id, stream_id)
+            )
 
     def play_dtmf(self, session_id: str, connection_id: str, digits: str, options: dict = {}) -> requests.Response:
         """
@@ -2115,9 +2043,16 @@ class OpenTok(Client):
             elif response.status_code == 400:
                 raise DTMFError("One of the properties digits, sessionId or connectionId is invalid.")
             elif response.status_code == 403:
-                raise AuthError("Failed to create session, invalid credentials. Please check your OpenTok API Key or JSON web token")
+                raise AuthError(
+                    "Failed to create session, invalid credentials. Please check your OpenTok API Key or JSON web token"
+                )
             elif response.status_code == 404:
-                raise NotFoundError("The session does not exists or the client specified by the connection_id is not connected to the session")
+                raise NotFoundError(
+                    "The session does not exists or the client specified by the connection_id is not connected to the session"
+                )
         except Exception as e:
             raise OpenTokException(
-                (f"There was an error thrown by the OpenTok SDK, please check that your session_id: {session_id}, connection_id (if exists): {connection_id} and digits: {digits} are valid"))
+                (
+                    f"There was an error thrown by the OpenTok SDK, please check that your session_id: {session_id}, connection_id (if exists): {connection_id} and digits: {digits} are valid"
+                )
+            )
