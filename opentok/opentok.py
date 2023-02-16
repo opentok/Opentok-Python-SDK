@@ -400,6 +400,7 @@ class Client(object):
                 location=location,
                 media_mode=media_mode,
                 archive_mode=archive_mode,
+                e2ee=e2ee,
             )
         except Exception as e:
             raise OpenTokException("Failed to generate session: %s" % str(e))

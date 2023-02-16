@@ -54,6 +54,7 @@ class OpenTokSessionCreationTest(unittest.TestCase):
         )
         expect(session).to(have_property(u("media_mode"), MediaModes.relayed))
         expect(session).to(have_property(u("location"), None))
+        expect(session).to(have_property(u("e2ee"), False))
 
     @httpretty.activate
     def test_create_routed_session(self):
@@ -87,6 +88,7 @@ class OpenTokSessionCreationTest(unittest.TestCase):
         )
         expect(session).to(have_property(u("media_mode"), MediaModes.routed))
         expect(session).to(have_property(u("location"), None))
+        expect(session).to(have_property(u("e2ee"), False))
 
     @httpretty.activate
     def test_failure_create_routed_session(self):
@@ -138,6 +140,7 @@ class OpenTokSessionCreationTest(unittest.TestCase):
         )
         expect(session).to(have_property(u("media_mode"), MediaModes.relayed))
         expect(session).to(have_property(u("location"), u("12.34.56.78")))
+        expect(session).to(have_property(u("e2ee"), False))
 
     @httpretty.activate
     def test_create_routed_session_with_location_hint(self):
@@ -174,6 +177,7 @@ class OpenTokSessionCreationTest(unittest.TestCase):
         )
         expect(session).to(have_property(u("media_mode"), MediaModes.routed))
         expect(session).to(have_property(u("location"), u("12.34.56.78")))
+        expect(session).to(have_property(u("e2ee"), False))
 
     @httpretty.activate
     def test_create_manual_archive_mode_session(self):
@@ -209,6 +213,7 @@ class OpenTokSessionCreationTest(unittest.TestCase):
         )
         expect(session).to(have_property(u("media_mode"), MediaModes.routed))
         expect(session).to(have_property(u("archive_mode"), ArchiveModes.manual))
+        expect(session).to(have_property(u("e2ee"), False))
 
     @httpretty.activate
     def test_create_always_archive_mode_session(self):
@@ -244,6 +249,7 @@ class OpenTokSessionCreationTest(unittest.TestCase):
         )
         expect(session).to(have_property(u("media_mode"), MediaModes.routed))
         expect(session).to(have_property(u("archive_mode"), ArchiveModes.always))
+        expect(session).to(have_property(u("e2ee"), False))
 
     @httpretty.activate
     def test_complains_about_always_archive_mode_and_relayed_session(self):
@@ -262,6 +268,33 @@ class OpenTokSessionCreationTest(unittest.TestCase):
             media_mode=MediaModes.relayed,
             archive_mode=ArchiveModes.always,
         )
+
+    @httpretty.activate
+    def test_create_session_with_e2ee(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            u("https://api.opentok.com/session/create"),
+            body=u(
+                '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sessions><Session><session_id>1_MX4xMjM0NTZ-fk1vbiBNYXIgMTcgMDA6NDE6MzEgUERUIDIwMTR-MC42ODM3ODk1MzQ0OTQyODA4fg</session_id><partner_id>123456</partner_id><create_dt>Mon Mar 17 00:41:31 PDT 2014</create_dt></Session></sessions>'
+            ),
+            status=200,
+            content_type=u("text/xml"),
+        )
+
+        session = self.opentok.create_session(e2ee=True)
+
+        body = parse_qs(httpretty.last_request().body)
+        expect(body).to(have_key(b("e2ee"), [b'True']))
+        expect(session).to(be_a(Session))
+        expect(session).to(
+            have_property(
+                u("session_id"),
+                u(
+                    "1_MX4xMjM0NTZ-fk1vbiBNYXIgMTcgMDA6NDE6MzEgUERUIDIwMTR-MC42ODM3ODk1MzQ0OTQyODA4fg"
+                ),
+            )
+        )
+        expect(session).to(have_property(u("e2ee"), True))
 
     # TODO: all the cases that throw exceptions
     # TODO: custom api_url requests
