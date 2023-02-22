@@ -62,7 +62,9 @@ keyword parameters for this method:
 * ``archive_mode`` which specifies whether the session will be automatically archived (``always``)
   or not (``manual``).
 
-* ``e2ee`` which is a boolean. This specifies whether to enable end-to-end encryption for the OpenTok session.
+* ``e2ee`` which is a boolean. This specifies whether to enable
+`end-to-end encryption <https://tokbox.com/developer/guides/end-to-end-encryption/>`_
+for the OpenTok session.
 
 This method returns a ``Session`` object. Its ``session_id`` attribute is useful when saving to a persistent
 store (such as a database).
