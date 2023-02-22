@@ -359,7 +359,8 @@ class Client(object):
             situate the session in its global network. If you do not set a location hint,
             the OpenTok servers will be based on the first client connecting to the session.
 
-        :param Boolean e2ee: Whether to enable end-to-end encryption for the OpenTok session.
+         :param Boolean e2ee: Whether to enable end-to-end encryption for the OpenTok session
+             (see https://tokbox.com/platform/fallback).
 
         :rtype: The Session object. The session_id property of the object is the session ID.
         """
