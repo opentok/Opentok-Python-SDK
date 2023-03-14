@@ -1,5 +1,5 @@
 # Release v3.4.0
-- Support for end-to-end session encryption (E2EE)
+- Support for Audio Connector API via `connect_audio_to_websocket` method
 
 # Release v3.3.0
 
