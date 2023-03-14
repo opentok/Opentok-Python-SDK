@@ -107,12 +107,22 @@ class BroadcastStreamModeError(OpenTokException):
     Indicates that the broadcast is configured with a streamMode that does not support stream manipulation.
     """
 
-    pass
-
 
 class BroadcastHLSOptionsError(OpenTokException):
     """
     Indicates that HLS options have been set incorrectly. 
     
     dvr and lowLatency modes cannot both be set to true in a broadcast.
+    """
+
+
+class InvalidWebSocketOptionsError(OpenTokException):
+    """
+    Indicates that the WebSocket options selected are invalid.
+    """
+
+
+class InvalidMediaModeError(OpenTokException):
+    """
+    Indicates that the media mode selected was not valid for the type of request made.
     """

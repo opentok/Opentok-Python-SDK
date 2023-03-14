@@ -208,3 +208,9 @@ class Endpoints(object):
             url += "/" + render_id
 
         return url
+
+    def get_audio_connector_url(self):
+        """Returns URLs for working with the Audio Connector API."""
+        url = self.api_url + "/v2/project/" + self.api_key + "/connect"
+        
+        return url
