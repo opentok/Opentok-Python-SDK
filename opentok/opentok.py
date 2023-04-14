@@ -115,6 +115,9 @@ class Client(object):
         self._proxies = None
         self.endpoints = Endpoints(api_url, self.api_key)
         self._app_version = __version__ if app_version == None else app_version
+        self._user_agent = (
+            f"OpenTok-Python-SDK/{self.app_version} python/{platform.python_version()}"
+        )
         # JWT custom claims - Default values
         self._jwt_livetime = 3  # In minutes
 
@@ -133,6 +136,17 @@ class Client(object):
     @app_version.setter
     def app_version(self, value):
         self._app_version = value
+
+    @property
+    def user_agent(self):
+        return self._user_agent
+
+    @user_agent.setter
+    def user_agent(self, value):
+        self._user_agent = value
+
+    def append_to_user_agent(self, value):
+        self.user_agent = self.user_agent + value
 
     @property
     def jwt_livetime(self):
