@@ -28,6 +28,12 @@ class Broadcast(object):
     :ivar status:
         The status of the broadcast.
 
+    :ivar hasAudio:
+        Whether the broadcast has audio.
+
+    :ivar hasVideo:
+        Whether the broadcast has video.
+
     :ivar broadcastUrls:
         An object containing details about the HLS and RTMP broadcasts.
         
@@ -63,6 +69,8 @@ class Broadcast(object):
         self.projectId = kwargs.get("projectId")
         self.createdAt = kwargs.get("createdAt")
         self.updatedAt = kwargs.get("updatedAt")
+        self.hasAudio = kwargs.get("hasAudio")
+        self.hasVideo = kwargs.get("hasVideo")
         self.resolution = kwargs.get("resolution")
         self.status = kwargs.get("status")
         self.broadcastUrls = kwargs.get("broadcastUrls")
@@ -71,7 +79,7 @@ class Broadcast(object):
 
     def json(self):
         """
-        Returns a JSON representation of the broadcast
+        Returns a JSON representation of the broadcast.
         """
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 

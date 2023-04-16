@@ -1377,7 +1377,7 @@ class Client(object):
         BroadcastStreamModes.manual to explicitly select streams to include in the the broadcast, using the
         OpenTok.add_broadcast_stream() and OpenTok.remove_broadcast_stream() methods.
 
-        :rtype A Broadcast object, which contains information of the broadcast: id, sessionId
+        :rtype A Broadcast object, which contains information of the broadcast: id, sessionId,
         projectId, createdAt, updatedAt, resolution, status and broadcastUrls
         """
 
