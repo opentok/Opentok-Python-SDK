@@ -597,7 +597,7 @@ class Client(object):
             "POST to %r with params %r, headers %r, proxies %r",
             self.endpoints.archive_url(),
             json.dumps(payload),
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -643,7 +643,7 @@ class Client(object):
         logger.debug(
             "POST to %r with headers %r, proxies %r",
             self.endpoints.archive_url(archive_id) + "/stop",
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -678,7 +678,7 @@ class Client(object):
         logger.debug(
             "DELETE to %r with headers %r, proxies %r",
             self.endpoints.archive_url(archive_id),
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -708,7 +708,7 @@ class Client(object):
         logger.debug(
             "GET to %r with headers %r, proxies %r",
             self.endpoints.archive_url(archive_id),
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -754,7 +754,7 @@ class Client(object):
         logger.debug(
             "GET to %r with headers %r, proxies %r",
             endpoint,
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -905,7 +905,7 @@ class Client(object):
             "POST to %r with params %r, headers %r, proxies %r",
             self.endpoints.signaling_url(session_id, connection_id),
             json.dumps(payload),
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -960,7 +960,7 @@ class Client(object):
         logger.debug(
             "GET to %r with headers %r, proxies %r",
             endpoint,
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -997,7 +997,7 @@ class Client(object):
         logger.debug(
             "GET to %r with headers %r, proxies %r",
             endpoint,
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -1035,7 +1035,7 @@ class Client(object):
         logger.debug(
             "DELETE to %r with headers %r, proxies %r",
             endpoint,
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -1095,7 +1095,7 @@ class Client(object):
             "PUT to %r with params %r, headers %r, proxies %r",
             endpoint,
             json.dumps(payload),
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -1224,7 +1224,7 @@ class Client(object):
             "POST to %r with params %r, headers %r, proxies %r",
             endpoint,
             json.dumps(payload),
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -1278,7 +1278,7 @@ class Client(object):
             "PUT to %r with params %r, headers %r, proxies %r",
             endpoint,
             json.dumps(items_payload),
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -1312,6 +1312,10 @@ class Client(object):
         relayed
 
         :param String session_id: The session ID of the OpenTok session you want to broadcast
+
+        :param Boolean optional hasAudio: Whether the stream is broadcast with audio.
+
+        :param Boolean optional hasVideo: Whether the stream is broadcast with video.
 
         :param Dictionary options, with the following properties:
 
@@ -1397,7 +1401,7 @@ class Client(object):
             "POST to %r with params %r, headers %r, proxies %r",
             endpoint,
             json.dumps(payload),
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -1440,7 +1444,7 @@ class Client(object):
         logger.debug(
             "POST to %r with headers %r, proxies %r",
             endpoint,
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -1580,7 +1584,7 @@ class Client(object):
         logger.debug(
             "GET to %r with headers %r, proxies %r",
             endpoint,
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -1637,7 +1641,7 @@ class Client(object):
             "PUT to %r with params %r, headers %r, proxies %r",
             endpoint,
             json.dumps(payload),
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
