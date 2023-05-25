@@ -62,6 +62,15 @@ keyword parameters for this method:
 * ``archive_mode`` which specifies whether the session will be automatically archived (``always``)
   or not (``manual``).
 
+* ``archive_name`` which indicates the archive name for all the archives in auto archived session. 
+  A session that begins with archive mode 'always' will be using this archive name for all archives of that session.
+  Passing 'archive_name' with archive mode 'manual' will cause an error response.
+
+* ``archive_resolution`` which indicates the archive resolution for all the archives in auto archived session.
+  Valid values are '640x480', '480x640', '1280x720', '720x1280', '1920x1080' and '1080x1920'.
+  A session that begins with archive mode 'always' will be using this resolution for all archives of that session.
+  Passing 'archive_resolution' with archive mode 'manual' will cause an error response.
+
 * ``e2ee`` which is a boolean. This specifies whether to enable
   `end-to-end encryption <https://tokbox.com/developer/guides/end-to-end-encryption/>`_
   for the OpenTok session.
@@ -81,6 +90,14 @@ store (such as a database).
 
   # An automatically archived session:
   session = opentok.create_session(media_mode=MediaModes.routed, archive_mode=ArchiveModes.always)
+
+  # An automatically archived session with the archive name and resolution specified:
+  session = opentok.create_session(
+    media_mode=MediaModes.routed,
+    archive_mode=ArchiveModes.always,
+    archive_name='my_archive',
+    archive_resolution='1920x1080'
+  )
 
   # A session with a location hint
   session = opentok.create_session(location=u'12.34.56.78')
