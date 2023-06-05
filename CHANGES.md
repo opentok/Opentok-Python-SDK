@@ -1,5 +1,7 @@
-# Release v3.4.0
+# Release v3.5.0
+- Support for end-to-end encryption (E2EE) that can be specified by a user when creating an OpenTok session.
 
+# Release v3.4.0
 - Support for Audio Connector API via `connect_audio_to_websocket` method
 
 # Release v3.3.0

@@ -48,7 +48,7 @@ Import the package at the top of any file where you will use it. At the very lea
 Creating Sessions
 ~~~~~~~~~~~~~~~~~
 
-To create an OpenTok Session, use the ``opentok.create_session()`` method. There are three optional
+To create an OpenTok Session, use the ``opentok.create_session()`` method. There are optional
 keyword parameters for this method:
 
 * ``location`` which can be set to a string containing an IP address.
@@ -61,6 +61,10 @@ keyword parameters for this method:
 
 * ``archive_mode`` which specifies whether the session will be automatically archived (``always``)
   or not (``manual``).
+
+* ``e2ee`` which is a boolean. This specifies whether to enable
+  `end-to-end encryption <https://tokbox.com/developer/guides/end-to-end-encryption/>`_
+  for the OpenTok session.
 
 This method returns a ``Session`` object. Its ``session_id`` attribute is useful when saving to a persistent
 store (such as a database).

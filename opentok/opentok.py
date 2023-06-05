@@ -315,6 +315,7 @@ class Client(object):
         location=None,
         media_mode=MediaModes.relayed,
         archive_mode=ArchiveModes.manual,
+        e2ee=False,
     ):
         """
         Creates a new OpenTok session and returns the session ID, which uniquely identifies
@@ -373,6 +374,9 @@ class Client(object):
             situate the session in its global network. If you do not set a location hint,
             the OpenTok servers will be based on the first client connecting to the session.
 
+         :param Boolean e2ee: Whether to enable end-to-end encryption for a routed session
+             (see https://tokbox.com/developer/guides/end-to-end-encryption/).
+
         :rtype: The Session object. The session_id property of the object is the session ID.
         """
 
@@ -409,6 +413,7 @@ class Client(object):
                     ).format(location)
                 )
             options[u("location")] = location
+        options["e2ee"] = e2ee
 
         try:
             logger.debug(
@@ -450,13 +455,14 @@ class Client(object):
 
             session_id = (
                 dom.getElementsByTagName("session_id")[0].childNodes[0].nodeValue
-            )
+            )            
             return Session(
                 self,
                 session_id,
                 location=location,
                 media_mode=media_mode,
                 archive_mode=archive_mode,
+                e2ee=e2ee,
             )
         except Exception as e:
             raise OpenTokException("Failed to generate session: %s" % str(e))
