@@ -90,6 +90,15 @@ class ArchiveModes(Enum):
     """The session will be automatically archived."""
 
 
+valid_archive_resolutions = {
+    "640x480",
+    "480x640",
+    "1280x720",
+    "720x1280",
+    "1920x1080",
+    "1080x1920",
+}
+
 logger = logging.getLogger("opentok")
 
 
@@ -312,6 +321,8 @@ class Client(object):
         location=None,
         media_mode=MediaModes.relayed,
         archive_mode=ArchiveModes.manual,
+        archive_name=None,
+        archive_resolution=None,
         e2ee=False,
     ):
         """
@@ -367,6 +378,16 @@ class Client(object):
             (either automatically or not), you must set the media_mode parameter to
             MediaModes.routed.
 
+        :param String archive_name: Indicates the archive name for all the archives in auto archived session.
+            A session that begins with archive mode 'always' will be using this archive name for all archives of that session.
+            Passing 'archive_name' with archive mode 'manual' will cause an error response.
+
+        :param String archive_resolution:
+            Indicates the archive resolution for all the archives in auto archived session.
+            Valid values are '640x480', '480x640', '1280x720', '720x1280', '1920x1080' and '1080x1920'.
+            A session that begins with archive mode 'always' will be using this resolution for all archives of that session.
+            Passing 'archive_resolution' with archive mode 'manual' will cause an error response.
+
         :param String location: An IP address that the OpenTok servers will use to
             situate the session in its global network. If you do not set a location hint,
             the OpenTok servers will be based on the first client connecting to the session.
@@ -397,8 +418,34 @@ class Client(object):
                     "A session with always archive mode must also have the routed media mode."
                 )
             )
+
+        if archive_name is not None:
+            if archive_mode == ArchiveModes.manual:
+                raise OpenTokException(
+                    "You cannot specify a value for archive_name with archive mode: manual."
+                )
+            if not 1 <= len(archive_name) <= 80:
+                raise OpenTokException(
+                    "archive_name must be between 1 and 80 characters in length."
+                )
+
+        if archive_resolution is not None:
+            if archive_mode == ArchiveModes.manual:
+                raise OpenTokException(
+                    "You cannot specify a value for archive_resolution with archive mode: manual."
+                )
+            if archive_resolution not in valid_archive_resolutions:
+                raise OpenTokException(
+                    f"archive_resolution must be one of the allowed values: {valid_archive_resolutions}."
+                )
+
         options[u("p2p.preference")] = media_mode.value
         options[u("archiveMode")] = archive_mode.value
+        if archive_name is not None:
+            options[("archiveName")] = archive_name
+        if archive_resolution is not None:
+            options[("archiveResolution")] = archive_resolution
+
         if location:
             # validate IP address
             try:
@@ -452,7 +499,7 @@ class Client(object):
 
             session_id = (
                 dom.getElementsByTagName("session_id")[0].childNodes[0].nodeValue
-            )            
+            )
             return Session(
                 self,
                 session_id,
