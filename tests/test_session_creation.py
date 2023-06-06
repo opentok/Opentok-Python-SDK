@@ -228,7 +228,10 @@ class OpenTokSessionCreationTest(unittest.TestCase):
         )
 
         session = self.opentok.create_session(
-            media_mode=MediaModes.routed, archive_mode=ArchiveModes.always, archive_name='test_opentok_archive', archive_resolution='1920x1080'
+            media_mode=MediaModes.routed,
+            archive_mode=ArchiveModes.always,
+            archive_name="test_opentok_archive",
+            archive_resolution="1920x1080",
         )
 
         validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
@@ -238,6 +241,8 @@ class OpenTokSessionCreationTest(unittest.TestCase):
         body = parse_qs(httpretty.last_request().body)
         expect(body).to(have_key(b("p2p.preference"), [b("disabled")]))
         expect(body).to(have_key(b("archiveMode"), [b("always")]))
+        expect(body).to(have_key(b("archiveName"), [b("test_opentok_archive")]))
+        expect(body).to(have_key(b("archiveResolution"), [b("1920x1080")]))
         expect(session).to(be_a(Session))
         expect(session).to(
             have_property(
@@ -265,28 +270,28 @@ class OpenTokSessionCreationTest(unittest.TestCase):
             self.opentok.create_session,
             media_mode=MediaModes.routed,
             archive_mode=ArchiveModes.manual,
-            archive_name='my_archive',
+            archive_name="my_archive",
         )
         self.assertRaises(
             OpenTokException,
             self.opentok.create_session,
             media_mode=MediaModes.routed,
             archive_mode=ArchiveModes.manual,
-            archive_resolution='640x480'
+            archive_resolution="640x480",
         )
         self.assertRaises(
             OpenTokException,
             self.opentok.create_session,
             media_mode=MediaModes.routed,
             archive_mode=ArchiveModes.always,
-            archive_name='my_incredibly_long_name_that_is_definitely_going_to_be_over_the_80_character_limit_we_currently_impose'
+            archive_name="my_incredibly_long_name_that_is_definitely_going_to_be_over_the_80_character_limit_we_currently_impose",
         )
         self.assertRaises(
             OpenTokException,
             self.opentok.create_session,
             media_mode=MediaModes.routed,
             archive_mode=ArchiveModes.always,
-            archive_resolution='10x10'
+            archive_resolution="10x10",
         )
 
     @httpretty.activate
@@ -304,7 +309,7 @@ class OpenTokSessionCreationTest(unittest.TestCase):
         session = self.opentok.create_session(e2ee=True)
 
         body = parse_qs(httpretty.last_request().body)
-        expect(body).to(have_key(b("e2ee"), [b'True']))
+        expect(body).to(have_key(b("e2ee"), [b"True"]))
         expect(session).to(be_a(Session))
         expect(session).to(
             have_property(
