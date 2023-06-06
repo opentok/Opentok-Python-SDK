@@ -1,3 +1,15 @@
+# Release v3.6.0
+- Added auto-archive improvements to the `opentok.Client.create_session` method 
+to customize automatically created archives:
+  - `archive_name` parameter
+  - `archive_resolution` parameter
+- Added the option to append to the user-agent, which can be done with
+```python
+opentok.Client.append_to_user_agent('my-appended-string')
+```
+- Added the option to specify audio-only or video-only broadcasts with the new booleans `hasAudio` and `hasVideo` 
+when starting a broadcast or adding new streams to a broadcast.
+
 # Release v3.5.0
 - Support for end-to-end encryption (E2EE) that can be specified by a user when creating an OpenTok session.
 
