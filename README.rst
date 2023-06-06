@@ -421,6 +421,8 @@ The live streaming broadcast can target one HLS endpoint and up to five RTMP ser
       'stylesheet': 'the layout stylesheet (only used with type == custom)'
     },
     'maxDuration': 5400,
+    'hasAudio': True
+    'hasVideo': True
     'outputs': {
       'hls': {},
       'rtmp': [{
@@ -476,6 +478,37 @@ You can specify the following broadcast resolutions:
   
 To enable multiple simultaneous broadcasts on the same session, specify a unique value for the 
 ``multiBroadcastTag`` parameter in ``options`` when calling the ``opentok.start_broadcast`` method.
+
+You can broadcast only audio, or only video, for a stream by setting ``hasAudio`` or ``hasVideo``
+to ``False`` as required. These fields are ``True`` by default.
+
+.. code:: python
+
+  session_id = 'SESSIONID'
+  options = {
+    'layout': {
+      'type': 'custom',
+      'stylesheet': 'the layout stylesheet (only used with type == custom)'
+    },
+    'maxDuration': 5400,
+    'hasAudio': True
+    'hasVideo': False
+    'outputs': {
+      'hls': {},
+      'rtmp': [{
+        'id': 'foo',
+        'serverUrl': 'rtmp://myfooserver/myfooapp',
+        'streamName': 'myfoostream'
+      }, {
+        'id': 'bar',
+        'serverUrl': 'rtmp://mybarserver/mybarapp',
+        'streamName': 'mybarstream'
+      }]
+    },
+    'resolution': '640x480'
+  }
+
+  broadcast = opentok.start_broadcast(session_id, options)
 
 You can stop a started Broadcast using the ``opentok.stop_broadcast(broadcast_id)`` method.
 
@@ -639,6 +672,15 @@ to all clients connected to session or to a specific connection:
 
   # To a specific connection
   opentok.play_dtmf(session_id, connection_id, digits)
+
+Appending to the User Agent
+-------
+
+You can append a string to the user agent that is sent with requests:
+
+.. code:: python
+
+  opentok.append_to_user_agent('my-appended-string')
 
 Samples
 -------

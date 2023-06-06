@@ -293,6 +293,208 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(list(broadcast.broadcastUrls["rtmp"])).to(have_length(2))
 
     @httpretty.activate
+    def test_start_broadcast_audio_only(self):
+        """
+        Test start_broadcast() method
+        """
+        httpretty.register_uri(
+            httpretty.POST,
+            u("https://api.opentok.com/v2/project/{0}/broadcast").format(self.api_key),
+            body=textwrap.dedent(
+                u(
+                    """\
+                        {
+                            "id": "1748b7070a81464c9759c46ad10d3734",
+                            "sessionId": "2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4",
+                            "projectId": 100,
+                            "createdAt": 1437676551000,
+                            "updatedAt": 1437676551000,
+                            "resolution": "640x480",
+                            "status": "started",
+                            "hasAudio": true,
+                            "hasVideo": false,
+                            "broadcastUrls": {
+                                "hls" : "http://server/fakepath/playlist.m3u8",
+                                "rtmp": {
+                                    "foo": {
+                                        "serverUrl": "rtmp://myfooserver/myfooapp",
+                                        "streamName": "myfoostream"
+                                    },
+                                    "bar": {
+                                        "serverUrl": "rtmp://mybarserver/mybarapp",
+                                        "streamName": "mybarstream"
+                                    }
+                                }
+                            }
+                        }
+                    """
+                )
+            ),
+            status=200,
+            content_type=u("application/json"),
+        )
+
+        options = {
+            "layout": {
+                "type": "custom",
+                "stylesheet": "the layout stylesheet (only used with type == custom)",
+            },
+            "maxDuration": 5400,
+            "hasAudio": True,
+            "hasVideo": False,
+            "outputs": {
+                "hls": {},
+                "rtmp": [
+                    {
+                        "id": "foo",
+                        "serverUrl": "rtmp://myfooserver/myfooapp",
+                        "streamName": "myfoostream",
+                    },
+                    {
+                        "id": "bar",
+                        "serverUrl": "rtmp://mybarserver/mybarapp",
+                        "streamName": "mybarstream",
+                    },
+                ],
+            },
+            "resolution": "640x480",
+        }
+
+        broadcast = self.opentok.start_broadcast(self.session_id, options)
+        validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
+        expect(httpretty.last_request().headers[u("user-agent")]).to(
+            contain(u("OpenTok-Python-SDK/") + __version__)
+        )
+        expect(httpretty.last_request().headers[u("content-type")]).to(
+            equal(u("application/json"))
+        
+        )
+        # non-deterministic json encoding. have to decode to test it properly
+        if PY2:
+            body = json.loads(httpretty.last_request().body)
+        if PY3:
+            body = json.loads(httpretty.last_request().body.decode("utf-8"))
+
+        expect(body).to(have_key(u("layout")))
+        expect(broadcast).to(be_an(Broadcast))
+        expect(broadcast).to(
+            have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734"))
+        )
+        expect(broadcast).to(
+            have_property(u("sessionId"), u("2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4"))
+        )
+        expect(broadcast).to(have_property(u("projectId"), 100))
+        expect(broadcast).to(have_property(u("createdAt"), 1437676551000))
+        expect(broadcast).to(have_property(u("updatedAt"), 1437676551000))
+        expect(broadcast).to(have_property(u("hasAudio"), True))
+        expect(broadcast).to(have_property(u("hasVideo"), False))
+        expect(broadcast).to(have_property(u("resolution"), u("640x480")))
+        expect(broadcast).to(have_property(u("status"), u("started")))
+        expect(list(broadcast.broadcastUrls)).to(have_length(2))
+        expect(list(broadcast.broadcastUrls["rtmp"])).to(have_length(2))
+
+    @httpretty.activate
+    def test_start_broadcast_video_only(self):
+        """
+        Test start_broadcast() method
+        """
+        httpretty.register_uri(
+            httpretty.POST,
+            u("https://api.opentok.com/v2/project/{0}/broadcast").format(self.api_key),
+            body=textwrap.dedent(
+                u(
+                    """\
+                        {
+                            "id": "1748b7070a81464c9759c46ad10d3734",
+                            "sessionId": "2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4",
+                            "projectId": 100,
+                            "createdAt": 1437676551000,
+                            "updatedAt": 1437676551000,
+                            "resolution": "640x480",
+                            "status": "started",
+                            "hasAudio": false,
+                            "hasVideo": true,
+                            "broadcastUrls": {
+                                "hls" : "http://server/fakepath/playlist.m3u8",
+                                "rtmp": {
+                                    "foo": {
+                                        "serverUrl": "rtmp://myfooserver/myfooapp",
+                                        "streamName": "myfoostream"
+                                    },
+                                    "bar": {
+                                        "serverUrl": "rtmp://mybarserver/mybarapp",
+                                        "streamName": "mybarstream"
+                                    }
+                                }
+                            }
+                        }
+                    """
+                )
+            ),
+            status=200,
+            content_type=u("application/json"),
+        )
+
+        options = {
+            "layout": {
+                "type": "custom",
+                "stylesheet": "the layout stylesheet (only used with type == custom)",
+            },
+            "maxDuration": 5400,
+            "hasAudio": False,
+            "hasVideo": True,
+            "outputs": {
+                "hls": {},
+                "rtmp": [
+                    {
+                        "id": "foo",
+                        "serverUrl": "rtmp://myfooserver/myfooapp",
+                        "streamName": "myfoostream",
+                    },
+                    {
+                        "id": "bar",
+                        "serverUrl": "rtmp://mybarserver/mybarapp",
+                        "streamName": "mybarstream",
+                    },
+                ],
+            },
+            "resolution": "640x480",
+        }
+
+        broadcast = self.opentok.start_broadcast(self.session_id, options)
+        validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
+        expect(httpretty.last_request().headers[u("user-agent")]).to(
+            contain(u("OpenTok-Python-SDK/") + __version__)
+        )
+        expect(httpretty.last_request().headers[u("content-type")]).to(
+            equal(u("application/json"))
+        
+        )
+        # non-deterministic json encoding. have to decode to test it properly
+        if PY2:
+            body = json.loads(httpretty.last_request().body)
+        if PY3:
+            body = json.loads(httpretty.last_request().body.decode("utf-8"))
+
+        expect(body).to(have_key(u("layout")))
+        expect(broadcast).to(be_an(Broadcast))
+        expect(broadcast).to(
+            have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734"))
+        )
+        expect(broadcast).to(
+            have_property(u("sessionId"), u("2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4"))
+        )
+        expect(broadcast).to(have_property(u("projectId"), 100))
+        expect(broadcast).to(have_property(u("createdAt"), 1437676551000))
+        expect(broadcast).to(have_property(u("updatedAt"), 1437676551000))
+        expect(broadcast).to(have_property(u("hasAudio"), False))
+        expect(broadcast).to(have_property(u("hasVideo"), True))
+        expect(broadcast).to(have_property(u("resolution"), u("640x480")))
+        expect(broadcast).to(have_property(u("status"), u("started")))
+        expect(list(broadcast.broadcastUrls)).to(have_length(2))
+        expect(list(broadcast.broadcastUrls["rtmp"])).to(have_length(2))
+
+    @httpretty.activate
     def test_start_broadcast_with_streammode_auto(self):
         url = f"https://api.opentok.com/v2/partner/{self.api_key}/broadcast"
 
