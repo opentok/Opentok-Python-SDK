@@ -91,12 +91,12 @@ class ArchiveModes(Enum):
 
 
 valid_archive_resolutions = {
-    '640x480',
-    '480x640',
-    '1280x720',
-    '720x1280',
-    '1920x1080',
-    '1080x1920',
+    "640x480",
+    "480x640",
+    "1280x720",
+    "720x1280",
+    "1920x1080",
+    "1080x1920",
 }
 
 logger = logging.getLogger("opentok")
@@ -125,6 +125,9 @@ class Client(object):
         self._proxies = None
         self.endpoints = Endpoints(api_url, self.api_key)
         self._app_version = __version__ if app_version == None else app_version
+        self._user_agent = (
+            f"OpenTok-Python-SDK/{self.app_version} python/{platform.python_version()}"
+        )
         # JWT custom claims - Default values
         self._jwt_livetime = 3  # In minutes
 
@@ -143,6 +146,13 @@ class Client(object):
     @app_version.setter
     def app_version(self, value):
         self._app_version = value
+
+    @property
+    def user_agent(self):
+        return self._user_agent
+
+    def append_to_user_agent(self, value):
+        self._user_agent = self._user_agent + value
 
     @property
     def jwt_livetime(self):
@@ -408,7 +418,7 @@ class Client(object):
                     "A session with always archive mode must also have the routed media mode."
                 )
             )
-        
+
         if archive_name is not None:
             if archive_mode == ArchiveModes.manual:
                 raise OpenTokException(
@@ -418,7 +428,7 @@ class Client(object):
                 raise OpenTokException(
                     "archive_name must be between 1 and 80 characters in length."
                 )
-        
+
         if archive_resolution is not None:
             if archive_mode == ArchiveModes.manual:
                 raise OpenTokException(
@@ -631,13 +641,13 @@ class Client(object):
         }
 
         if layout is not None:
-            payload['layout'] = layout
+            payload["layout"] = layout
 
         logger.debug(
             "POST to %r with params %r, headers %r, proxies %r",
             self.endpoints.archive_url(),
             json.dumps(payload),
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -683,7 +693,7 @@ class Client(object):
         logger.debug(
             "POST to %r with headers %r, proxies %r",
             self.endpoints.archive_url(archive_id) + "/stop",
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -718,7 +728,7 @@ class Client(object):
         logger.debug(
             "DELETE to %r with headers %r, proxies %r",
             self.endpoints.archive_url(archive_id),
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -748,7 +758,7 @@ class Client(object):
         logger.debug(
             "GET to %r with headers %r, proxies %r",
             self.endpoints.archive_url(archive_id),
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -794,7 +804,7 @@ class Client(object):
         logger.debug(
             "GET to %r with headers %r, proxies %r",
             endpoint,
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -942,7 +952,7 @@ class Client(object):
             "POST to %r with params %r, headers %r, proxies %r",
             self.endpoints.signaling_url(session_id, connection_id),
             json.dumps(payload),
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -997,7 +1007,7 @@ class Client(object):
         logger.debug(
             "GET to %r with headers %r, proxies %r",
             endpoint,
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -1034,7 +1044,7 @@ class Client(object):
         logger.debug(
             "GET to %r with headers %r, proxies %r",
             endpoint,
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -1072,7 +1082,7 @@ class Client(object):
         logger.debug(
             "DELETE to %r with headers %r, proxies %r",
             endpoint,
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -1134,7 +1144,7 @@ class Client(object):
             "PUT to %r with params %r, headers %r, proxies %r",
             endpoint,
             json.dumps(payload),
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -1263,7 +1273,7 @@ class Client(object):
             "POST to %r with params %r, headers %r, proxies %r",
             endpoint,
             json.dumps(payload),
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -1317,7 +1327,7 @@ class Client(object):
             "PUT to %r with params %r, headers %r, proxies %r",
             endpoint,
             json.dumps(items_payload),
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -1353,6 +1363,10 @@ class Client(object):
         relayed
 
         :param String session_id: The session ID of the OpenTok session you want to broadcast
+
+        :param Boolean optional hasAudio: Whether the stream is broadcast with audio.
+
+        :param Boolean optional hasVideo: Whether the stream is broadcast with video.
 
         :param Dictionary options, with the following properties:
 
@@ -1414,18 +1428,18 @@ class Client(object):
         BroadcastStreamModes.manual to explicitly select streams to include in the the broadcast, using the
         OpenTok.add_broadcast_stream() and OpenTok.remove_broadcast_stream() methods.
 
-        :rtype A Broadcast object, which contains information of the broadcast: id, sessionId
+        :rtype A Broadcast object, which contains information of the broadcast: id, sessionId,
         projectId, createdAt, updatedAt, resolution, status and broadcastUrls
         """
 
-        if 'hls' in options['outputs']:
+        if "hls" in options["outputs"]:
             if (
-                'lowLatency' in options['outputs']['hls']
-                and 'dvr' in options['outputs']['hls']
+                "lowLatency" in options["outputs"]["hls"]
+                and "dvr" in options["outputs"]["hls"]
             ):
                 if (
-                    options['outputs']['hls']['lowLatency'] == True
-                    and options['outputs']['hls']['dvr'] == True
+                    options["outputs"]["hls"]["lowLatency"] == True
+                    and options["outputs"]["hls"]["dvr"] == True
                 ):
                     raise BroadcastHLSOptionsError(
                         'HLS options "lowLatency" and "dvr" cannot both be set to "True".'
@@ -1441,7 +1455,7 @@ class Client(object):
             "POST to %r with params %r, headers %r, proxies %r",
             endpoint,
             json.dumps(payload),
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -1484,7 +1498,7 @@ class Client(object):
         logger.debug(
             "POST to %r with headers %r, proxies %r",
             endpoint,
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -1621,7 +1635,7 @@ class Client(object):
         logger.debug(
             "GET to %r with headers %r, proxies %r",
             endpoint,
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -1680,7 +1694,7 @@ class Client(object):
             "PUT to %r with params %r, headers %r, proxies %r",
             endpoint,
             json.dumps(payload),
-            self.json_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
@@ -1929,10 +1943,10 @@ class Client(object):
     def validate_websocket_options(self, options):
         if type(options) is not dict:
             raise InvalidWebSocketOptionsError(
-                'Must pass WebSocket options as a dictionary.'
+                "Must pass WebSocket options as a dictionary."
             )
-        if 'uri' not in options:
-            raise InvalidWebSocketOptionsError('Provide a WebSocket URI.')
+        if "uri" not in options:
+            raise InvalidWebSocketOptionsError("Provide a WebSocket URI.")
 
     def _sign_string(self, string, secret):
         return hmac.new(
@@ -1974,9 +1988,9 @@ class Client(object):
 
         try:
             if excludedStreamIds:
-                options = {'active': True, 'excludedStreams': excludedStreamIds}
+                options = {"active": True, "excludedStreams": excludedStreamIds}
             else:
-                options = {'active': True, 'excludedStreams': []}
+                options = {"active": True, "excludedStreams": []}
 
             response = requests.post(
                 url, headers=self.get_headers(), data=json.dumps(options)
@@ -2012,7 +2026,7 @@ class Client(object):
         :param session_id The session ID.
         """
 
-        options = {'active': False}
+        options = {"active": False}
         url = self.endpoints.get_mute_all_url(session_id)
 
         response = requests.post(
@@ -2162,9 +2176,9 @@ class OpenTok(Client):
 
         try:
             if excludedStreamIds:
-                options = {'active': True, 'excludedStreams': excludedStreamIds}
+                options = {"active": True, "excludedStreams": excludedStreamIds}
             else:
-                options = {'active': True, 'excludedStreams': []}
+                options = {"active": True, "excludedStreams": []}
 
             response = requests.post(
                 url, headers=self.get_headers(), data=json.dumps(options)
@@ -2198,7 +2212,7 @@ class OpenTok(Client):
         :param session_id The session ID.
         """
 
-        options = {'active': False}
+        options = {"active": False}
         url = self.endpoints.get_mute_all_url(session_id)
 
         response = requests.post(

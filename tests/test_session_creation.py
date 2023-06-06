@@ -1,10 +1,11 @@
 import unittest
-from six import text_type, u, b, PY2, PY3
+from six import u, b
 from six.moves.urllib.parse import parse_qs
 from nose.tools import raises
 from expects import *
 import httpretty
 from .validate_jwt import validate_jwt_header
+import platform
 
 from opentok import (
     Client,
@@ -38,7 +39,7 @@ class OpenTokSessionCreationTest(unittest.TestCase):
 
         validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
         expect(httpretty.last_request().headers[u("user-agent")]).to(
-            contain(u("OpenTok-Python-SDK/") + __version__)
+            equal(u("OpenTok-Python-SDK/") + __version__ + ' python/' + platform.python_version())
         )
         body = parse_qs(httpretty.last_request().body)
         expect(body).to(have_key(b("p2p.preference"), [b("enabled")]))

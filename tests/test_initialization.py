@@ -1,11 +1,8 @@
-# import time
-# import urllib2
 import unittest
 from nose.tools import raises
+import platform
 
-# from xml.dom.minidom import parseString
-
-from opentok import Client  # , OpenTokException
+from opentok import Client
 
 
 class OpenTokInitializationTest(unittest.TestCase):
@@ -39,6 +36,16 @@ class OpenTokInitializationTest(unittest.TestCase):
     def test_initialization_with_timeout(self):
         opentok = Client(self.api_key, self.api_secret, timeout=5)
         assert isinstance(opentok, Client)
+
+    def test_user_agent(self):
+        opentok = Client(self.api_key, self.api_secret, self.api_url)
+        assert opentok.user_agent == f"OpenTok-Python-SDK/{opentok.app_version} python/{platform.python_version()}"
+    
+    def test_append_to_user_agent(self):
+        opentok = Client(self.api_key, self.api_secret, self.api_url)
+        opentok.append_to_user_agent('/my_appended_user_agent_string')
+        assert opentok.user_agent == f"OpenTok-Python-SDK/{opentok.app_version} python/{platform.python_version()}/my_appended_user_agent_string"
+
 
 
 if __name__ == "__main__":
