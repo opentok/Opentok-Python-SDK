@@ -691,7 +691,7 @@ to all clients connected to session or to a specific connection:
   opentok.play_dtmf(session_id, connection_id, digits)
 
 Appending to the User Agent
--------
+---------------------------
 
 You can append a string to the user agent that is sent with requests:
 

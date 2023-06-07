@@ -13,6 +13,9 @@ test:
 dist:
 	python setup.py sdist --formats gztar bdist_wheel
 
+check:
+	twine check dist/*.whl
+
 release:
 	twine upload dist/*
 
