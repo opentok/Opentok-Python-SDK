@@ -4,13 +4,11 @@ from expects import *
 import httpretty
 from sure import expect
 import textwrap
-import json
 import datetime
-import requests
 import pytz
 from .validate_jwt import validate_jwt_header
 
-from opentok import Client, Archive, __version__, OutputModes, StreamModes
+from opentok import Client, Archive, __version__, OutputModes
 
 
 class OpenTokArchiveTest(unittest.TestCase):
@@ -105,18 +103,26 @@ class OpenTokArchiveTest(unittest.TestCase):
     def test_add_archive_stream(self):
         archive_id = u("ARCHIVEID")
         url = f"https://api.opentok.com/v2/project/{self.api_key}/archive/{archive_id}/streams"
-        httpretty.register_uri(httpretty.PATCH, url, responses=[httpretty.Response(body=u(""), status=204)])
-        
-        response = self.opentok.add_archive_stream(archive_id=archive_id, stream_id=self.stream1)
+        httpretty.register_uri(
+            httpretty.PATCH, url, responses=[httpretty.Response(body=u(""), status=204)]
+        )
+
+        response = self.opentok.add_archive_stream(
+            archive_id=archive_id, stream_id=self.stream1
+        )
         assert response == None
 
     @httpretty.activate
     def test_remove_archive_stream(self):
         archive_id = u("ARCHIVEID")
         url = f"https://api.opentok.com/v2/project/{self.api_key}/archive/{archive_id}/streams"
-        httpretty.register_uri(httpretty.PATCH, url, responses=[httpretty.Response(body=u(""), status=204)])
-        
-        response = self.opentok.remove_archive_stream(archive_id=archive_id, stream_id=self.stream1)
+        httpretty.register_uri(
+            httpretty.PATCH, url, responses=[httpretty.Response(body=u(""), status=204)]
+        )
+
+        response = self.opentok.remove_archive_stream(
+            archive_id=archive_id, stream_id=self.stream1
+        )
         assert response == None
 
     @httpretty.activate
