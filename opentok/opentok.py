@@ -864,26 +864,27 @@ class Client(object):
         )
 
         if response:
-            return Archive(self, response.json())
-        elif response.status_code == 403:
-            raise AuthError()
-        elif response.status_code == 400:
-            """
-            The HTTP response has a 400 status code in the following cases:
-            You do not pass in a session ID or you pass in an invalid session ID.
-            No clients are actively connected to the OpenTok session.
-            You specify an invalid resolution value.
-            The outputMode property is set to "individual" and you set the resolution property and (which is not supported in individual stream archives).
-            """
-            raise RequestError(response.json().get("message"))
-        elif response.status_code == 404:
-            raise NotFoundError("Archive or Stream not found")
-        elif response.status_code == 405:
-            raise ArchiveStreamModeError(
-                "Your archive is configured with a streamMode that does not support stream manipulation."
-            )
-        elif response.status_code == 409:
-            raise ArchiveError(response.json().get("message"))
+            if response.status_code == 204:
+                return None
+            elif response.status_code == 403:
+                raise AuthError()
+            elif response.status_code == 400:
+                """
+                The HTTP response has a 400 status code in the following cases:
+                You do not pass in a session ID or you pass in an invalid session ID.
+                No clients are actively connected to the OpenTok session.
+                You specify an invalid resolution value.
+                The outputMode property is set to "individual" and you set the resolution property and (which is not supported in individual stream archives).
+                """
+                raise RequestError(response.json().get("message"))
+            elif response.status_code == 404:
+                raise NotFoundError("Archive or Stream not found")
+            elif response.status_code == 405:
+                raise ArchiveStreamModeError(
+                    "Your archive is configured with a streamMode that does not support stream manipulation."
+                )
+            elif response.status_code == 409:
+                raise ArchiveError(response.json().get("message"))
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 
@@ -910,26 +911,27 @@ class Client(object):
         )
 
         if response:
-            return Archive(self, response.json())
-        elif response.status_code == 403:
-            raise AuthError()
-        elif response.status_code == 400:
-            """
-            The HTTP response has a 400 status code in the following cases:
-            You do not pass in a session ID or you pass in an invalid session ID.
-            No clients are actively connected to the OpenTok session.
-            You specify an invalid resolution value.
-            The outputMode property is set to "individual" and you set the resolution property and (which is not supported in individual stream archives).
-            """
-            raise RequestError(response.json().get("message"))
-        elif response.status_code == 404:
-            raise NotFoundError("Archive or Stream not found")
-        elif response.status_code == 405:
-            raise ArchiveStreamModeError(
-                "Your archive is configured with a streamMode that does not support stream manipulation."
-            )
-        elif response.status_code == 409:
-            raise ArchiveError(response.json().get("message"))
+            if response.status_code == 204:
+                return None
+            elif response.status_code == 403:
+                raise AuthError()
+            elif response.status_code == 400:
+                """
+                The HTTP response has a 400 status code in the following cases:
+                You do not pass in a session ID or you pass in an invalid session ID.
+                No clients are actively connected to the OpenTok session.
+                You specify an invalid resolution value.
+                The outputMode property is set to "individual" and you set the resolution property and (which is not supported in individual stream archives).
+                """
+                raise RequestError(response.json().get("message"))
+            elif response.status_code == 404:
+                raise NotFoundError("Archive or Stream not found")
+            elif response.status_code == 405:
+                raise ArchiveStreamModeError(
+                    "Your archive is configured with a streamMode that does not support stream manipulation."
+                )
+            elif response.status_code == 409:
+                raise ArchiveError(response.json().get("message"))
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 

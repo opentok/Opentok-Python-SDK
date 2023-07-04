@@ -181,7 +181,7 @@ class Endpoints(object):
             self.api_url
             + "/v2/project/"
             + self.api_key
-            + "archive/"
+            + "/archive/"
             + archive_id
             + "/streams"
         )
@@ -194,7 +194,7 @@ class Endpoints(object):
             self.api_url
             + "/v2/partner/"
             + self.api_key
-            + "broadcast/"
+            + "/broadcast/"
             + broadcast_id
             + "/streams"
         )
