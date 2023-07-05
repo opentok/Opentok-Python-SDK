@@ -1,3 +1,7 @@
+# Release v3.6.1
+- Fixed broken `opentok.Client.add_archive_stream`, `opentok.Client.remove_archive_stream`, `opentok.Client.add_broadcast_stream` and `opentok.Client.remove_broadcast_stream` methods and tests
+- Fixed `opentok.Endpoints.get_archive_stream` and `opentok.Endpoints.get_broadcast_stream` methods
+
 # Release v3.6.0
 - Added auto-archive improvements to the `opentok.Client.create_session` method 
 to customize automatically created archives:

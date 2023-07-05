@@ -864,28 +864,29 @@ class Client(object):
         )
 
         if response:
-            return Archive(self, response.json())
-        elif response.status_code == 403:
-            raise AuthError()
-        elif response.status_code == 400:
-            """
-            The HTTP response has a 400 status code in the following cases:
-            You do not pass in a session ID or you pass in an invalid session ID.
-            No clients are actively connected to the OpenTok session.
-            You specify an invalid resolution value.
-            The outputMode property is set to "individual" and you set the resolution property and (which is not supported in individual stream archives).
-            """
-            raise RequestError(response.json().get("message"))
-        elif response.status_code == 404:
-            raise NotFoundError("Archive or Stream not found")
-        elif response.status_code == 405:
-            raise ArchiveStreamModeError(
-                "Your archive is configured with a streamMode that does not support stream manipulation."
-            )
-        elif response.status_code == 409:
-            raise ArchiveError(response.json().get("message"))
+            if response.status_code == 204:
+                return None
+            elif response.status_code == 403:
+                raise AuthError()
+            elif response.status_code == 400:
+                """
+                The HTTP response has a 400 status code in the following cases:
+                You do not pass in a session ID or you pass in an invalid session ID.
+                No clients are actively connected to the OpenTok session.
+                You specify an invalid resolution value.
+                The outputMode property is set to "individual" and you set the resolution property and (which is not supported in individual stream archives).
+                """
+                raise RequestError(response.json().get("message"))
+            elif response.status_code == 404:
+                raise NotFoundError("Archive or Stream not found")
+            elif response.status_code == 405:
+                raise ArchiveStreamModeError(
+                    "Your archive is configured with a streamMode that does not support stream manipulation."
+                )
+            elif response.status_code == 409:
+                raise ArchiveError(response.json().get("message"))
         else:
-            raise RequestError("An unexpected error occurred", response.status_code)
+            raise RequestError("An unexpected error occurred.", response.status_code)
 
     def remove_archive_stream(
         self, archive_id: str, stream_id: str
@@ -910,28 +911,29 @@ class Client(object):
         )
 
         if response:
-            return Archive(self, response.json())
-        elif response.status_code == 403:
-            raise AuthError()
-        elif response.status_code == 400:
-            """
-            The HTTP response has a 400 status code in the following cases:
-            You do not pass in a session ID or you pass in an invalid session ID.
-            No clients are actively connected to the OpenTok session.
-            You specify an invalid resolution value.
-            The outputMode property is set to "individual" and you set the resolution property and (which is not supported in individual stream archives).
-            """
-            raise RequestError(response.json().get("message"))
-        elif response.status_code == 404:
-            raise NotFoundError("Archive or Stream not found")
-        elif response.status_code == 405:
-            raise ArchiveStreamModeError(
-                "Your archive is configured with a streamMode that does not support stream manipulation."
-            )
-        elif response.status_code == 409:
-            raise ArchiveError(response.json().get("message"))
+            if response.status_code == 204:
+                return None
+            elif response.status_code == 403:
+                raise AuthError()
+            elif response.status_code == 400:
+                """
+                The HTTP response has a 400 status code in the following cases:
+                You do not pass in a session ID or you pass in an invalid session ID.
+                No clients are actively connected to the OpenTok session.
+                You specify an invalid resolution value.
+                The outputMode property is set to "individual" and you set the resolution property and (which is not supported in individual stream archives).
+                """
+                raise RequestError(response.json().get("message"))
+            elif response.status_code == 404:
+                raise NotFoundError("Archive or Stream not found")
+            elif response.status_code == 405:
+                raise ArchiveStreamModeError(
+                    "Your archive is configured with a streamMode that does not support stream manipulation."
+                )
+            elif response.status_code == 409:
+                raise ArchiveError(response.json().get("message"))
         else:
-            raise RequestError("An unexpected error occurred", response.status_code)
+            raise RequestError("An unexpected error occurred.", response.status_code)
 
     def send_signal(self, session_id, payload, connection_id=None):
         """
@@ -964,26 +966,27 @@ class Client(object):
             timeout=self.timeout,
         )
 
-        if response.status_code == 204:
-            pass
-        elif response.status_code == 400:
-            raise SignalingError(
-                "One of the signal properties - data, type, sessionId or connectionId - is invalid."
-            )
-        elif response.status_code == 403:
-            raise AuthError(
-                "You are not authorized to send the signal. Check your authentication credentials."
-            )
-        elif response.status_code == 404:
-            raise SignalingError(
-                "The client specified by the connectionId property is not connected to the session."
-            )
-        elif response.status_code == 413:
-            raise SignalingError(
-                "The type string exceeds the maximum length (128 bytes), or the data string exceeds the maximum size (8 kB)."
-            )
+        if response:
+            if response.status_code == 204:
+                return None
+            elif response.status_code == 400:
+                raise SignalingError(
+                    "One of the signal properties - data, type, sessionId or connectionId - is invalid."
+                )
+            elif response.status_code == 403:
+                raise AuthError(
+                    "You are not authorized to send the signal. Check your authentication credentials."
+                )
+            elif response.status_code == 404:
+                raise SignalingError(
+                    "The client specified by the connectionId property is not connected to the session."
+                )
+            elif response.status_code == 413:
+                raise SignalingError(
+                    "The type string exceeds the maximum length (128 bytes), or the data string exceeds the maximum size (8 kB)."
+                )
         else:
-            raise RequestError("An unexpected error occurred", response.status_code)
+            raise RequestError("An unexpected error occurred.", response.status_code)
 
     def signal(self, session_id, payload, connection_id=None):
         warnings.warn(
@@ -1559,24 +1562,25 @@ class Client(object):
         )
 
         if response:
-            return Broadcast(response.json())
-        elif response.status_code == 400:
-            raise BroadcastError(
-                "Invalid request. This response may indicate that data in your request data is "
-                "invalid JSON. It may also indicate that you passed in invalid layout options. "
-                "Or you have exceeded the limit of five simultaneous RTMP streams for an OpenTok "
-                "session. Or you specified and invalid resolution."
-            )
-        elif response.status_code == 403:
-            raise AuthError("Authentication error.")
-        elif response.status_code == 405:
-            raise BroadcastStreamModeError(
-                "Your broadcast is configured with a streamMode that does not support stream manipulation."
-            )
-        elif response.status_code == 409:
-            raise BroadcastError("The broadcast has already started for the session.")
+            if response.status_code == 204:
+                return None
+            elif response.status_code == 400:
+                raise BroadcastError(
+                    "Invalid request. This response may indicate that data in your request data is "
+                    "invalid JSON. It may also indicate that you passed in invalid layout options. "
+                    "Or you have exceeded the limit of five simultaneous RTMP streams for an OpenTok "
+                    "session. Or you specified and invalid resolution."
+                )
+            elif response.status_code == 403:
+                raise AuthError("Authentication error.")
+            elif response.status_code == 405:
+                raise BroadcastStreamModeError(
+                    "Your broadcast is configured with a streamMode that does not support stream manipulation."
+                )
+            elif response.status_code == 409:
+                raise BroadcastError("The broadcast has already started for the session.")
         else:
-            raise RequestError("OpenTok server error.", response.status_code)
+            raise RequestError("An unexpected error occurred.", response.status_code)
 
     def remove_broadcast_stream(
         self, broadcast_id: str, stream_id: str
@@ -1601,22 +1605,23 @@ class Client(object):
         )
 
         if response:
-            return Broadcast(response.json())
-        elif response.status_code == 400:
-            raise BroadcastError(
-                "Invalid request. This response may indicate that data in your request data is "
-                "invalid JSON. It may also indicate that you passed in invalid layout options. "
-                "Or you have exceeded the limit of five simultaneous RTMP streams for an OpenTok "
-                "session. Or you specified and invalid resolution."
-            )
-        elif response.status_code == 403:
-            raise AuthError("Authentication error.")
-        elif response.status_code == 405:
-            raise BroadcastStreamModeError(
-                "Your broadcast is configured with a streamMode that does not support stream manipulation."
-            )
-        elif response.status_code == 409:
-            raise BroadcastError("The broadcast has already started for the session.")
+            if response.status_code == 204:
+                return None
+            elif response.status_code == 400:
+                raise BroadcastError(
+                    "Invalid request. This response may indicate that data in your request data is "
+                    "invalid JSON. It may also indicate that you passed in invalid layout options. "
+                    "Or you have exceeded the limit of five simultaneous RTMP streams for an OpenTok "
+                    "session. Or you specified and invalid resolution."
+                )
+            elif response.status_code == 403:
+                raise AuthError("Authentication error.")
+            elif response.status_code == 405:
+                raise BroadcastStreamModeError(
+                    "Your broadcast is configured with a streamMode that does not support stream manipulation."
+                )
+            elif response.status_code == 409:
+                raise BroadcastError("The broadcast has already started for the session.")
         else:
             raise RequestError("OpenTok server error.", response.status_code)
 

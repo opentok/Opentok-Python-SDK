@@ -7,7 +7,6 @@ class Endpoints(object):
     Class that provides the endpoint urls
     """
 
-
     def __init__(self, api_url, api_key):
         self.api_url = api_url
         self.api_key = api_key
@@ -57,7 +56,7 @@ class Endpoints(object):
         return self.get_signaling_url(session_id, connection_id)
 
     def get_stream_url(self, session_id, stream_id=None):
-        """ this method returns the url to get streams information """
+        """this method returns the url to get streams information"""
         url = (
             self.api_url
             + "/v2/project/"
@@ -79,7 +78,7 @@ class Endpoints(object):
         return self.get_broadcast_url(broadcast_id, stop, layout)
 
     def force_disconnect_url(self, session_id, connection_id):
-        """ this method returns the force disconnect url endpoint """
+        """this method returns the force disconnect url endpoint"""
         url = (
             self.api_url
             + "/v2/project/"
@@ -92,7 +91,7 @@ class Endpoints(object):
         return url
 
     def set_archive_layout_url(self, archive_id):
-        """ this method returns the url to set the archive layout """
+        """this method returns the url to set the archive layout"""
         url = (
             self.api_url
             + "/v2/project/"
@@ -104,12 +103,12 @@ class Endpoints(object):
         return url
 
     def dial_url(self):
-        """ this method returns the url to initialize a SIP call """
+        """this method returns the url to initialize a SIP call"""
         url = self.api_url + "/v2/project/" + self.api_key + "/dial"
         return url
 
     def set_stream_class_lists_url(self, session_id):
-        """ this method returns the url to set the stream class list """
+        """this method returns the url to set the stream class list"""
         url = (
             self.api_url
             + "/v2/project/"
@@ -121,7 +120,7 @@ class Endpoints(object):
         return url
 
     def get_broadcast_url(self, broadcast_id=None, stop=False, layout=False):
-        """ this method returns urls for working with broadcast """
+        """this method returns urls for working with broadcast"""
         url = self.api_url + "/v2/project/" + self.api_key + "/broadcast"
 
         if broadcast_id:
@@ -130,28 +129,27 @@ class Endpoints(object):
             url = url + "/stop"
         if layout:
             url = url + "/layout"
-            
+
         return url
 
     def get_mute_all_url(self, session_id):
-        """ this method returns the urls for muting every stream in a session """
+        """this method returns the urls for muting every stream in a session"""
         url = (
-             self.api_url  
-            + "/v2/project/" 
+            self.api_url
+            + "/v2/project/"
             + self.api_key
             + "/session/"
             + session_id
             + "/mute"
-
         )
 
         return url
 
     def get_dtmf_all_url(self, session_id):
-        """ this method returns the url for Play DTMF to all clients in the session """
+        """this method returns the url for Play DTMF to all clients in the session"""
         url = (
             self.api_url
-            + "/v2/project/" 
+            + "/v2/project/"
             + self.api_key
             + "/session/"
             + session_id
@@ -161,7 +159,7 @@ class Endpoints(object):
         return url
 
     def get_dtmf_specific_url(self, session_id, connection_id):
-        """ this method returns the url for Play DTMF to a specific client connection"""
+        """this method returns the url for Play DTMF to a specific client connection"""
         url = (
             self.api_url
             + "/v2/project/"
@@ -176,12 +174,12 @@ class Endpoints(object):
         return url
 
     def get_archive_stream(self, archive_id=None):
-        """ this method returns urls for working with streamModes in archives """
+        """this method returns urls for working with streamModes in archives"""
         url = (
             self.api_url
             + "/v2/project/"
             + self.api_key
-            + "archive/"
+            + "/archive/"
             + archive_id
             + "/streams"
         )
@@ -189,12 +187,12 @@ class Endpoints(object):
         return url
 
     def get_broadcast_stream(self, broadcast_id=None):
-        """ this method returns urls for working with streamModes in broadcasts """
+        """this method returns urls for working with streamModes in broadcasts"""
         url = (
             self.api_url
-            + "/v2/partner/"
+            + "/v2/project/"
             + self.api_key
-            + "broadcast/"
+            + "/broadcast/"
             + broadcast_id
             + "/streams"
         )
@@ -202,7 +200,7 @@ class Endpoints(object):
         return url
 
     def get_render_url(self, render_id: str = None):
-        "Returns URLs for working with the Render API."""
+        "Returns URLs for working with the Render API." ""
         url = self.api_url + "/v2/project/" + self.api_key + "/render"
         if render_id:
             url += "/" + render_id
@@ -212,5 +210,5 @@ class Endpoints(object):
     def get_audio_connector_url(self):
         """Returns URLs for working with the Audio Connector API."""
         url = self.api_url + "/v2/project/" + self.api_key + "/connect"
-        
+
         return url

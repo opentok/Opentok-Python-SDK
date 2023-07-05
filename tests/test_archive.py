@@ -1,17 +1,14 @@
 import unittest
-from six import text_type, u, b, PY2, PY3
-from nose.tools import raises
+from six import u, PY2, PY3
 from expects import *
 import httpretty
 from sure import expect
 import textwrap
-import json
 import datetime
-import requests
 import pytz
 from .validate_jwt import validate_jwt_header
 
-from opentok import Client, Archive, __version__, OutputModes, StreamModes
+from opentok import Client, Archive, __version__, OutputModes
 
 
 class OpenTokArchiveTest(unittest.TestCase):
@@ -102,64 +99,31 @@ class OpenTokArchiveTest(unittest.TestCase):
         expect(archive).to(have_property(u("output_mode"), OutputModes.composed))
         expect(archive).to(have_property(u("url"), None))
 
-
-
     @httpretty.activate
     def test_add_archive_stream(self):
         archive_id = u("ARCHIVEID")
         url = f"https://api.opentok.com/v2/project/{self.api_key}/archive/{archive_id}/streams"
-       
-        payload = {
-            "hasAudio": True,
-            "hasVideo": True,
-            "addStream": self.stream1
-        }
-        
-        httpretty.register_uri(httpretty.PATCH, 
-                                         url, 
-                                         responses=[
-                                            httpretty.Response(body=json.dumps(payload), 
-                                                               content_type="application/json",
-                                                               status=200)
-                                        ])
-        
-        response = requests.patch(url)
+        httpretty.register_uri(
+            httpretty.PATCH, url, responses=[httpretty.Response(body=u(""), status=204)]
+        )
 
-        response.status_code.should.equal(200)
-        response.json().should.equal({
-                                        "hasAudio": True,
-                                        "hasVideo": True,
-                                        "addStream": self.stream1
-                                        })
-
-        response.headers["Content-Type"].should.equal("application/json")
+        response = self.opentok.add_archive_stream(
+            archive_id=archive_id, stream_id=self.stream1
+        )
+        assert response == None
 
     @httpretty.activate
     def test_remove_archive_stream(self):
         archive_id = u("ARCHIVEID")
         url = f"https://api.opentok.com/v2/project/{self.api_key}/archive/{archive_id}/streams"
-       
-        payload = {
-            "removeStream": self.stream1
-        }
-        
-        httpretty.register_uri(httpretty.PATCH, 
-                                         url, 
-                                         responses=[
-                                            httpretty.Response(body=json.dumps(payload), 
-                                                               content_type="application/json",
-                                                               status=200)
-                                        ])
-        
-        response = requests.patch(url)
+        httpretty.register_uri(
+            httpretty.PATCH, url, responses=[httpretty.Response(body=u(""), status=204)]
+        )
 
-        response.status_code.should.equal(200)
-        response.json().should.equal({
-                                        "removeStream": self.stream1
-                                        })
-                                        
-        response.headers["Content-Type"].should.equal("application/json")
-
+        response = self.opentok.remove_archive_stream(
+            archive_id=archive_id, stream_id=self.stream1
+        )
+        assert response == None
 
     @httpretty.activate
     def test_delete_archive(self):
