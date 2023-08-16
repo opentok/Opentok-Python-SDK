@@ -97,7 +97,9 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
+        expect(httpretty.last_request().headers[u("content-type")]).to(
+            equal(u("application/json"))
+        )
         # non-deterministic json encoding. have to decode to test it properly
         if PY2:
             body = json.loads(httpretty.last_request().body)
@@ -106,7 +108,9 @@ class OpenTokBroadcastTest(unittest.TestCase):
 
         expect(body).to(have_key(u("layout")))
         expect(broadcast).to(be_an(Broadcast))
-        expect(broadcast).to(have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734")))
+        expect(broadcast).to(
+            have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734"))
+        )
         expect(broadcast).to(
             have_property(u("sessionId"), u("2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4"))
         )
@@ -190,9 +194,13 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
+        expect(httpretty.last_request().headers[u("content-type")]).to(
+            equal(u("application/json"))
+        )
         expect(broadcast).to(be_an(Broadcast))
-        expect(broadcast).to(have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734")))
+        expect(broadcast).to(
+            have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734"))
+        )
         expect(broadcast).to(
             have_property(u("sessionId"), u("2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4"))
         )
@@ -276,7 +284,9 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
+        expect(httpretty.last_request().headers[u("content-type")]).to(
+            equal(u("application/json"))
+        )
         # non-deterministic json encoding. have to decode to test it properly
         if PY2:
             body = json.loads(httpretty.last_request().body)
@@ -288,7 +298,9 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(body["layout"]).to(have_key("screenshareType"))
         expect(body["layout"]["screenshareType"]).to(equal("verticalPresentation"))
         expect(broadcast).to(be_an(Broadcast))
-        expect(broadcast).to(have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734")))
+        expect(broadcast).to(
+            have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734"))
+        )
         expect(broadcast).to(
             have_property(u("sessionId"), u("2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4"))
         )
@@ -379,7 +391,9 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
+        expect(httpretty.last_request().headers[u("content-type")]).to(
+            equal(u("application/json"))
+        )
         # non-deterministic json encoding. have to decode to test it properly
         if PY2:
             body = json.loads(httpretty.last_request().body)
@@ -388,7 +402,9 @@ class OpenTokBroadcastTest(unittest.TestCase):
 
         expect(body).to(have_key(u("layout")))
         expect(broadcast).to(be_an(Broadcast))
-        expect(broadcast).to(have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734")))
+        expect(broadcast).to(
+            have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734"))
+        )
         expect(broadcast).to(
             have_property(u("sessionId"), u("2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4"))
         )
@@ -481,7 +497,9 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
+        expect(httpretty.last_request().headers[u("content-type")]).to(
+            equal(u("application/json"))
+        )
         # non-deterministic json encoding. have to decode to test it properly
         if PY2:
             body = json.loads(httpretty.last_request().body)
@@ -490,7 +508,9 @@ class OpenTokBroadcastTest(unittest.TestCase):
 
         expect(body).to(have_key(u("layout")))
         expect(broadcast).to(be_an(Broadcast))
-        expect(broadcast).to(have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734")))
+        expect(broadcast).to(
+            have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734"))
+        )
         expect(broadcast).to(
             have_property(u("sessionId"), u("2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4"))
         )
@@ -652,9 +672,13 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
+        expect(httpretty.last_request().headers[u("content-type")]).to(
+            equal(u("application/json"))
+        )
         expect(broadcast).to(be_an(Broadcast))
-        expect(broadcast).to(have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734")))
+        expect(broadcast).to(
+            have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734"))
+        )
         expect(broadcast).to(
             have_property(u("sessionId"), u("2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4"))
         )
@@ -715,7 +739,9 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
+        expect(httpretty.last_request().headers[u("content-type")]).to(
+            equal(u("application/json"))
+        )
         expect(broadcast).to(be_an(Broadcast))
         expect(broadcast).to(have_property(u("id"), broadcast_id))
         expect(broadcast).to(
@@ -750,7 +776,9 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
+        expect(httpretty.last_request().headers[u("content-type")]).to(
+            equal(u("application/json"))
+        )
 
     @httpretty.activate
     def test_set_broadcast_layout_with_screenshare_type(self):
@@ -774,7 +802,9 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
+        expect(httpretty.last_request().headers[u("content-type")]).to(
+            equal(u("application/json"))
+        )
         if PY2:
             body = json.loads(httpretty.last_request().body)
         if PY3:
@@ -808,7 +838,9 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
+        expect(httpretty.last_request().headers[u("content-type")]).to(
+            equal(u("application/json"))
+        )
 
     @httpretty.activate
     def test_set_broadcast_layout_throws_exception(self):
