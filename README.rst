@@ -438,8 +438,9 @@ The live streaming broadcast can target one HLS endpoint and up to five RTMP ser
       'stylesheet': 'the layout stylesheet (only used with type == custom)'
     },
     'maxDuration': 5400,
-    'hasAudio': True
-    'hasVideo': True
+    'hasAudio': True,
+    'hasVideo': True,
+    'maxBitrate': 2000000,
     'outputs': {
       'hls': {},
       'rtmp': [{
@@ -466,6 +467,8 @@ You can specify the following broadcast resolutions:
 * "1920x1080" (FHD landscape)
 * "1080x1920" (FHD portrait)
 
+You can specify a maximum bitrate between 100000 and 6000000.
+
 .. code:: python
 
   session_id = 'SESSIONID'
@@ -476,6 +479,7 @@ You can specify the following broadcast resolutions:
       'stylesheet': 'the layout stylesheet (only used with type == custom)'
     },
     'maxDuration': 5400,
+    'maxBitrate': 2000000,
     'outputs': {
       'hls': {},
       'rtmp': [{
@@ -508,8 +512,9 @@ to ``False`` as required. These fields are ``True`` by default.
       'stylesheet': 'the layout stylesheet (only used with type == custom)'
     },
     'maxDuration': 5400,
-    'hasAudio': True
-    'hasVideo': False
+    'hasAudio': True,
+    'hasVideo': False,
+    'maxBitrate': 2000000,
     'outputs': {
       'hls': {},
       'rtmp': [{

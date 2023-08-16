@@ -41,8 +41,13 @@ class OpenTokBroadcastTest(unittest.TestCase):
                             "updatedAt": 1437676551000,
                             "resolution": "640x480",
                             "status": "started",
+                            "hasAudio": true,
+                            "hasVideo": true,
+                            "maxBitrate": 1000000,
+                            "maxDuration": 5400,
                             "broadcastUrls": {
                                 "hls" : "http://server/fakepath/playlist.m3u8",
+                                "hlsStatus": "ready",
                                 "rtmp": {
                                     "foo": {
                                         "serverUrl": "rtmp://myfooserver/myfooapp",
@@ -68,6 +73,7 @@ class OpenTokBroadcastTest(unittest.TestCase):
                 "stylesheet": "the layout stylesheet (only used with type == custom)",
             },
             "maxDuration": 5400,
+            "maxBitrate": 1000000,
             "outputs": {
                 "hls": {},
                 "rtmp": [
@@ -91,9 +97,7 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(
-            equal(u("application/json"))
-        )
+        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
         # non-deterministic json encoding. have to decode to test it properly
         if PY2:
             body = json.loads(httpretty.last_request().body)
@@ -102,9 +106,7 @@ class OpenTokBroadcastTest(unittest.TestCase):
 
         expect(body).to(have_key(u("layout")))
         expect(broadcast).to(be_an(Broadcast))
-        expect(broadcast).to(
-            have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734"))
-        )
+        expect(broadcast).to(have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734")))
         expect(broadcast).to(
             have_property(u("sessionId"), u("2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4"))
         )
@@ -113,7 +115,12 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(broadcast).to(have_property(u("updatedAt"), 1437676551000))
         expect(broadcast).to(have_property(u("resolution"), u("640x480")))
         expect(broadcast).to(have_property(u("status"), u("started")))
-        expect(list(broadcast.broadcastUrls)).to(have_length(2))
+        expect(broadcast).to(have_property("maxDuration", 5400))
+        expect(broadcast).to(have_property("hasAudio", True))
+        expect(broadcast).to(have_property("hasVideo", True))
+        expect(broadcast).to(have_property("maxBitrate", 1000000))
+        expect(broadcast.broadcastUrls["hlsStatus"]).to(equal("ready"))
+        expect(list(broadcast.broadcastUrls)).to(have_length(3))
         expect(list(broadcast.broadcastUrls["rtmp"])).to(have_length(2))
 
     @httpretty.activate
@@ -135,8 +142,13 @@ class OpenTokBroadcastTest(unittest.TestCase):
                             "updatedAt": 1437676551000,
                             "resolution": "640x480",
                             "status": "started",
+                            "hasAudio": true,
+                            "hasVideo": true,
+                            "maxBitrate": 1000000,
+                            "maxDuration": 5400,
                             "broadcastUrls": {
-                                "hls" : "http://server/fakepath/playlist.m3u8",
+                                "hls": "http://server/fakepath/playlist.m3u8",
+                                "hlsStatus": "connecting",
                                 "rtmp": {
                                     "foo": {
                                         "serverUrl": "rtmp://myfooserver/myfooapp",
@@ -178,13 +190,9 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(
-            equal(u("application/json"))
-        )
+        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
         expect(broadcast).to(be_an(Broadcast))
-        expect(broadcast).to(
-            have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734"))
-        )
+        expect(broadcast).to(have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734")))
         expect(broadcast).to(
             have_property(u("sessionId"), u("2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4"))
         )
@@ -193,7 +201,8 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(broadcast).to(have_property(u("updatedAt"), 1437676551000))
         expect(broadcast).to(have_property(u("resolution"), u("640x480")))
         expect(broadcast).to(have_property(u("status"), u("started")))
-        expect(list(broadcast.broadcastUrls)).to(have_length(2))
+        expect(broadcast.broadcastUrls["hlsStatus"]).to(equal("connecting"))
+        expect(list(broadcast.broadcastUrls)).to(have_length(3))
         expect(list(broadcast.broadcastUrls["rtmp"])).to(have_length(2))
 
     @httpretty.activate
@@ -215,8 +224,13 @@ class OpenTokBroadcastTest(unittest.TestCase):
                             "updatedAt": 1437676551000,
                             "resolution": "640x480",
                             "status": "started",
+                            "hasAudio": true,
+                            "hasVideo": true,
+                            "maxBitrate": 1000000,
+                            "maxDuration": 5400,
                             "broadcastUrls": {
                                 "hls" : "http://server/fakepath/playlist.m3u8",
+                                "hlsStatus": "ready",
                                 "rtmp": {
                                     "foo": {
                                         "serverUrl": "rtmp://myfooserver/myfooapp",
@@ -262,9 +276,7 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(
-            equal(u("application/json"))
-        )
+        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
         # non-deterministic json encoding. have to decode to test it properly
         if PY2:
             body = json.loads(httpretty.last_request().body)
@@ -276,9 +288,7 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(body["layout"]).to(have_key("screenshareType"))
         expect(body["layout"]["screenshareType"]).to(equal("verticalPresentation"))
         expect(broadcast).to(be_an(Broadcast))
-        expect(broadcast).to(
-            have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734"))
-        )
+        expect(broadcast).to(have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734")))
         expect(broadcast).to(
             have_property(u("sessionId"), u("2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4"))
         )
@@ -287,7 +297,8 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(broadcast).to(have_property(u("updatedAt"), 1437676551000))
         expect(broadcast).to(have_property(u("resolution"), u("640x480")))
         expect(broadcast).to(have_property(u("status"), u("started")))
-        expect(list(broadcast.broadcastUrls)).to(have_length(2))
+        expect(broadcast.broadcastUrls["hlsStatus"]).to(equal("ready"))
+        expect(list(broadcast.broadcastUrls)).to(have_length(3))
         expect(list(broadcast.broadcastUrls["rtmp"])).to(have_length(2))
 
     @httpretty.activate
@@ -311,8 +322,13 @@ class OpenTokBroadcastTest(unittest.TestCase):
                             "status": "started",
                             "hasAudio": true,
                             "hasVideo": false,
+                            "maxBitrate": 1000000,
+                            "maxDuration": 5400,
+                            "hasAudio": true,
+                            "hasVideo": false,
                             "broadcastUrls": {
-                                "hls" : "http://server/fakepath/playlist.m3u8",
+                                "hls": "http://server/fakepath/playlist.m3u8",
+                                "hlsStatus": "live",
                                 "rtmp": {
                                     "foo": {
                                         "serverUrl": "rtmp://myfooserver/myfooapp",
@@ -363,9 +379,7 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(
-            equal(u("application/json"))
-        )
+        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
         # non-deterministic json encoding. have to decode to test it properly
         if PY2:
             body = json.loads(httpretty.last_request().body)
@@ -374,9 +388,7 @@ class OpenTokBroadcastTest(unittest.TestCase):
 
         expect(body).to(have_key(u("layout")))
         expect(broadcast).to(be_an(Broadcast))
-        expect(broadcast).to(
-            have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734"))
-        )
+        expect(broadcast).to(have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734")))
         expect(broadcast).to(
             have_property(u("sessionId"), u("2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4"))
         )
@@ -387,7 +399,8 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(broadcast).to(have_property(u("hasVideo"), False))
         expect(broadcast).to(have_property(u("resolution"), u("640x480")))
         expect(broadcast).to(have_property(u("status"), u("started")))
-        expect(list(broadcast.broadcastUrls)).to(have_length(2))
+        expect(broadcast.broadcastUrls["hlsStatus"]).to(equal("live"))
+        expect(list(broadcast.broadcastUrls)).to(have_length(3))
         expect(list(broadcast.broadcastUrls["rtmp"])).to(have_length(2))
 
     @httpretty.activate
@@ -411,8 +424,13 @@ class OpenTokBroadcastTest(unittest.TestCase):
                             "status": "started",
                             "hasAudio": false,
                             "hasVideo": true,
+                            "maxBitrate": 1000000,
+                            "maxDuration": 5400,
+                            "hasAudio": false,
+                            "hasVideo": true,
                             "broadcastUrls": {
-                                "hls" : "http://server/fakepath/playlist.m3u8",
+                                "hls": "http://server/fakepath/playlist.m3u8",
+                                "hlsStatus": "ready",
                                 "rtmp": {
                                     "foo": {
                                         "serverUrl": "rtmp://myfooserver/myfooapp",
@@ -463,9 +481,7 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(
-            equal(u("application/json"))
-        )
+        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
         # non-deterministic json encoding. have to decode to test it properly
         if PY2:
             body = json.loads(httpretty.last_request().body)
@@ -474,9 +490,7 @@ class OpenTokBroadcastTest(unittest.TestCase):
 
         expect(body).to(have_key(u("layout")))
         expect(broadcast).to(be_an(Broadcast))
-        expect(broadcast).to(
-            have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734"))
-        )
+        expect(broadcast).to(have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734")))
         expect(broadcast).to(
             have_property(u("sessionId"), u("2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4"))
         )
@@ -487,7 +501,8 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(broadcast).to(have_property(u("hasVideo"), True))
         expect(broadcast).to(have_property(u("resolution"), u("640x480")))
         expect(broadcast).to(have_property(u("status"), u("started")))
-        expect(list(broadcast.broadcastUrls)).to(have_length(2))
+        expect(broadcast.broadcastUrls["hlsStatus"]).to(equal("ready"))
+        expect(list(broadcast.broadcastUrls)).to(have_length(3))
         expect(list(broadcast.broadcastUrls["rtmp"])).to(have_length(2))
 
     @httpretty.activate
@@ -637,13 +652,9 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(
-            equal(u("application/json"))
-        )
+        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
         expect(broadcast).to(be_an(Broadcast))
-        expect(broadcast).to(
-            have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734"))
-        )
+        expect(broadcast).to(have_property(u("id"), u("1748b7070a81464c9759c46ad10d3734")))
         expect(broadcast).to(
             have_property(u("sessionId"), u("2_MX4xMDBfjE0Mzc2NzY1NDgwMTJ-TjMzfn4"))
         )
@@ -675,7 +686,8 @@ class OpenTokBroadcastTest(unittest.TestCase):
                             "updatedAt": 1437676551000,
                             "resolution": "640x480",
                             "broadcastUrls": {
-                                "hls" : "http://server/fakepath/playlist.m3u8",
+                                "hls": "http://server/fakepath/playlist.m3u8",
+                                "hlsStatus": "live",
                                 "rtmp": {
                                     "foo": {
                                         "serverUrl": "rtmp://myfooserver/myfooapp",
@@ -703,9 +715,7 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(
-            equal(u("application/json"))
-        )
+        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
         expect(broadcast).to(be_an(Broadcast))
         expect(broadcast).to(have_property(u("id"), broadcast_id))
         expect(broadcast).to(
@@ -716,7 +726,8 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(broadcast).to(have_property(u("updatedAt"), 1437676551000))
         expect(broadcast).to(have_property(u("resolution"), u("640x480")))
         expect(broadcast).to(have_property(u("status"), u("started")))
-        expect(list(broadcast.broadcastUrls)).to(have_length(2))
+        expect(broadcast.broadcastUrls["hlsStatus"]).to(equal("live"))
+        expect(list(broadcast.broadcastUrls)).to(have_length(3))
         expect(list(broadcast.broadcastUrls["rtmp"])).to(have_length(2))
 
     @httpretty.activate
@@ -739,9 +750,7 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(
-            equal(u("application/json"))
-        )
+        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
 
     @httpretty.activate
     def test_set_broadcast_layout_with_screenshare_type(self):
@@ -765,9 +774,7 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(
-            equal(u("application/json"))
-        )
+        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
         if PY2:
             body = json.loads(httpretty.last_request().body)
         if PY3:
@@ -801,9 +808,7 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(
-            equal(u("application/json"))
-        )
+        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
 
     @httpretty.activate
     def test_set_broadcast_layout_throws_exception(self):

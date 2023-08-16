@@ -35,6 +35,7 @@ from .broadcast import Broadcast, BroadcastStreamModes
 from .websocket_audio_connection import WebSocketAudioConnection
 from .exceptions import (
     ArchiveStreamModeError,
+    BroadcastOptionsError,
     BroadcastHLSOptionsError,
     BroadcastStreamModeError,
     OpenTokException,
@@ -219,9 +220,7 @@ class Client(object):
                     expire_time = int(expire_time)
                 except (ValueError, TypeError):
                     raise OpenTokException(
-                        u("Cannot generate token, invalid expire time {0}").format(
-                            expire_time
-                        )
+                        u("Cannot generate token, invalid expire time {0}").format(expire_time)
                     )
         else:
             expire_time = int(time.time()) + (60 * 60 * 24)  # 1 day
@@ -229,38 +228,28 @@ class Client(object):
         # validations
         if not text_type(session_id):
             raise OpenTokException(
-                u("Cannot generate token, session_id was not valid {0}").format(
-                    session_id
-                )
+                u("Cannot generate token, session_id was not valid {0}").format(session_id)
             )
         if not isinstance(role, Roles):
-            raise OpenTokException(
-                u("Cannot generate token, {0} is not a valid role").format(role)
-            )
+            raise OpenTokException(u("Cannot generate token, {0} is not a valid role").format(role))
         now = int(time.time())
         if expire_time < now:
             raise OpenTokException(
-                u("Cannot generate token, expire_time is not in the future {0}").format(
-                    expire_time
-                )
+                u("Cannot generate token, expire_time is not in the future {0}").format(expire_time)
             )
         if expire_time > now + (60 * 60 * 24 * 30):  # 30 days
             raise OpenTokException(
-                u(
-                    "Cannot generate token, expire_time is not in the next 30 days {0}"
-                ).format(expire_time)
+                u("Cannot generate token, expire_time is not in the next 30 days {0}").format(
+                    expire_time
+                )
             )
         if data and len(data) > 1000:
             raise OpenTokException(
                 u("Cannot generate token, data must be less than 1000 characters")
             )
-        if initial_layout_class_list and not all(
-            text_type(c) for c in initial_layout_class_list
-        ):
+        if initial_layout_class_list and not all(text_type(c) for c in initial_layout_class_list):
             raise OpenTokException(
-                u(
-                    "Cannot generate token, all items in initial_layout_class_list must be strings"
-                )
+                u("Cannot generate token, all items in initial_layout_class_list must be strings")
             )
         initial_layout_class_list_serialized = u(" ").join(initial_layout_class_list)
         if len(initial_layout_class_list_serialized) > 1000:
@@ -281,9 +270,7 @@ class Client(object):
             parts = decoded_session_id.decode("utf-8").split(u("~"))
         except Exception as e:
             raise OpenTokException(
-                u("Cannot generate token, the session_id {0} was not valid").format(
-                    session_id
-                )
+                u("Cannot generate token, the session_id {0} was not valid").format(session_id)
             )
         if self.api_key not in parts:
             raise OpenTokException(
@@ -402,21 +389,15 @@ class Client(object):
         options = {}
         if not isinstance(media_mode, MediaModes):
             raise OpenTokException(
-                u("Cannot create session, {0} is not a valid media mode").format(
-                    media_mode
-                )
+                u("Cannot create session, {0} is not a valid media mode").format(media_mode)
             )
         if not isinstance(archive_mode, ArchiveModes):
             raise OpenTokException(
-                u("Cannot create session, {0} is not a valid archive mode").format(
-                    archive_mode
-                )
+                u("Cannot create session, {0} is not a valid archive mode").format(archive_mode)
             )
         if archive_mode == ArchiveModes.always and media_mode != MediaModes.routed:
             raise OpenTokException(
-                u(
-                    "A session with always archive mode must also have the routed media mode."
-                )
+                u("A session with always archive mode must also have the routed media mode.")
             )
 
         if archive_name is not None:
@@ -497,9 +478,7 @@ class Client(object):
                     )
                 )
 
-            session_id = (
-                dom.getElementsByTagName("session_id")[0].childNodes[0].nodeValue
-            )
+            session_id = dom.getElementsByTagName("session_id")[0].childNodes[0].nodeValue
             return Session(
                 self,
                 session_id,
@@ -617,16 +596,12 @@ class Client(object):
         """
         if not isinstance(output_mode, OutputModes):
             raise OpenTokException(
-                u("Cannot start archive, {0} is not a valid output mode").format(
-                    output_mode
-                )
+                u("Cannot start archive, {0} is not a valid output mode").format(output_mode)
             )
 
         if resolution and output_mode == OutputModes.individual:
             raise OpenTokException(
-                u(
-                    "Invalid parameters: Resolution cannot be supplied for individual output mode."
-                )
+                u("Invalid parameters: Resolution cannot be supplied for individual output mode.")
             )
 
         payload = {
@@ -888,9 +863,7 @@ class Client(object):
         else:
             raise RequestError("An unexpected error occurred.", response.status_code)
 
-    def remove_archive_stream(
-        self, archive_id: str, stream_id: str
-    ) -> requests.Response:
+    def remove_archive_stream(self, archive_id: str, stream_id: str) -> requests.Response:
         """
         This method will remove streams from the archive with removeStream.
 
@@ -1113,9 +1086,7 @@ class Client(object):
         else:
             raise RequestError("An unexpected error occurred", response.status_code)
 
-    def set_archive_layout(
-        self, archive_id, layout_type, stylesheet=None, screenshare_type=None
-    ):
+    def set_archive_layout(self, archive_id, layout_type, stylesheet=None, screenshare_type=None):
         """
         Use this method to change the layout of videos in an OpenTok archive
 
@@ -1354,9 +1325,7 @@ class Client(object):
         else:
             raise RequestError("OpenTok server error.", response.status_code)
 
-    def start_broadcast(
-        self, session_id, options, stream_mode=BroadcastStreamModes.auto
-    ):
+    def start_broadcast(self, session_id, options, stream_mode=BroadcastStreamModes.auto):
         """
         Use this method to start a live streaming broadcast for an OpenTok session. This broadcasts
         the session to an HLS (HTTP live streaming) or to RTMP streams. To successfully start
@@ -1367,11 +1336,11 @@ class Client(object):
 
         :param String session_id: The session ID of the OpenTok session you want to broadcast
 
-        :param Boolean optional hasAudio: Whether the stream is broadcast with audio.
-
-        :param Boolean optional hasVideo: Whether the stream is broadcast with video.
-
         :param Dictionary options, with the following properties:
+
+            :param Boolean optional hasAudio: Whether the stream is broadcast with audio.
+
+            :param Boolean optional hasVideo: Whether the stream is broadcast with video.
 
             Dictionary 'layout' optional: Specify this to assign the initial layout type for the
             broadcast.
@@ -1391,6 +1360,9 @@ class Client(object):
             The broadcast will automatically stop when the maximum duration is reached. You can
             set the maximum duration to a value from 60 (60 seconds) to 36000 (10 hours). The
             default maximum duration is 4 hours (14,400 seconds)
+
+            Integer 'maxBitrate' optional: The maximum bitrate (bits per second) used by the broadcast.
+            Value must be between 100_000 and 6_000_000.
 
             Dictionary 'outputs': This object defines the types of broadcast streams you want to
             start (both HLS and RTMP). You can include HLS, RTMP, or both as broadcast streams.
@@ -1436,10 +1408,7 @@ class Client(object):
         """
 
         if "hls" in options["outputs"]:
-            if (
-                "lowLatency" in options["outputs"]["hls"]
-                and "dvr" in options["outputs"]["hls"]
-            ):
+            if "lowLatency" in options["outputs"]["hls"] and "dvr" in options["outputs"]["hls"]:
                 if (
                     options["outputs"]["hls"]["lowLatency"] == True
                     and options["outputs"]["hls"]["dvr"] == True
@@ -1447,6 +1416,16 @@ class Client(object):
                     raise BroadcastHLSOptionsError(
                         'HLS options "lowLatency" and "dvr" cannot both be set to "True".'
                     )
+
+        if "maxBitrate" in options:
+            if (
+                type(options["maxBitrate"]) != int
+                or options["maxBitrate"] < 100000
+                or options["maxBitrate"] > 6000000
+            ):
+                raise BroadcastOptionsError(
+                    "maxBitrate must be an integer between 100000 and 6000000."
+                )
 
         payload = {"sessionId": session_id, "streamMode": stream_mode.value}
 
@@ -1523,8 +1502,7 @@ class Client(object):
             raise AuthError("Authentication error.")
         elif response.status_code == 409:
             raise BroadcastError(
-                "The broadcast (with the specified ID) was not found or it has already "
-                "stopped."
+                "The broadcast (with the specified ID) was not found or it has already " "stopped."
             )
         else:
             raise RequestError("OpenTok server error.", response.status_code)
@@ -1582,9 +1560,7 @@ class Client(object):
         else:
             raise RequestError("An unexpected error occurred.", response.status_code)
 
-    def remove_broadcast_stream(
-        self, broadcast_id: str, stream_id: str
-    ) -> requests.Response:
+    def remove_broadcast_stream(self, broadcast_id: str, stream_id: str) -> requests.Response:
         """
         This method will remove streams from the broadcast with removeStream.
 
@@ -1947,16 +1923,12 @@ class Client(object):
 
     def validate_websocket_options(self, options):
         if type(options) is not dict:
-            raise InvalidWebSocketOptionsError(
-                "Must pass WebSocket options as a dictionary."
-            )
+            raise InvalidWebSocketOptionsError("Must pass WebSocket options as a dictionary.")
         if "uri" not in options:
             raise InvalidWebSocketOptionsError("Provide a WebSocket URI.")
 
     def _sign_string(self, string, secret):
-        return hmac.new(
-            secret.encode("utf-8"), string.encode("utf-8"), hashlib.sha1
-        ).hexdigest()
+        return hmac.new(secret.encode("utf-8"), string.encode("utf-8"), hashlib.sha1).hexdigest()
 
     def _create_jwt_auth_header(self):
         payload = {
@@ -1997,9 +1969,7 @@ class Client(object):
             else:
                 options = {"active": True, "excludedStreams": []}
 
-            response = requests.post(
-                url, headers=self.get_headers(), data=json.dumps(options)
-            )
+            response = requests.post(url, headers=self.get_headers(), data=json.dumps(options))
 
             if response:
                 return response
@@ -2034,9 +2004,7 @@ class Client(object):
         options = {"active": False}
         url = self.endpoints.get_mute_all_url(session_id)
 
-        response = requests.post(
-            url, headers=self.get_headers(), data=json.dumps(options)
-        )
+        response = requests.post(url, headers=self.get_headers(), data=json.dumps(options))
 
         try:
             if response:
@@ -2114,9 +2082,7 @@ class Client(object):
                 url = self.endpoints.get_dtmf_specific_url(session_id, connection_id)
                 payload = {"digits": digits}
 
-            response = requests.post(
-                url, headers=self.get_json_headers(), data=json.dumps(payload)
-            )
+            response = requests.post(url, headers=self.get_json_headers(), data=json.dumps(payload))
 
             if response.status_code == 200:
                 return response
@@ -2185,9 +2151,7 @@ class OpenTok(Client):
             else:
                 options = {"active": True, "excludedStreams": []}
 
-            response = requests.post(
-                url, headers=self.get_headers(), data=json.dumps(options)
-            )
+            response = requests.post(url, headers=self.get_headers(), data=json.dumps(options))
 
             if response:
                 return response
@@ -2220,9 +2184,7 @@ class OpenTok(Client):
         options = {"active": False}
         url = self.endpoints.get_mute_all_url(session_id)
 
-        response = requests.post(
-            url, headers=self.get_headers(), data=json.dumps(options)
-        )
+        response = requests.post(url, headers=self.get_headers(), data=json.dumps(options))
 
         try:
             if response:
@@ -2294,9 +2256,7 @@ class OpenTok(Client):
                 url = self.endpoints.get_dtmf_specific_url(session_id, connection_id)
                 payload = {"digits": digits}
 
-            response = requests.post(
-                url, headers=self.get_json_headers(), data=json.dumps(payload)
-            )
+            response = requests.post(url, headers=self.get_json_headers(), data=json.dumps(payload))
 
             if response.status_code == 200:
                 return response
