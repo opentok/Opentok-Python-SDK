@@ -1,3 +1,8 @@
+# Release v3.7.0
+- Added the `maxBitrate` parameter to the `Client.start_broadcast` method
+- Added the `hlsStatus` parameter to the `Broadcast object`
+- Added the `streams` parameter so specific streams can be chosen to be included in a SIP call when using the `Client.dial` method
+
 # Release v3.6.1
 - Fixed broken `opentok.Client.add_archive_stream`, `opentok.Client.remove_archive_stream`, `opentok.Client.add_broadcast_stream` and `opentok.Client.remove_broadcast_stream` methods and tests
 - Fixed `opentok.Endpoints.get_archive_stream` and `opentok.Endpoints.get_broadcast_stream` methods
