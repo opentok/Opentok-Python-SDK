@@ -55,14 +55,10 @@ class OpenTokSipCallTest(unittest.TestCase):
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(
-            equal(u("application/json"))
-        )
+        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
         expect(sip_call_response).to(be_an(SipCall))
         expect(sip_call_response).to(have_property(u("id"), sip_call.id))
-        expect(sip_call_response).to(
-            have_property(u("connectionId"), sip_call.connectionId)
-        )
+        expect(sip_call_response).to(have_property(u("connectionId"), sip_call.connectionId))
         expect(sip_call_response).to(have_property(u("streamId"), sip_call.streamId))
 
     @httpretty.activate
@@ -103,22 +99,18 @@ class OpenTokSipCallTest(unittest.TestCase):
             "auth": {"username": "username", "password": "password"},
             "secure": True,
             "observeForceMute": True,
-            "video": True
+            "video": True,
+            "streams": ["stream-id-1", "stream-id-2"],
         }
 
-        sip_call_response = self.opentok.dial(
-            self.session_id, self.token, self.sip_uri, options
-        )
+        sip_call_response = self.opentok.dial(self.session_id, self.token, self.sip_uri, options)
         validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
         expect(httpretty.last_request().headers[u("user-agent")]).to(
             contain(u("OpenTok-Python-SDK/") + __version__)
         )
-        expect(httpretty.last_request().headers[u("content-type")]).to(
-            equal(u("application/json"))
-        )
+        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
         expect(sip_call_response).to(be_an(SipCall))
         expect(sip_call_response).to(have_property(u("id"), sip_call.id))
-        expect(sip_call_response).to(
-            have_property(u("connectionId"), sip_call.connectionId)
-        )
+        expect(sip_call_response).to(have_property(u("connectionId"), sip_call.connectionId))
         expect(sip_call_response).to(have_property(u("streamId"), sip_call.streamId))
+        assert b'"streams": ["stream-id-1", "stream-id-2"]}' in httpretty.last_request().body

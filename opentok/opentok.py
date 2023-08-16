@@ -1141,7 +1141,7 @@ class Client(object):
         else:
             raise RequestError("OpenTok server error.", response.status_code)
 
-    def dial(self, session_id, token, sip_uri, options=[]):
+    def dial(self, session_id, token, sip_uri, options={}):
         """
         Use this method to connect a SIP platform to an OpenTok session. The audio from the end
         of the SIP call is added to the OpenTok session as an audio-only stream. The OpenTok Media
@@ -1184,27 +1184,30 @@ class Client(object):
             in the OpenTok stream that is sent to the OpenTok session. The SIP client will receive a single
             composed video of the published streams in the OpenTok session.
 
-            This is an example of what the payload POST data body could look like:
+            List 'streams': An array of stream IDs for streams to include in the SIP call.
+            If you do not set this property, all streams in the session are included in the call.
+
+            This is an example of what the payload POST data dictionary could look like:
 
             {
                 "sessionId": "Your OpenTok session ID",
                 "token": "Your valid OpenTok token",
                 "sip": {
-                        "uri": "sip:user@sip.partner.com;transport=tls",
-                        "from": "from@example.com",
-                        "headers": {
-                            "headerKey": "headerValue"
-                        },
+                    "uri": "sip:user@sip.partner.com;transport=tls",
+                    "from": "from@example.com",
+                    "headers": {
+                        "headerKey": "headerValue"
+                    },
                     "auth": {
                         "username": "username",
                         "password": "password"
                     },
-                        "secure": true|false,
-                        "observeForceMute": true|false,
-                        "video": true|false
-                    }
+                    "secure": True,
+                    "video": True,
+                    "observeForceMute": True,
+                    "streams": ["stream-id-1", "stream-id-2"]
                 }
-
+            }
 
         :rtype: A SipCall object, which contains data of the SIP call: id, connectionId and streamId.
         This is what the response body should look like after returning with a status code of 200:
@@ -1217,29 +1220,9 @@ class Client(object):
 
         Note: Your response will have a different: id, connectionId and streamId
         """
+
         payload = {"sessionId": session_id, "token": token, "sip": {"uri": sip_uri}}
-        observeForceMute = False
-        video = False
-
-        if "from" in options:
-            payload["sip"]["from"] = options["from"]
-
-        if "headers" in options:
-            payload["sip"]["headers"] = options["headers"]
-
-        if "auth" in options:
-            payload["sip"]["auth"] = options["auth"]
-
-        if "secure" in options:
-            payload["sip"]["secure"] = options["secure"]
-
-        if "observeForceMute" in options:
-            observeForceMute = True
-            payload["sip"]["observeForceMute"] = options["observeForceMute"]
-
-        if "video" in options:
-            video = True
-            payload["sip"]["video"] = options["video"]
+        payload.update(options)
 
         endpoint = self.endpoints.dial_url()
 
