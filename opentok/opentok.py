@@ -35,6 +35,7 @@ from .broadcast import Broadcast, BroadcastStreamModes
 from .websocket_audio_connection import WebSocketAudioConnection
 from .exceptions import (
     ArchiveStreamModeError,
+    BroadcastOptionsError,
     BroadcastHLSOptionsError,
     BroadcastStreamModeError,
     OpenTokException,
@@ -1170,7 +1171,7 @@ class Client(object):
         else:
             raise RequestError("OpenTok server error.", response.status_code)
 
-    def dial(self, session_id, token, sip_uri, options=[]):
+    def dial(self, session_id, token, sip_uri, options={}):
         """
         Use this method to connect a SIP platform to an OpenTok session. The audio from the end
         of the SIP call is added to the OpenTok session as an audio-only stream. The OpenTok Media
@@ -1213,27 +1214,30 @@ class Client(object):
             in the OpenTok stream that is sent to the OpenTok session. The SIP client will receive a single
             composed video of the published streams in the OpenTok session.
 
-            This is an example of what the payload POST data body could look like:
+            List 'streams': An array of stream IDs for streams to include in the SIP call.
+            If you do not set this property, all streams in the session are included in the call.
+
+            This is an example of what the payload POST data dictionary could look like:
 
             {
                 "sessionId": "Your OpenTok session ID",
                 "token": "Your valid OpenTok token",
                 "sip": {
-                        "uri": "sip:user@sip.partner.com;transport=tls",
-                        "from": "from@example.com",
-                        "headers": {
-                            "headerKey": "headerValue"
-                        },
+                    "uri": "sip:user@sip.partner.com;transport=tls",
+                    "from": "from@example.com",
+                    "headers": {
+                        "headerKey": "headerValue"
+                    },
                     "auth": {
                         "username": "username",
                         "password": "password"
                     },
-                        "secure": true|false,
-                        "observeForceMute": true|false,
-                        "video": true|false
-                    }
+                    "secure": True,
+                    "video": True,
+                    "observeForceMute": True,
+                    "streams": ["stream-id-1", "stream-id-2"]
                 }
-
+            }
 
         :rtype: A SipCall object, which contains data of the SIP call: id, connectionId and streamId.
         This is what the response body should look like after returning with a status code of 200:
@@ -1246,29 +1250,9 @@ class Client(object):
 
         Note: Your response will have a different: id, connectionId and streamId
         """
+
         payload = {"sessionId": session_id, "token": token, "sip": {"uri": sip_uri}}
-        observeForceMute = False
-        video = False
-
-        if "from" in options:
-            payload["sip"]["from"] = options["from"]
-
-        if "headers" in options:
-            payload["sip"]["headers"] = options["headers"]
-
-        if "auth" in options:
-            payload["sip"]["auth"] = options["auth"]
-
-        if "secure" in options:
-            payload["sip"]["secure"] = options["secure"]
-
-        if "observeForceMute" in options:
-            observeForceMute = True
-            payload["sip"]["observeForceMute"] = options["observeForceMute"]
-
-        if "video" in options:
-            video = True
-            payload["sip"]["video"] = options["video"]
+        payload.update(options)
 
         endpoint = self.endpoints.dial_url()
 
@@ -1367,11 +1351,11 @@ class Client(object):
 
         :param String session_id: The session ID of the OpenTok session you want to broadcast
 
-        :param Boolean optional hasAudio: Whether the stream is broadcast with audio.
-
-        :param Boolean optional hasVideo: Whether the stream is broadcast with video.
-
         :param Dictionary options, with the following properties:
+
+            :param Boolean optional hasAudio: Whether the stream is broadcast with audio.
+
+            :param Boolean optional hasVideo: Whether the stream is broadcast with video.
 
             Dictionary 'layout' optional: Specify this to assign the initial layout type for the
             broadcast.
@@ -1391,6 +1375,9 @@ class Client(object):
             The broadcast will automatically stop when the maximum duration is reached. You can
             set the maximum duration to a value from 60 (60 seconds) to 36000 (10 hours). The
             default maximum duration is 4 hours (14,400 seconds)
+
+            Integer 'maxBitrate' optional: The maximum bitrate (bits per second) used by the broadcast.
+            Value must be between 100_000 and 6_000_000.
 
             Dictionary 'outputs': This object defines the types of broadcast streams you want to
             start (both HLS and RTMP). You can include HLS, RTMP, or both as broadcast streams.
@@ -1447,6 +1434,16 @@ class Client(object):
                     raise BroadcastHLSOptionsError(
                         'HLS options "lowLatency" and "dvr" cannot both be set to "True".'
                     )
+
+        if "maxBitrate" in options:
+            if (
+                type(options["maxBitrate"]) != int
+                or options["maxBitrate"] < 100000
+                or options["maxBitrate"] > 6000000
+            ):
+                raise BroadcastOptionsError(
+                    "maxBitrate must be an integer between 100000 and 6000000."
+                )
 
         payload = {"sessionId": session_id, "streamMode": stream_mode.value}
 
@@ -1578,7 +1575,9 @@ class Client(object):
                     "Your broadcast is configured with a streamMode that does not support stream manipulation."
                 )
             elif response.status_code == 409:
-                raise BroadcastError("The broadcast has already started for the session.")
+                raise BroadcastError(
+                    "The broadcast has already started for the session."
+                )
         else:
             raise RequestError("An unexpected error occurred.", response.status_code)
 
@@ -1621,7 +1620,9 @@ class Client(object):
                     "Your broadcast is configured with a streamMode that does not support stream manipulation."
                 )
             elif response.status_code == 409:
-                raise BroadcastError("The broadcast has already started for the session.")
+                raise BroadcastError(
+                    "The broadcast has already started for the session."
+                )
         else:
             raise RequestError("OpenTok server error.", response.status_code)
 

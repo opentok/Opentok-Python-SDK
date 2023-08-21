@@ -89,10 +89,12 @@ class BroadcastError(OpenTokException):
 
     pass
 
+
 class DTMFError(OpenTokException):
     """
     Indicates that one of the properties digits, session_id or connection_id is invalid
     """
+
 
 class ArchiveStreamModeError(OpenTokException):
     """
@@ -110,9 +112,15 @@ class BroadcastStreamModeError(OpenTokException):
 
 class BroadcastHLSOptionsError(OpenTokException):
     """
-    Indicates that HLS options have been set incorrectly. 
-    
+    Indicates that HLS options have been set incorrectly.
+
     dvr and lowLatency modes cannot both be set to true in a broadcast.
+    """
+
+
+class BroadcastOptionsError(OpenTokException):
+    """
+    Indicates that broadcast options have been set incorrectly.
     """
 
 

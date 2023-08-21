@@ -103,7 +103,8 @@ class OpenTokSipCallTest(unittest.TestCase):
             "auth": {"username": "username", "password": "password"},
             "secure": True,
             "observeForceMute": True,
-            "video": True
+            "video": True,
+            "streams": ["stream-id-1", "stream-id-2"],
         }
 
         sip_call_response = self.opentok.dial(
@@ -122,3 +123,7 @@ class OpenTokSipCallTest(unittest.TestCase):
             have_property(u("connectionId"), sip_call.connectionId)
         )
         expect(sip_call_response).to(have_property(u("streamId"), sip_call.streamId))
+        assert (
+            b'"streams": ["stream-id-1", "stream-id-2"]}'
+            in httpretty.last_request().body
+        )

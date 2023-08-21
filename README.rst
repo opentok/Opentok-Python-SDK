@@ -386,7 +386,8 @@ Your application server can disconnect a client from an OpenTok session by calli
 Working with SIP Interconnect
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can connect your SIP platform to an OpenTok session, the audio from your end of the SIP call is added to the OpenTok session as an audio-only stream. The OpenTok Media Router mixes audio from other streams in the session and sends the mixed audio to your SIP endpoint.
+You can connect your SIP platform to an OpenTok session, the audio from your end of the SIP call is added to the OpenTok session as an audio-only stream. 
+The OpenTok Media Router mixes audio from other streams in the session and sends the mixed audio to your SIP endpoint.
 
 .. code:: python
 
@@ -397,8 +398,7 @@ You can connect your SIP platform to an OpenTok session, the audio from your end
   # call the method with the required parameters
   sip_call = opentok.dial(session_id, token, sip_uri)
 
-  # the method also support aditional options to establish the sip call
-
+  # the method also supports aditional options to establish the sip call
   options = {
       'from': 'from@example.com',
       'headers': {
@@ -408,7 +408,10 @@ You can connect your SIP platform to an OpenTok session, the audio from your end
           'username': 'username',
           'password': 'password'
       },
-      'secure': True
+      'secure': True,
+      'video': True,
+      'observeForceMute': True,
+      'streams': ['stream-id-1', 'stream-id-2']
   }
 
   # call the method with aditional options
@@ -438,8 +441,9 @@ The live streaming broadcast can target one HLS endpoint and up to five RTMP ser
       'stylesheet': 'the layout stylesheet (only used with type == custom)'
     },
     'maxDuration': 5400,
-    'hasAudio': True
-    'hasVideo': True
+    'hasAudio': True,
+    'hasVideo': True,
+    'maxBitrate': 2000000,
     'outputs': {
       'hls': {},
       'rtmp': [{
@@ -466,6 +470,8 @@ You can specify the following broadcast resolutions:
 * "1920x1080" (FHD landscape)
 * "1080x1920" (FHD portrait)
 
+You can specify a maximum bitrate between 100000 and 6000000.
+
 .. code:: python
 
   session_id = 'SESSIONID'
@@ -476,6 +482,7 @@ You can specify the following broadcast resolutions:
       'stylesheet': 'the layout stylesheet (only used with type == custom)'
     },
     'maxDuration': 5400,
+    'maxBitrate': 2000000,
     'outputs': {
       'hls': {},
       'rtmp': [{
@@ -508,8 +515,9 @@ to ``False`` as required. These fields are ``True`` by default.
       'stylesheet': 'the layout stylesheet (only used with type == custom)'
     },
     'maxDuration': 5400,
-    'hasAudio': True
-    'hasVideo': False
+    'hasAudio': True,
+    'hasVideo': False,
+    'maxBitrate': 2000000,
     'outputs': {
       'hls': {},
       'rtmp': [{

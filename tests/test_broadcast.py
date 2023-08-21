@@ -41,8 +41,13 @@ class OpenTokBroadcastTest(unittest.TestCase):
                             "updatedAt": 1437676551000,
                             "resolution": "640x480",
                             "status": "started",
+                            "hasAudio": true,
+                            "hasVideo": true,
+                            "maxBitrate": 1000000,
+                            "maxDuration": 5400,
                             "broadcastUrls": {
                                 "hls" : "http://server/fakepath/playlist.m3u8",
+                                "hlsStatus": "ready",
                                 "rtmp": {
                                     "foo": {
                                         "serverUrl": "rtmp://myfooserver/myfooapp",
@@ -68,6 +73,7 @@ class OpenTokBroadcastTest(unittest.TestCase):
                 "stylesheet": "the layout stylesheet (only used with type == custom)",
             },
             "maxDuration": 5400,
+            "maxBitrate": 1000000,
             "outputs": {
                 "hls": {},
                 "rtmp": [
@@ -113,7 +119,12 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(broadcast).to(have_property(u("updatedAt"), 1437676551000))
         expect(broadcast).to(have_property(u("resolution"), u("640x480")))
         expect(broadcast).to(have_property(u("status"), u("started")))
-        expect(list(broadcast.broadcastUrls)).to(have_length(2))
+        expect(broadcast).to(have_property("maxDuration", 5400))
+        expect(broadcast).to(have_property("hasAudio", True))
+        expect(broadcast).to(have_property("hasVideo", True))
+        expect(broadcast).to(have_property("maxBitrate", 1000000))
+        expect(broadcast.broadcastUrls["hlsStatus"]).to(equal("ready"))
+        expect(list(broadcast.broadcastUrls)).to(have_length(3))
         expect(list(broadcast.broadcastUrls["rtmp"])).to(have_length(2))
 
     @httpretty.activate
@@ -135,8 +146,13 @@ class OpenTokBroadcastTest(unittest.TestCase):
                             "updatedAt": 1437676551000,
                             "resolution": "640x480",
                             "status": "started",
+                            "hasAudio": true,
+                            "hasVideo": true,
+                            "maxBitrate": 1000000,
+                            "maxDuration": 5400,
                             "broadcastUrls": {
-                                "hls" : "http://server/fakepath/playlist.m3u8",
+                                "hls": "http://server/fakepath/playlist.m3u8",
+                                "hlsStatus": "connecting",
                                 "rtmp": {
                                     "foo": {
                                         "serverUrl": "rtmp://myfooserver/myfooapp",
@@ -193,7 +209,8 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(broadcast).to(have_property(u("updatedAt"), 1437676551000))
         expect(broadcast).to(have_property(u("resolution"), u("640x480")))
         expect(broadcast).to(have_property(u("status"), u("started")))
-        expect(list(broadcast.broadcastUrls)).to(have_length(2))
+        expect(broadcast.broadcastUrls["hlsStatus"]).to(equal("connecting"))
+        expect(list(broadcast.broadcastUrls)).to(have_length(3))
         expect(list(broadcast.broadcastUrls["rtmp"])).to(have_length(2))
 
     @httpretty.activate
@@ -215,8 +232,13 @@ class OpenTokBroadcastTest(unittest.TestCase):
                             "updatedAt": 1437676551000,
                             "resolution": "640x480",
                             "status": "started",
+                            "hasAudio": true,
+                            "hasVideo": true,
+                            "maxBitrate": 1000000,
+                            "maxDuration": 5400,
                             "broadcastUrls": {
                                 "hls" : "http://server/fakepath/playlist.m3u8",
+                                "hlsStatus": "ready",
                                 "rtmp": {
                                     "foo": {
                                         "serverUrl": "rtmp://myfooserver/myfooapp",
@@ -287,7 +309,8 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(broadcast).to(have_property(u("updatedAt"), 1437676551000))
         expect(broadcast).to(have_property(u("resolution"), u("640x480")))
         expect(broadcast).to(have_property(u("status"), u("started")))
-        expect(list(broadcast.broadcastUrls)).to(have_length(2))
+        expect(broadcast.broadcastUrls["hlsStatus"]).to(equal("ready"))
+        expect(list(broadcast.broadcastUrls)).to(have_length(3))
         expect(list(broadcast.broadcastUrls["rtmp"])).to(have_length(2))
 
     @httpretty.activate
@@ -311,8 +334,13 @@ class OpenTokBroadcastTest(unittest.TestCase):
                             "status": "started",
                             "hasAudio": true,
                             "hasVideo": false,
+                            "maxBitrate": 1000000,
+                            "maxDuration": 5400,
+                            "hasAudio": true,
+                            "hasVideo": false,
                             "broadcastUrls": {
-                                "hls" : "http://server/fakepath/playlist.m3u8",
+                                "hls": "http://server/fakepath/playlist.m3u8",
+                                "hlsStatus": "live",
                                 "rtmp": {
                                     "foo": {
                                         "serverUrl": "rtmp://myfooserver/myfooapp",
@@ -387,7 +415,8 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(broadcast).to(have_property(u("hasVideo"), False))
         expect(broadcast).to(have_property(u("resolution"), u("640x480")))
         expect(broadcast).to(have_property(u("status"), u("started")))
-        expect(list(broadcast.broadcastUrls)).to(have_length(2))
+        expect(broadcast.broadcastUrls["hlsStatus"]).to(equal("live"))
+        expect(list(broadcast.broadcastUrls)).to(have_length(3))
         expect(list(broadcast.broadcastUrls["rtmp"])).to(have_length(2))
 
     @httpretty.activate
@@ -411,8 +440,13 @@ class OpenTokBroadcastTest(unittest.TestCase):
                             "status": "started",
                             "hasAudio": false,
                             "hasVideo": true,
+                            "maxBitrate": 1000000,
+                            "maxDuration": 5400,
+                            "hasAudio": false,
+                            "hasVideo": true,
                             "broadcastUrls": {
-                                "hls" : "http://server/fakepath/playlist.m3u8",
+                                "hls": "http://server/fakepath/playlist.m3u8",
+                                "hlsStatus": "ready",
                                 "rtmp": {
                                     "foo": {
                                         "serverUrl": "rtmp://myfooserver/myfooapp",
@@ -487,7 +521,8 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(broadcast).to(have_property(u("hasVideo"), True))
         expect(broadcast).to(have_property(u("resolution"), u("640x480")))
         expect(broadcast).to(have_property(u("status"), u("started")))
-        expect(list(broadcast.broadcastUrls)).to(have_length(2))
+        expect(broadcast.broadcastUrls["hlsStatus"]).to(equal("ready"))
+        expect(list(broadcast.broadcastUrls)).to(have_length(3))
         expect(list(broadcast.broadcastUrls["rtmp"])).to(have_length(2))
 
     @httpretty.activate
@@ -675,7 +710,8 @@ class OpenTokBroadcastTest(unittest.TestCase):
                             "updatedAt": 1437676551000,
                             "resolution": "640x480",
                             "broadcastUrls": {
-                                "hls" : "http://server/fakepath/playlist.m3u8",
+                                "hls": "http://server/fakepath/playlist.m3u8",
+                                "hlsStatus": "live",
                                 "rtmp": {
                                     "foo": {
                                         "serverUrl": "rtmp://myfooserver/myfooapp",
@@ -716,7 +752,8 @@ class OpenTokBroadcastTest(unittest.TestCase):
         expect(broadcast).to(have_property(u("updatedAt"), 1437676551000))
         expect(broadcast).to(have_property(u("resolution"), u("640x480")))
         expect(broadcast).to(have_property(u("status"), u("started")))
-        expect(list(broadcast.broadcastUrls)).to(have_length(2))
+        expect(broadcast.broadcastUrls["hlsStatus"]).to(equal("live"))
+        expect(list(broadcast.broadcastUrls)).to(have_length(3))
         expect(list(broadcast.broadcastUrls["rtmp"])).to(have_length(2))
 
     @httpretty.activate
