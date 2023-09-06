@@ -458,24 +458,23 @@ class Client(object):
                     ).format(location)
                 )
             options[u("location")] = location
-        options["e2ee"] = e2ee
+        options["e2ee"] = str(e2ee).lower()
 
         try:
             logger.debug(
                 "POST to %r with params %r, headers %r, proxies %r",
                 self.endpoints.session_url(),
                 options,
-                self.headers(),
+                {**self.get_headers(), "Accept": "application/json"},
                 self.proxies,
             )
             response = requests.post(
                 self.endpoints.get_session_url(),
                 data=options,
-                headers=self.get_headers(),
+                headers={**self.get_headers(), "Accept": "application/json"},
                 proxies=self.proxies,
                 timeout=self.timeout,
             )
-
             response.encoding = "utf-8"
 
             if response.status_code == 403:
