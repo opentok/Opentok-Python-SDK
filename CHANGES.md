@@ -1,3 +1,6 @@
+# Release v3.7.1
+- Fixed an issue with end-to-end encryption not being called correctly when creating a new session
+
 # Release v3.7.0
 - Added the `maxBitrate` parameter to the `Client.start_broadcast` method
 - Added the `hlsStatus` parameter to the `Broadcast object`
