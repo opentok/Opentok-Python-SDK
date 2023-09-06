@@ -39,7 +39,12 @@ class OpenTokSessionCreationTest(unittest.TestCase):
 
         validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
         expect(httpretty.last_request().headers[u("user-agent")]).to(
-            equal(u("OpenTok-Python-SDK/") + __version__ + ' python/' + platform.python_version())
+            equal(
+                u("OpenTok-Python-SDK/")
+                + __version__
+                + " python/"
+                + platform.python_version()
+            )
         )
         body = parse_qs(httpretty.last_request().body)
         expect(body).to(have_key(b("p2p.preference"), [b("enabled")]))
@@ -310,7 +315,7 @@ class OpenTokSessionCreationTest(unittest.TestCase):
         session = self.opentok.create_session(e2ee=True)
 
         body = parse_qs(httpretty.last_request().body)
-        expect(body).to(have_key(b("e2ee"), [b"True"]))
+        expect(body).to(have_key(b("e2ee"), [b"true"]))
         expect(session).to(be_a(Session))
         expect(session).to(
             have_property(
