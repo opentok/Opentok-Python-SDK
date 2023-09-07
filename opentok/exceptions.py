@@ -1,15 +1,11 @@
 class OpenTokException(Exception):
     """Defines exceptions thrown by the OpenTok SDK."""
 
-    pass
-
 
 class RequestError(OpenTokException):
     """Indicates an error during the request. Most likely an error connecting
     to the OpenTok API servers. (HTTP 500 error).
     """
-
-    pass
 
 
 class AuthError(OpenTokException):
@@ -17,15 +13,11 @@ class AuthError(OpenTokException):
     key and API secret and try again.
     """
 
-    pass
-
 
 class NotFoundError(OpenTokException):
     """Indicates that the element requested was not found.  Check the parameters
     of the request.
     """
-
-    pass
 
 
 class ArchiveError(OpenTokException):
@@ -33,21 +25,15 @@ class ArchiveError(OpenTokException):
     of the requested archive is invalid.
     """
 
-    pass
-
 
 class SignalingError(OpenTokException):
     """Indicates that there was a signaling specific problem, one of the parameter
     is invalid or the type|data string doesn't have a correct size"""
 
-    pass
-
 
 class GetStreamError(OpenTokException):
     """Indicates that the data in the request is invalid, or the session_id or stream_id
     are invalid"""
-
-    pass
 
 
 class ForceDisconnectError(OpenTokException):
@@ -57,37 +43,29 @@ class ForceDisconnectError(OpenTokException):
     is not connected to the session
     """
 
-    pass
-
 
 class SipDialError(OpenTokException):
     """
     Indicates that there was a SIP dial specific problem:
-    The Session ID passed in is invalid or you attempt to start a SIP call for a session
+    The Session ID ed in is invalid or you attempt to start a SIP call for a session
     that does not use the OpenTok Media Router.
     """
-
-    pass
 
 
 class SetStreamClassError(OpenTokException):
     """
     Indicates that there is invalid data in the JSON request.
-    It may also indicate that invalid layout options have been passed
+    It may also indicate that invalid layout options have been ed
     """
-
-    pass
 
 
 class BroadcastError(OpenTokException):
     """
     Indicates that data in your request data is invalid JSON. It may also indicate
-    that you passed in invalid layout options. Or you have exceeded the limit of five
+    that you ed in invalid layout options. Or you have exceeded the limit of five
     simultaneous RTMP streams for an OpenTok session. Or you specified and invalid resolution.
     Or The broadcast has already started for the session
     """
-
-    pass
 
 
 class DTMFError(OpenTokException):
@@ -100,8 +78,6 @@ class ArchiveStreamModeError(OpenTokException):
     """
     Indicates that the archive is configured with a streamMode that does not support stream manipulation.
     """
-
-    pass
 
 
 class BroadcastStreamModeError(OpenTokException):
@@ -133,4 +109,10 @@ class InvalidWebSocketOptionsError(OpenTokException):
 class InvalidMediaModeError(OpenTokException):
     """
     Indicates that the media mode selected was not valid for the type of request made.
+    """
+
+
+class CaptioningAlreadyInProgressError(OpenTokException):
+    """
+    Indicates that captioning was requested for an OpenTok session where live captions have already started.
     """

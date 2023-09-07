@@ -1,4 +1,5 @@
-from datetime import datetime  # generate_token
+from datetime import datetime
+from functools import partial  # generate_token
 from typing import List, Optional  # imports List, Optional type hint
 import calendar  # generate_token
 import base64  # generate_token
@@ -27,6 +28,7 @@ from .version import __version__
 from .endpoints import Endpoints
 from .session import Session
 from .archives import Archive, ArchiveList, OutputModes, StreamModes
+from .captions import Captions
 from .render import Render, RenderList
 from .stream import Stream
 from .streamlist import StreamList
@@ -52,6 +54,7 @@ from .exceptions import (
     DTMFError,
     InvalidWebSocketOptionsError,
     InvalidMediaModeError,
+    CaptioningAlreadyInProgressError,
 )
 
 
@@ -1730,7 +1733,6 @@ class Client(object):
         url,
         max_duration=7200,
         resolution="1280x720",
-        status_callback_url=None,
         properties: dict = None,
     ):
         """
@@ -1776,7 +1778,7 @@ class Client(object):
         elif response.status_code == 400:
             """
             The HTTP response has a 400 status code in the following cases:
-            You do not pass in a session ID or you pass in an invalid session ID.
+            You did not pass in a session ID or you passed in an invalid session ID.
             You specify an invalid value for input parameters.
             """
             raise RequestError(response.json().get("message"))
@@ -1810,7 +1812,7 @@ class Client(object):
             return Render(response.json())
         elif response.status_code == 400:
             raise RequestError(
-                "Invalid request. This response may indicate that data in your request is invalid JSON. Or it may indicate that you do not pass in a session ID."
+                "Invalid request. This response may indicate that data in your request is invalid JSON. Or it may indicate that you did not pass in a session ID."
             )
         elif response.status_code == 403:
             raise AuthError("You passed in an invalid OpenTok API key or JWT token.")
@@ -1843,7 +1845,7 @@ class Client(object):
             return response
         elif response.status_code == 400:
             raise RequestError(
-                "Invalid request. This response may indicate that data in your request is invalid JSON. Or it may indicate that you do not pass in a session ID."
+                "Invalid request. This response may indicate that data in your request is invalid JSON. Or it may indicate that you did not pass in a session ID."
             )
         elif response.status_code == 403:
             raise AuthError("You passed in an invalid OpenTok API key or JWT token.")
@@ -1932,7 +1934,7 @@ class Client(object):
         elif response.status_code == 400:
             """
             The HTTP response has a 400 status code in the following cases:
-            You did not pass in a session ID or you pass in an invalid session ID.
+            You did not pass in a session ID or you passed in an invalid session ID.
             You specified an invalid value for input parameters.
             """
             raise RequestError(response.json().get("message"))
@@ -1952,6 +1954,104 @@ class Client(object):
             )
         if "uri" not in options:
             raise InvalidWebSocketOptionsError("Provide a WebSocket URI.")
+
+    def start_captions(
+        self,
+        session_id: str,
+        opentok_token: str,
+        language_code: str = "en-US",
+        max_duration: int = 14400,
+        partial_captions: bool = True,
+        status_callback_url: str = None,
+    ):
+        """
+        Starts real-time Live Captions for an OpenTok Session. The maximum allowed duration is 4 hours, after which the audio
+        captioning will stop without any effect on the ongoing OpenTok Session.
+        An event will be posted to your callback URL if provided when starting the captions.
+
+        Each OpenTok Session supports only one audio captioning session. For more information about the Live Captions feature,
+        see the Live Captions developer guide <https://tokbox.com/developer/guides/live-captions/>.
+
+        :param String 'session_id': The OpenTok session ID. The audio from participants publishing into this session will be used to generate the captions.
+        :param String 'opentok_token': A valid OpenTok token with role set to Moderator.
+        :param String 'language_code' Optional: The BCP-47 code for a spoken language used on this call.
+        :param Integer 'max_duration' Optional: The maximum duration for the audio captioning, in seconds.
+        :param Boolean 'partial_captions' Optional: Whether to enable this to faster captioning at the cost of some inaccuracies.
+        :param String 'status_callback_url' Optional: A publicly reachable URL controlled by the customer and capable of generating the content to be rendered without user intervention. The minimum length of the URL is 15 characters and the maximum length is 2048 characters.
+        """
+
+        payload = {
+            "sessionId": session_id,
+            "token": opentok_token,
+            "languageCode": language_code,
+            "maxDuration": max_duration,
+            "partialCaptions": partial_captions,
+            "statusCallbackUrl": status_callback_url,
+        }
+
+        logger.debug(
+            "POST to %r with params %r, headers %r, proxies %r",
+            self.endpoints.get_captions_url(),
+            json.dumps(payload),
+            self.get_json_headers(),
+            self.proxies,
+        )
+
+        response = requests.post(
+            self.endpoints.get_captions_url(),
+            json=payload,
+            headers=self.get_json_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout,
+        )
+
+        if response and response.status_code == 200:
+            return Captions(response.json())
+        elif response.status_code == 400:
+            """
+            The HTTP response has a 400 status code in the following cases:
+            You did not pass in a session ID or you passed in an invalid session ID.
+            You specified an invalid value for input parameters.
+            """
+            raise RequestError(response.json().get("message"))
+        elif response.status_code == 403:
+            raise AuthError("You passed in an invalid OpenTok API key or JWT.")
+        elif response.status_code == 409:
+            raise CaptioningAlreadyInProgressError(
+                "Live captions have already started for this OpenTok Session."
+            )
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
+
+    def stop_captions(self, captions_id: str):
+        """
+        Stops live captioning for the specified captioning session.
+
+        :param String captions_id: The ID of the captioning session to stop.
+        """
+
+        logger.debug(
+            "POST to %r with headers %r, proxies %r",
+            self.endpoints.get_captions_url(captions_id),
+            self.get_json_headers(),
+            self.proxies,
+        )
+
+        response = requests.post(
+            self.endpoints.get_captions_url(captions_id),
+            headers=self.get_json_headers(),
+            proxies=self.proxies,
+            timeout=self.timeout,
+        )
+
+        if response and response.status_code == 202:
+            return None
+        elif response.status_code == 403:
+            raise AuthError("You passed in an invalid OpenTok API key or JWT.")
+        elif response.status_code == 404:
+            raise NotFoundError("No matching captionsId was found.")
+        else:
+            raise RequestError("An unexpected error occurred", response.status_code)
 
     def _sign_string(self, string, secret):
         return hmac.new(

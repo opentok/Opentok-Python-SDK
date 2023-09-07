@@ -1,3 +1,6 @@
+# Release v3.8.0
+- Added support for the [Captions API](https://tokbox.com/developer/guides/live-captions/)
+
 # Release v3.7.1
 - Fixed an issue with end-to-end encryption not being called correctly when creating a new session
 

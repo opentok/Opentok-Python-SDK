@@ -640,6 +640,36 @@ by adding these fields to the ``websocket_options`` object.
     }
   }
 
+
+Using the Live Captions API
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+You can enable live captioning for an OpenTok session with the ``opentok.start_captions`` method.
+For more information, see the
+`Live Captions API developer guide <https://tokbox.com/developer/guides/live-captions/>`.
+
+.. code:: python
+
+  captions = opentok.start_captions(session_id, opentok_token)
+
+You can also specify optional parameters, as shown below.
+
+.. code:: python
+
+  captions = opentok.start_captions(
+    session_id,
+    opentok_token,
+    language_code='en-GB',
+    max_duration=10000,
+    partial_captions=False,
+    status_callback_url='https://example.com',
+  )
+
+You can stop an ongoing live captioning session by calling the ``opentok.stop_captions`` method.
+
+.. code:: python
+
+  opentok.stop_captions(captions_id)
+
 Configuring Timeout
 -------------------
 Timeout is passed in the Client constructor:
