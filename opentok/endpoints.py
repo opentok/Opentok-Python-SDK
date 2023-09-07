@@ -174,7 +174,7 @@ class Endpoints(object):
         return url
 
     def get_archive_stream(self, archive_id=None):
-        """this method returns urls for working with streamModes in archives"""
+        """this method returns the url for working with streamModes in archives"""
         url = (
             self.api_url
             + "/v2/project/"
@@ -187,7 +187,7 @@ class Endpoints(object):
         return url
 
     def get_broadcast_stream(self, broadcast_id=None):
-        """this method returns urls for working with streamModes in broadcasts"""
+        """this method returns the url for working with streamModes in broadcasts"""
         url = (
             self.api_url
             + "/v2/project/"
@@ -200,7 +200,7 @@ class Endpoints(object):
         return url
 
     def get_render_url(self, render_id: str = None):
-        "Returns URLs for working with the Render API." ""
+        "Returns the URL for working with the Render API." ""
         url = self.api_url + "/v2/project/" + self.api_key + "/render"
         if render_id:
             url += "/" + render_id
@@ -208,7 +208,15 @@ class Endpoints(object):
         return url
 
     def get_audio_connector_url(self):
-        """Returns URLs for working with the Audio Connector API."""
+        """Returns the  URL for working with the Audio Connector API."""
         url = self.api_url + "/v2/project/" + self.api_key + "/connect"
+
+        return url
+
+    def get_captions_url(self, captions_id: str = None):
+        """Returns the URL for working with the Captions API."""
+        url = self.api_url + '/v2/project/' + self.api_key + '/captions'
+        if captions_id:
+            url += f'/{captions_id}/stop'
 
         return url
