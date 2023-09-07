@@ -47,7 +47,7 @@ class ForceDisconnectError(OpenTokException):
 class SipDialError(OpenTokException):
     """
     Indicates that there was a SIP dial specific problem:
-    The Session ID ed in is invalid or you attempt to start a SIP call for a session
+    The Session ID passed in is invalid or you attempt to start a SIP call for a session
     that does not use the OpenTok Media Router.
     """
 
@@ -55,14 +55,14 @@ class SipDialError(OpenTokException):
 class SetStreamClassError(OpenTokException):
     """
     Indicates that there is invalid data in the JSON request.
-    It may also indicate that invalid layout options have been ed
+    It may also indicate that invalid layout options have been passed.
     """
 
 
 class BroadcastError(OpenTokException):
     """
     Indicates that data in your request data is invalid JSON. It may also indicate
-    that you ed in invalid layout options. Or you have exceeded the limit of five
+    that you passed in invalid layout options. Or you have exceeded the limit of five
     simultaneous RTMP streams for an OpenTok session. Or you specified and invalid resolution.
     Or The broadcast has already started for the session
     """

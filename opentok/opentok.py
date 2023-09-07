@@ -1,5 +1,4 @@
-from datetime import datetime
-from functools import partial  # generate_token
+from datetime import datetime  # generate_token
 from typing import List, Optional  # imports List, Optional type hint
 import calendar  # generate_token
 import base64  # generate_token
