@@ -467,13 +467,13 @@ class Client(object):
                 "POST to %r with params %r, headers %r, proxies %r",
                 self.endpoints.session_url(),
                 options,
-                {**self.get_headers(), "Accept": "application/json"},
+                self.get_headers(),
                 self.proxies,
             )
             response = requests.post(
                 self.endpoints.get_session_url(),
                 data=options,
-                headers={**self.get_headers(), "Accept": "application/json"},
+                headers=self.get_headers(),
                 proxies=self.proxies,
                 timeout=self.timeout,
             )

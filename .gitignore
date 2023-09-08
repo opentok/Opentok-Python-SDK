@@ -42,7 +42,7 @@ coverage.xml
 docs/_build/
 
 # Virtual env
-venv/
+venv*
 env/
 
 # Mac Desktop files
