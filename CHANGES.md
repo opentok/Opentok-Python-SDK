@@ -1,3 +1,6 @@
+# Release v3.8.1
+- Fixed an issue with the `opentok.create_session` method
+
 # Release v3.8.0
 - Added support for the [Captions API](https://tokbox.com/developer/guides/live-captions/)
 
