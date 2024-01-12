@@ -14,6 +14,18 @@ The OpenTok Python SDK lets you generate
 `tokens <http://tokbox.com/opentok/tutorials/create-token/>`_ for `OpenTok <http://www.tokbox.com/>`_
 applications, and `archive <http://www.tokbox.com/platform/archiving>`_ OpenTok sessions.
 
+Note!
+-----
+
+This library is designed to work with the Tokbox/OpenTok platform, part of the Vonage Video API. If you are looking to use the Vonage Video API and are using the Vonage Customer Dashboard, you will want to install the `Vonage Server SDK for Python <https://github.com/Vonage/vonage-python-sdk>`_, which includes support for the Vonage Video API.
+
+Not sure which exact platform you are using? Take a look at `this guide <https://api.support.vonage.com/hc/en-us/articles/10817774782492>`_.
+
+If you are using the Tokbox platform, do not worry! The Tokbox platform is not going away, and this library will continue to be updated. While we encourage customers to check out the new Unified platform, there is no rush to switch. Both platforms run the exact same infrastructure and capabilities. The main difference is a unified billing interface and easier access to `Vonage's other CPaaS APIs <https://www.vonage.com/communications-apis/>`_.
+
+If you are new to the Vonage Video API, head on over to the `Vonage Customer Dashboard <https://dashboard.vonage.com>`_ to sign up for a developer account and check out the `Vonage Server SDK for Python <https://github.com/Vonage/vonage-python-sdk>`_. 
+
+
 Installation using Pip (recommended):
 -------------------------------------
 
