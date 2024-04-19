@@ -2166,7 +2166,7 @@ class ClientAsync(object):
             )
 
 
-class OpenTok(ClientAsync):
+class OpenTokAsync(ClientAsync):
     def __init__(
             self,
             api_key,
@@ -2180,7 +2180,7 @@ class OpenTok(ClientAsync):
             DeprecationWarning,
             stacklevel=2,
         )
-        super(OpenTok, self).__init__(
+        super(OpenTokAsync, self).__init__(
             api_key,
             api_secret,
             api_url=api_url,
