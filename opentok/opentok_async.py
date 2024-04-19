@@ -62,7 +62,7 @@ class ClientAsync(object):
     TOKEN_SENTINEL = "T1=="
     """For internal use."""
 
-    httpx_client = None
+    _httpx_client = None
     loop = None
 
     def __init__(
@@ -84,15 +84,20 @@ class ClientAsync(object):
         )
         # JWT custom claims - Default values
         self._jwt_livetime = 3  # In minutes
-        self.set_httpx_client()
         self.loop = asyncio.get_event_loop()
 
     def set_httpx_client(self):
-        self.httpx_client = httpx.AsyncClient(proxies=self._proxies, timeout=self.timeout)
+        self._httpx_client = httpx.AsyncClient(proxies=self._proxies, timeout=self.timeout)
+
+    @property
+    def httpx_client(self):
+        if self._httpx_client is None:
+            self.set_httpx_client()
+        return self._httpx_client
 
     async def close(self):
-        # httpx.AsyncClient.aclose must be awaited!
-        await self.httpx_client.aclose()
+        if self._httpx_client:
+            await self._httpx_client.aclose()
 
     def __del__(self):
         """
