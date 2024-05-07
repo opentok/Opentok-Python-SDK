@@ -749,6 +749,21 @@ You can append a string to the user agent that is sent with requests:
 
   opentok.append_to_user_agent('my-appended-string')
 
+
+Async (experimental)
+--------------------
+
+You can install ``httpx`` package via ``pip install httpx`` and start using ``ClientAsync`` to make your requests async.
+
+
+.. code:: python
+
+  from opentok.opentok_async import ClientAsync
+  opentok = ClientAsync(api_key, api_secret)
+  session = await opentok.create_session()
+  archive = await opentok.start_archive(session.session_id, name=u'Important Presentation')
+
+
 Samples
 -------
 

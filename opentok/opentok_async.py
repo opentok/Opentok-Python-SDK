@@ -351,7 +351,7 @@ class ClientAsync(object):
                  If the client's connectivity improves, the video returns.
 
                * The OpenTok Media Router supports the archiving feature, which lets
-                 you record, save, and retrieve OpenTok sessions (see http://tokbox.com/platform/archiving).
+                 you record, save, and retrieve OpenTok sessions (see https://tokbox.com/platform/archiving).
 
         :param String archive_mode: Whether the session is automatically archived
             (ArchiveModes.always) or not (ArchiveModes.manual). By default,
@@ -557,11 +557,11 @@ class ClientAsync(object):
         :param OutputModes output_mode: Whether all streams in the archive are recorded
           to a single file (OutputModes.composed, the default) or to individual files
           (OutputModes.individual).
-        :param String resolution (Optional): The resolution of the archive, either "640x480" (the default)
+        :param String resolution: (Optional) The resolution of the archive, either "640x480" (the default)
           or "1280x720". This parameter only applies to composed archives. If you set this
           parameter and set the output_mode parameter to OutputModes.individual, the call to the
           start_archive() method results in an error.
-        :param Dictionary 'layout' (optional): Specify this to assign the initial layout type for the
+        :param Dictionary layout: (Optional) Specify this to assign the initial layout type for the
             archive.
 
             String 'type': Type of layout. Valid values for the layout property are "bestFit" (best fit),
@@ -575,12 +575,12 @@ class ClientAsync(object):
             String 'screenshareType' optional: Layout to use for screenshares. If this is set, you must
             set 'type' to 'bestFit'
 
-        :param StreamModes stream_mode (Optional): Determines the archive stream handling mode.
+        :param StreamModes stream_mode: (Optional) Determines the archive stream handling mode.
         Set this to StreamModes.auto (the default) to have streams added automatically. Set this to
         StreamModes.manual to explicitly select streams to include in the the archive, using the
         OpenTok.add_archive_stream() and OpenTok.remove_archive_stream() methods.
 
-        :param String multi_archive_tag (Optional): Set this to support recording multiple archives for the same
+        :param String multi_archive_tag: (Optional) Set this to support recording multiple archives for the same
         session simultaneously. Set this to a unique string for each simultaneous archive of an ongoing session.
         You must also set this option when manually starting an archive that is automatically archived.
         Note that the multiArchiveTag value is not included in the response for the methods to list archives and
@@ -1076,10 +1076,10 @@ class ClientAsync(object):
         :param String layout_type: The layout type for the archive. Valid values are:
         'bestFit', 'custom', 'horizontalPresentation', 'pip' and 'verticalPresentation'
 
-        :param String stylesheet (optional): CSS used to style the custom layout.
+        :param String stylesheet: (optional) CSS used to style the custom layout.
         Specify this only if you set the type property to 'custom'
 
-        :param String screenshare_type (optional): Layout to use for screenshares. Must
+        :param String screenshare_type: (optional) Layout to use for screenshares. Must
         set 'layout_type' to 'bestFit'
         """
         payload = {
@@ -1134,7 +1134,7 @@ class ClientAsync(object):
         :param String sip_uri: The SIP URI to be used as destination of the SIP call initiated from
         OpenTok to the SIP platform
 
-        :param Dictionary options (optional): Aditional options with the following properties:
+        :param Dictionary options: (optional) Aditional options with the following properties:
 
             String 'from': The number or string that will be sent to the final SIP number
             as the caller
@@ -1360,7 +1360,7 @@ class ClientAsync(object):
             broadcasts and get information about a live streaming broadcast.
             For more information, see https://tokbox.com/developer/guides/broadcast/live-streaming#simultaneous-broadcasts.
 
-        :param BroadcastStreamModes stream_mode (Optional): Determines the broadcast stream handling mode.
+        :param BroadcastStreamModes stream_mode: (Optional) Determines the broadcast stream handling mode.
         Set this to BroadcastStreamModes.auto (the default) to have streams added automatically. Set this to
         BroadcastStreamModes.manual to explicitly select streams to include in the broadcast, using the
         OpenTok.add_broadcast_stream() and OpenTok.remove_broadcast_stream() methods.
@@ -1614,10 +1614,10 @@ class ClientAsync(object):
         :param String layout_type: The layout type for the broadcast. Valid values are:
         'bestFit', 'custom', 'horizontalPresentation', 'pip' and 'verticalPresentation'
 
-        :param String stylesheet (optional): CSS used to style the custom layout.
+        :param String stylesheet: (optional) CSS used to style the custom layout.
         Specify this only if you set the type property to 'custom'
 
-        :param String screenshare_type (optional): Layout to use for screenshares. Must
+        :param String screenshare_type: (optional) Layout to use for screenshares. Must
         set 'layout_type' to 'bestFit'
         """
         payload = {
@@ -1673,12 +1673,12 @@ class ClientAsync(object):
          For more information, see the
         `Experience Composer developer guide <https://tokbox.com/developer/guides/experience-composer>`_.
 
-         :param String 'session_id': The session ID of the OpenTok session that will include the Experience Composer stream.
-         :param String 'opentok_token': A valid OpenTok token with a Publisher role and (optionally) connection data to be associated with the output stream.
-         :param String 'url': A publically reachable URL controlled by the customer and capable of generating the content to be rendered without user intervention.
-         :param Integer 'maxDuration' (Optional): The maximum time allowed for the Experience Composer, in seconds. After this time, it is stopped automatically, if it is still running. The maximum value is 36000 (10 hours), the minimum value is 60 (1 minute), and the default value is 7200 (2 hours). When the Experience Composer ends, its stream is unpublished and an event is posted to the callback URL, if configured in the Account Portal.
-         :param String 'resolution' (Optional): The resolution of the Experience Composer, either "640x480" (SD landscape), "480x640" (SD portrait), "1280x720" (HD landscape), "720x1280" (HD portrait), "1920x1080" (FHD landscape), or "1080x1920" (FHD portrait). By default, this resolution is "1280x720" (HD landscape, the default).
-         :param Dictionary 'properties' (Optional): Initial configuration of Publisher properties for the composed output stream.
+         :param String session_id: The session ID of the OpenTok session that will include the Experience Composer stream.
+         :param String opentok_token: A valid OpenTok token with a Publisher role and (optionally) connection data to be associated with the output stream.
+         :param String url: A publically reachable URL controlled by the customer and capable of generating the content to be rendered without user intervention.
+         :param Integer max_duration: (Optional) The maximum time allowed for the Experience Composer, in seconds. After this time, it is stopped automatically, if it is still running. The maximum value is 36000 (10 hours), the minimum value is 60 (1 minute), and the default value is 7200 (2 hours). When the Experience Composer ends, its stream is unpublished and an event is posted to the callback URL, if configured in the Account Portal.
+         :param String resolution: (Optional) The resolution of the Experience Composer, either "640x480" (SD landscape), "480x640" (SD portrait), "1280x720" (HD landscape), "720x1280" (HD portrait), "1920x1080" (FHD landscape), or "1080x1920" (FHD portrait). By default, this resolution is "1280x720" (HD landscape, the default).
+         :param Dictionary properties: (Optional) Initial configuration of Publisher properties for the composed output stream.
              String name Optional: The name of the composed output stream which will be published to the session. The name must have a minimum length of 1 and a maximum length of 200.
         """
         payload = {
@@ -1723,7 +1723,7 @@ class ClientAsync(object):
         This method allows you to see the status of a render, which can be one of the following:
             ['starting', 'started', 'stopped', 'failed']
 
-        :param String 'render_id': The ID of a specific render.
+        :param String render_id: The ID of a specific render.
         """
         logger.debug(
             "GET to %r with headers %r, proxies %r",
@@ -1754,7 +1754,7 @@ class ClientAsync(object):
         """
         This method stops a render.
 
-        :param String 'render_id': The ID of a specific render.
+        :param String render_id: The ID of a specific render.
         """
         logger.debug(
             "DELETE to %r with headers %r, proxies %r",
@@ -1785,8 +1785,8 @@ class ClientAsync(object):
         """
         List existing renders associated with the project's API key.
 
-        :param Integer 'offset' (Optional): Start offset in the list of existing renders.
-        :param Integer 'count' (Optional): Number of renders to retrieve, starting at 'offset'.
+        :param Integer offset: (Optional) Start offset in the list of existing renders.
+        :param Integer count: (Optional) Number of renders to retrieve, starting at 'offset'.
         """
 
         query_params = {"offset": offset, "count": count}
@@ -1823,9 +1823,9 @@ class ClientAsync(object):
         Connects audio streams to a specified WebSocket URI.
         For more information, see the `Audio Connector developer guide <https://tokbox.com/developer/guides/audio-streamer/>`.
 
-        :param String 'session_id': The OpenTok session ID that includes the OpenTok streams you want to include in the WebSocket stream. The Audio Connector feature is only supported in routed sessions (sessions that use the OpenTok Media Router).
-        :param String 'opentok_token': The OpenTok token to be used for the Audio Connector connection to the OpenTok session.
-        :param Dictionary 'websocket_options': Included options for the WebSocket.
+        :param String session_id: The OpenTok session ID that includes the OpenTok streams you want to include in the WebSocket stream. The Audio Connector feature is only supported in routed sessions (sessions that use the OpenTok Media Router).
+        :param String opentok_token: The OpenTok token to be used for the Audio Connector connection to the OpenTok session.
+        :param Dictionary websocket_options: Included options for the WebSocket.
             String 'uri': A publicly reachable WebSocket URI to be used for the destination of the audio stream (such as "wss://example.com/ws-endpoint").
             List 'streams' Optional: A list of stream IDs for the OpenTok streams you want to include in the WebSocket audio. If you omit this property, all streams in the session will be included.
             Dictionary 'headers' Optional: An object of key-value pairs of headers to be sent to your WebSocket server with each message, with a maximum length of 512 bytes.
@@ -1895,12 +1895,12 @@ class ClientAsync(object):
         Each OpenTok Session supports only one audio captioning session. For more information about the Live Captions feature,
         see the Live Captions developer guide <https://tokbox.com/developer/guides/live-captions/>.
 
-        :param String 'session_id': The OpenTok session ID. The audio from participants publishing into this session will be used to generate the captions.
-        :param String 'opentok_token': A valid OpenTok token with role set to Moderator.
-        :param String 'language_code' (Optional): The BCP-47 code for a spoken language used on this call.
-        :param Integer 'max_duration' (Optional): The maximum duration for the audio captioning, in seconds.
-        :param Boolean 'partial_captions' (Optional): Whether to enable this to faster captioning at the cost of some inaccuracies.
-        :param String 'status_callback_url' (Optional): A publicly reachable URL controlled by the customer and capable of generating the content to be rendered without user intervention. The minimum length of the URL is 15 characters and the maximum length is 2048 characters.
+        :param String session_id: The OpenTok session ID. The audio from participants publishing into this session will be used to generate the captions.
+        :param String opentok_token: A valid OpenTok token with role set to Moderator.
+        :param String language_code: (Optional) The BCP-47 code for a spoken language used on this call.
+        :param Integer max_duration: (Optional) The maximum duration for the audio captioning, in seconds.
+        :param Boolean partial_captions: (Optional) Whether to enable this to faster captioning at the cost of some inaccuracies.
+        :param String status_callback_url: (Optional) A publicly reachable URL controlled by the customer and capable of generating the content to be rendered without user intervention. The minimum length of the URL is 15 characters and the maximum length is 2048 characters.
         """
 
         payload = {
@@ -2307,6 +2307,7 @@ class OpenTokAsync(ClientAsync):
         :param digits DTMF digits to play
         Valid DTMF digits are 0-9, p, #, and * digits. 'p' represents a 500ms pause if a delay is
         needed during the input process.
+        :param options: additional options
         """
         if options is None:
             options = {}
