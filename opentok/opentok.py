@@ -64,6 +64,9 @@ class Roles(Enum):
     """A subscriber can only subscribe to streams."""
     publisher = u("publisher")
     """A publisher can publish streams, subscribe to streams, and signal"""
+    publisher_only = "publisheronly"
+    """A client with the `publisher_only` role can only publish streams. It cannot subscribe to 
+    other clients' streams or send signals."""
     moderator = u("moderator")
     """In addition to the privileges granted to a publisher, a moderator can perform
     moderation functions, such as forcing clients to disconnect, to stop publishing streams,
@@ -106,7 +109,6 @@ logger = logging.getLogger("opentok")
 
 
 class Client(object):
-
     """Use this SDK to create tokens and interface with the server-side portion
     of the Opentok API.
     """
@@ -186,6 +188,9 @@ class Client(object):
 
           * `Roles.publisher` -- A publisher can publish streams, subscribe to
             streams, and signal. (This is the default value if you do not specify a role.)
+
+          * `Roles.publisher_only` -- A client with the `publisher_only` role can only publish streams.
+            It cannot subscribe to other clients' streams or send signals.
 
           * `Roles.moderator` -- In addition to the privileges granted to a
             publisher, in clients using the OpenTok.js 2.2 library, a moderator can call the
@@ -499,9 +504,7 @@ class Client(object):
                     )
                 )
 
-            session_id = (
-                dom.getElementsByTagName("session_id")[0].childNodes[0].nodeValue
-            )
+            session_id = dom.getElementsByTagName("session_id")[0].childNodes[0].nodeValue
             return Session(
                 self,
                 session_id,
@@ -890,9 +893,7 @@ class Client(object):
         else:
             raise RequestError("An unexpected error occurred.", response.status_code)
 
-    def remove_archive_stream(
-        self, archive_id: str, stream_id: str
-    ) -> requests.Response:
+    def remove_archive_stream(self, archive_id: str, stream_id: str) -> requests.Response:
         """
         This method will remove streams from the archive with removeStream.
 
@@ -1339,9 +1340,7 @@ class Client(object):
         else:
             raise RequestError("OpenTok server error.", response.status_code)
 
-    def start_broadcast(
-        self, session_id, options, stream_mode=BroadcastStreamModes.auto
-    ):
+    def start_broadcast(self, session_id, options, stream_mode=BroadcastStreamModes.auto):
         """
         Use this method to start a live streaming broadcast for an OpenTok session. This broadcasts
         the session to an HLS (HTTP live streaming) or to RTMP streams. To successfully start
@@ -1576,9 +1575,7 @@ class Client(object):
                     "Your broadcast is configured with a streamMode that does not support stream manipulation."
                 )
             elif response.status_code == 409:
-                raise BroadcastError(
-                    "The broadcast has already started for the session."
-                )
+                raise BroadcastError("The broadcast has already started for the session.")
         else:
             raise RequestError("An unexpected error occurred.", response.status_code)
 
@@ -1621,9 +1618,7 @@ class Client(object):
                     "Your broadcast is configured with a streamMode that does not support stream manipulation."
                 )
             elif response.status_code == 409:
-                raise BroadcastError(
-                    "The broadcast has already started for the session."
-                )
+                raise BroadcastError("The broadcast has already started for the session.")
         else:
             raise RequestError("OpenTok server error.", response.status_code)
 

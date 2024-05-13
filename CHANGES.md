@@ -1,3 +1,6 @@
+# Release v3.9.0
+- Add `publisher_only` role that can be specified when generating a token.
+
 # Release v3.8.1
 - Fixed an issue with the `opentok.create_session` method
 

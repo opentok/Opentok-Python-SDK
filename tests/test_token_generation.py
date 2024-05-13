@@ -31,9 +31,14 @@ class OpenTokTokenGenerationTest(unittest.TestCase):
         assert isinstance(token, text_type)
         assert token_decoder(token)[u("role")] == Roles.moderator.value
         assert token_signature_validator(token, self.api_secret)
+
         token = self.opentok.generate_token(self.session_id, role=Roles.moderator)
         assert isinstance(token, text_type)
         assert token_decoder(token)[u("role")] == Roles.moderator.value
+        assert token_signature_validator(token, self.api_secret)
+
+        token = self.opentok.generate_token(self.session_id, Roles.publisher_only)
+        assert token_decoder(token)["role"] == Roles.publisher_only.value
         assert token_signature_validator(token, self.api_secret)
 
     def test_generate_expires_token(self):
@@ -91,15 +96,15 @@ class OpenTokTokenGenerationTest(unittest.TestCase):
 
     @raises(TypeError)
     def test_does_not_generate_token_without_params(self):
-        token = self.opentok.generate_token()
+        self.opentok.generate_token()
 
     @raises(TypeError)
     def test_does_not_generate_token_without_session(self):
-        token = self.opentok.generate_token(role=Roles.subscriber)
+        self.opentok.generate_token(role=Roles.subscriber)
 
     @raises(OpenTokException)
     def test_does_not_generate_token_invalid_session(self):
-        token = self.opentok.generate_token(u("NOT A REAL SESSIONID"))
+        self.opentok.generate_token(u("NOT A REAL SESSIONID"))
 
     @raises(OpenTokException)
     def test_does_not_generate_token_without_api_key_match(self):
@@ -107,6 +112,4 @@ class OpenTokTokenGenerationTest(unittest.TestCase):
         session_id = u(
             "1_MX42NTQzMjF-flNhdCBNYXIgMTUgMTQ6NDI6MjMgUERUIDIwMTR-MC40OTAxMzAyNX4"
         )
-        token = self.opentok.generate_token(session_id)
-
-    # TODO: all the things that raise OpenTokException
+        self.opentok.generate_token(session_id)
