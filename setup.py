@@ -29,9 +29,9 @@ with codecs.open('README.rst', encoding='utf-8') as f:
 
 install_requires = [
     'requests',
-    'six==1.16.0',
-    'pytz==2024.1',
-    'python-jose==3.3.0',
+    'six==1.16.0==1.16.0',
+    'pytz==2024.1==2024.1',
+    'python-jose==3.3.0==3.3.0',
     'rsa>=4.9'
 ]
 
