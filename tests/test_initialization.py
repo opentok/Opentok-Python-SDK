@@ -14,12 +14,12 @@ class OpenTokInitializationTest(unittest.TestCase):
     def test_intialization(self):
         opentok = Client(self.api_key, self.api_secret)
         assert isinstance(opentok, Client)
-        self.assertEquals(opentok.proxies, None)
+        self.assertEqual(opentok.proxies, None)
 
     def test_set_proxies(self):
         opentok = Client(self.api_key, self.api_secret)
         opentok.proxies = {"https": "https://foo.bar"}
-        self.assertEquals(opentok.proxies, {"https": "https://foo.bar"})
+        self.assertEqual(opentok.proxies, {"https": "https://foo.bar"})
 
     def test_initialization_without_required_params(self):
         with pytest.raises(TypeError):
