@@ -1,6 +1,6 @@
+import pytest
 import unittest
 from six import text_type, u, PY2, PY3
-from nose.tools import raises
 import time
 import datetime
 import calendar
@@ -94,22 +94,22 @@ class OpenTokTokenGenerationTest(unittest.TestCase):
         assert u("connection_data") not in token_decoder(token)
         assert token_signature_validator(token, self.api_secret)
 
-    @raises(TypeError)
     def test_does_not_generate_token_without_params(self):
-        self.opentok.generate_token()
+        with pytest.raises(TypeError):
+            self.opentok.generate_token()
 
-    @raises(TypeError)
     def test_does_not_generate_token_without_session(self):
-        self.opentok.generate_token(role=Roles.subscriber)
+        with pytest.raises(TypeError):
+            self.opentok.generate_token(role=Roles.subscriber)
 
-    @raises(OpenTokException)
     def test_does_not_generate_token_invalid_session(self):
-        self.opentok.generate_token(u("NOT A REAL SESSIONID"))
+        with pytest.raises(OpenTokException):
+            self.opentok.generate_token(u("NOT A REAL SESSIONID"))
 
-    @raises(OpenTokException)
     def test_does_not_generate_token_without_api_key_match(self):
-        # this session_id has the wrong api_key
-        session_id = u(
-            "1_MX42NTQzMjF-flNhdCBNYXIgMTUgMTQ6NDI6MjMgUERUIDIwMTR-MC40OTAxMzAyNX4"
-        )
-        self.opentok.generate_token(session_id)
+        with pytest.raises(OpenTokException):
+            # this session_id has the wrong api_key
+            session_id = u(
+                "1_MX42NTQzMjF-flNhdCBNYXIgMTUgMTQ6NDI6MjMgUERUIDIwMTR-MC40OTAxMzAyNX4"
+            )
+            self.opentok.generate_token(session_id)

@@ -1,5 +1,5 @@
+import pytest
 import unittest
-from nose.tools import raises
 import platform
 
 from opentok import Client
@@ -21,9 +21,9 @@ class OpenTokInitializationTest(unittest.TestCase):
         opentok.proxies = {"https": "https://foo.bar"}
         self.assertEquals(opentok.proxies, {"https": "https://foo.bar"})
 
-    @raises(TypeError)
     def test_initialization_without_required_params(self):
-        opentok = Client()
+        with pytest.raises(TypeError):
+            opentok = Client()
 
     def test_initialization_with_api_url(self):
         opentok = Client(self.api_key, self.api_secret, self.api_url)
@@ -39,13 +39,18 @@ class OpenTokInitializationTest(unittest.TestCase):
 
     def test_user_agent(self):
         opentok = Client(self.api_key, self.api_secret, self.api_url)
-        assert opentok.user_agent == f"OpenTok-Python-SDK/{opentok.app_version} python/{platform.python_version()}"
-    
+        assert (
+            opentok.user_agent
+            == f"OpenTok-Python-SDK/{opentok.app_version} python/{platform.python_version()}"
+        )
+
     def test_append_to_user_agent(self):
         opentok = Client(self.api_key, self.api_secret, self.api_url)
-        opentok.append_to_user_agent('/my_appended_user_agent_string')
-        assert opentok.user_agent == f"OpenTok-Python-SDK/{opentok.app_version} python/{platform.python_version()}/my_appended_user_agent_string"
-
+        opentok.append_to_user_agent("/my_appended_user_agent_string")
+        assert (
+            opentok.user_agent
+            == f"OpenTok-Python-SDK/{opentok.app_version} python/{platform.python_version()}/my_appended_user_agent_string"
+        )
 
 
 if __name__ == "__main__":

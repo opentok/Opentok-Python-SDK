@@ -50,14 +50,14 @@ other script in your environment, and continue to update and you make changes.
 
 ### Testing
 
-This project's tests are built using the `unittest` [`Nose'](https://nose.readthedocs.org) modules.
+This project's tests are built using the `unittest` [Pytest](https://docs.pytest.org/en/stable/) modules.
 To run the unit tests, install the core as well as development dependencies inside your `virtualenv`:
 
     $ pip install -r requirements.txt -r test_requirements.txt
 
 You can manually run the test suite for your version of python with:
 
-    $ nosetests
+    $ pytest
 
 If you would like to run the test suite against a variety of Python versions, we recommend installing
 `act` and running out Github Action "test" workflow:
