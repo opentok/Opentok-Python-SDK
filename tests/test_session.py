@@ -1,6 +1,5 @@
 import unittest
 from six import text_type, u, b, PY2, PY3
-from nose.tools import raises
 
 from opentok import Client, Session, Roles, MediaModes
 from .helpers import token_decoder, token_signature_validator

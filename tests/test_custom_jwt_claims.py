@@ -1,6 +1,5 @@
 import unittest
 from six import text_type, u, b, PY2, PY3
-from nose.tools import raises
 from expects import *
 
 from opentok import Client, __version__
