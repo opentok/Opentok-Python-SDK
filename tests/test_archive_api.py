@@ -1,6 +1,6 @@
+import pytest
 import unittest
 from six import text_type, u, b, PY2, PY3
-from nose.tools import raises
 from expects import *
 import httpretty
 from sure import expect
@@ -294,21 +294,19 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(archive).to(have_property(u("url"), equal(None)))
 
     def test_start_archive_individual_and_resolution_throws_error(self):
-        self.assertRaises(
-            OpenTokException,
-            self.opentok.start_archive,
-            session_id=self.session_id,
-            output_mode=OutputModes.individual,
-            resolution="640x480",
-        )
+        with pytest.raises(OpenTokException):
+            self.opentok.start_archive(
+                session_id=self.session_id,
+                output_mode=OutputModes.individual,
+                resolution="640x480",
+            )
 
-        self.assertRaises(
-            OpenTokException,
-            self.opentok.start_archive,
-            session_id=self.session_id,
-            output_mode=OutputModes.individual,
-            resolution="1280x720",
-        )
+        with pytest.raises(OpenTokException):
+            self.opentok.start_archive(
+                session_id=self.session_id,
+                output_mode=OutputModes.individual,
+                resolution="1280x720",
+            )
 
     @httpretty.activate
     def test_start_voice_archive(self):
@@ -549,7 +547,9 @@ class OpenTokArchiveApiTest(unittest.TestCase):
             content_type=u("application/json"),
         )
 
-        archive = self.opentok.start_archive(self.session_id, layout={"type": "pip", "screenshareType": "horizontal"})
+        archive = self.opentok.start_archive(
+            self.session_id, layout={"type": "pip", "screenshareType": "horizontal"}
+        )
 
         validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
         expect(httpretty.last_request().headers[u("user-agent")]).to(
@@ -565,7 +565,9 @@ class OpenTokArchiveApiTest(unittest.TestCase):
             body = json.loads(httpretty.last_request().body.decode("utf-8"))
         expect(body).to(have_key(u("sessionId"), u("SESSIONID")))
         expect(body).to(have_key(u("name"), None))
-        expect(body).to(have_key(u("layout"), {"type": "pip", "screenshareType": "horizontal"}))
+        expect(body).to(
+            have_key(u("layout"), {"type": "pip", "screenshareType": "horizontal"})
+        )
         expect(archive).to(be_an(Archive))
         expect(archive).to(
             have_property(u("id"), u("30b3ebf1-ba36-4f5b-8def-6f70d9986fe9"))
@@ -1078,7 +1080,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
     @httpretty.activate
     def test_find_archives_with_sessionid(self):
-        """ Test get_archives method using session_id parameter """
+        """Test get_archives method using session_id parameter"""
         httpretty.register_uri(
             httpretty.GET,
             u("https://api.opentok.com/v2/project/{0}/archive").format(self.api_key),
@@ -1166,7 +1168,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
     @httpretty.activate
     def test_find_archives_with_offset_count_sessionId(self):
-        """ Test get_archives method using all parameters: offset, count and sessionId """
+        """Test get_archives method using all parameters: offset, count and sessionId"""
         httpretty.register_uri(
             httpretty.GET,
             u("https://api.opentok.com/v2/project/{0}/archive").format(self.api_key),
@@ -1237,7 +1239,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
     @httpretty.activate
     def test_find_archives_alternative_method(self):
-        """ Test list_archives method using all parameters: offset, count and sessionId """
+        """Test list_archives method using all parameters: offset, count and sessionId"""
         httpretty.register_uri(
             httpretty.GET,
             u("https://api.opentok.com/v2/project/{0}/archive").format(self.api_key),
@@ -1419,7 +1421,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
     @httpretty.activate
     def test_set_archive_layout(self):
-        """ Test set archive layout functionality """
+        """Test set archive layout functionality"""
         archive_id = u("f6e7ee58-d6cf-4a59-896b-6d56b158ec71")
 
         httpretty.register_uri(
@@ -1443,7 +1445,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
     @httpretty.activate
     def test_set_archive_screenshare_type(self):
-        """ Test set archive layout functionality """
+        """Test set archive layout functionality"""
         archive_id = u("f6e7ee58-d6cf-4a59-896b-6d56b158ec71")
 
         httpretty.register_uri(
@@ -1455,7 +1457,9 @@ class OpenTokArchiveApiTest(unittest.TestCase):
             content_type=u("application/json"),
         )
 
-        self.opentok.set_archive_layout(archive_id, "bestFit", screenshare_type="horizontalPresentation")
+        self.opentok.set_archive_layout(
+            archive_id, "bestFit", screenshare_type="horizontalPresentation"
+        )
 
         validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
         expect(httpretty.last_request().headers[u("user-agent")]).to(
@@ -1476,7 +1480,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
 
     @httpretty.activate
     def test_set_custom_archive_layout(self):
-        """ Test set a custom archive layout specifying the 'stylesheet' parameter """
+        """Test set a custom archive layout specifying the 'stylesheet' parameter"""
         archive_id = u("f6e7ee58-d6cf-4a59-896b-6d56b158ec71")
 
         httpretty.register_uri(
@@ -1506,47 +1510,49 @@ class OpenTokArchiveApiTest(unittest.TestCase):
     def test_start_archive_with_streammode_auto(self):
         url = f"https://api.opentok.com/v2/project/{self.api_key}/archive"
 
-        httpretty.register_uri(httpretty.POST, 
-                                         url, 
-                                         responses=[
-                                            httpretty.Response(body=json.dumps({"streamMode":"auto"}), 
-                                                               content_type="application/json",
-                                                               status=200)
-                                        ])
+        httpretty.register_uri(
+            httpretty.POST,
+            url,
+            responses=[
+                httpretty.Response(
+                    body=json.dumps({"streamMode": "auto"}),
+                    content_type="application/json",
+                    status=200,
+                )
+            ],
+        )
 
-    
         response = requests.post(url)
 
         response.status_code.should.equal(200)
-        response.json().should.equal({"streamMode":"auto"})
+        response.json().should.equal({"streamMode": "auto"})
         response.headers["Content-Type"].should.equal("application/json")
-
-    
 
     @httpretty.activate
     def test_start_archive_with_streammode_manual(self):
         url = f"https://api.opentok.com/v2/project/{self.api_key}/archive"
 
-        httpretty.register_uri(httpretty.POST, 
-                                         url, 
-                                         responses=[
-                                            httpretty.Response(body=json.dumps({"streamMode":"manual"}), 
-                                                               content_type="application/json",
-                                                               status=200)
-                                        ])
+        httpretty.register_uri(
+            httpretty.POST,
+            url,
+            responses=[
+                httpretty.Response(
+                    body=json.dumps({"streamMode": "manual"}),
+                    content_type="application/json",
+                    status=200,
+                )
+            ],
+        )
 
-    
         response = requests.post(url)
 
         response.status_code.should.equal(200)
-        response.json().should.equal({"streamMode":"manual"})
+        response.json().should.equal({"streamMode": "manual"})
         response.headers["Content-Type"].should.equal("application/json")
-        
-
 
     @httpretty.activate
     def test_set_archive_layout_throws_exception(self):
-        """ Test invalid request in set archive layout """
+        """Test invalid request in set archive layout"""
         archive_id = u("f6e7ee58-d6cf-4a59-896b-6d56b158ec71")
 
         httpretty.register_uri(
@@ -1558,9 +1564,5 @@ class OpenTokArchiveApiTest(unittest.TestCase):
             content_type=u("application/json"),
         )
 
-        self.assertRaises(
-            ArchiveError,
-            self.opentok.set_archive_layout,
-            archive_id,
-            "horizontalPresentation",
-        )
+        with pytest.raises(ArchiveError):
+            self.opentok.set_archive_layout(archive_id, "horizontalPresentation")

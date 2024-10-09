@@ -32,7 +32,6 @@ pip-delete-this-directory.txt
 .tox/
 .coverage
 .cache
-nosetests.xml
 coverage.xml
 
 # Translations
@@ -53,3 +52,6 @@ env/
 
 #Pypi
 .pypirc
+
+# Pyenv
+.python-version

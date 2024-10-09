@@ -5,10 +5,10 @@ on: [push]
 jobs:
   test:
 
-    runs-on: "ubuntu-20.04"
+    runs-on: "ubuntu-24.04"
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: [3.8, 3.9, '3.10', 3.11, 3.12]
 
     steps:
     - uses: actions/checkout@v3
@@ -21,6 +21,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r test_requirements.txt
         pip install -r requirements.txt
-    - name: Test with nosetests
+    - name: Test with pytest
       run: |
-        nosetests -v tests/test_*
+        pytest -v tests/test_*

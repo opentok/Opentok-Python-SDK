@@ -1,6 +1,6 @@
+import pytest
 import unittest
 from six import u
-from nose.tools import raises
 import httpretty
 import requests
 
@@ -27,7 +27,7 @@ class OpenTokSessionCreationTest(unittest.TestCase):
     def tearDown(self):
         httpretty.disable()
 
-    @raises(OpenTokException)
     def test_timeout(self):
-        opentok = Client(self.api_key, self.api_secret, timeout=1)
-        opentok.create_session()
+        with pytest.raises(OpenTokException):
+            opentok = Client(self.api_key, self.api_secret, timeout=1)
+            opentok.create_session()
