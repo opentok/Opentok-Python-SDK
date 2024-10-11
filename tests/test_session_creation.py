@@ -1,7 +1,7 @@
+import pytest
 import unittest
 from six import u, b
 from six.moves.urllib.parse import parse_qs
-from nose.tools import raises
 from expects import *
 import httpretty
 from .validate_jwt import validate_jwt_header
@@ -109,9 +109,8 @@ class OpenTokSessionCreationTest(unittest.TestCase):
             content_type=u("text/xml"),
         )
 
-        self.assertRaises(
-            OpenTokException, self.opentok.create_session, media_mode=MediaModes.routed
-        )
+        with pytest.raises(OpenTokException):
+            self.opentok.create_session(media_mode=MediaModes.routed)
 
     @httpretty.activate
     def test_create_session_with_location_hint(self):
@@ -263,42 +262,39 @@ class OpenTokSessionCreationTest(unittest.TestCase):
         expect(session).to(have_property(u("e2ee"), False))
 
     def test_complains_about_always_archive_mode_and_relayed_session(self):
-        self.assertRaises(
-            OpenTokException,
-            self.opentok.create_session,
-            media_mode=MediaModes.relayed,
-            archive_mode=ArchiveModes.always,
-        )
+        with pytest.raises(OpenTokException):
+            self.opentok.create_session(
+                media_mode=MediaModes.relayed, archive_mode=ArchiveModes.always
+            )
 
     def test_auto_archive_errors(self):
-        self.assertRaises(
-            OpenTokException,
-            self.opentok.create_session,
-            media_mode=MediaModes.routed,
-            archive_mode=ArchiveModes.manual,
-            archive_name="my_archive",
-        )
-        self.assertRaises(
-            OpenTokException,
-            self.opentok.create_session,
-            media_mode=MediaModes.routed,
-            archive_mode=ArchiveModes.manual,
-            archive_resolution="640x480",
-        )
-        self.assertRaises(
-            OpenTokException,
-            self.opentok.create_session,
-            media_mode=MediaModes.routed,
-            archive_mode=ArchiveModes.always,
-            archive_name="my_incredibly_long_name_that_is_definitely_going_to_be_over_the_80_character_limit_we_currently_impose",
-        )
-        self.assertRaises(
-            OpenTokException,
-            self.opentok.create_session,
-            media_mode=MediaModes.routed,
-            archive_mode=ArchiveModes.always,
-            archive_resolution="10x10",
-        )
+        with pytest.raises(OpenTokException):
+            self.opentok.create_session(
+                media_mode=MediaModes.routed,
+                archive_mode=ArchiveModes.manual,
+                archive_name="my_archive",
+            )
+
+        with pytest.raises(OpenTokException):
+            self.opentok.create_session(
+                media_mode=MediaModes.routed,
+                archive_mode=ArchiveModes.manual,
+                archive_resolution="640x480",
+            )
+
+        with pytest.raises(OpenTokException):
+            self.opentok.create_session(
+                media_mode=MediaModes.routed,
+                archive_mode=ArchiveModes.always,
+                archive_name="my_incredibly_long_name_that_is_definitely_going_to_be_over_the_80_character_limit_we_currently_impose",
+            )
+
+        with pytest.raises(OpenTokException):
+            self.opentok.create_session(
+                media_mode=MediaModes.routed,
+                archive_mode=ArchiveModes.always,
+                archive_resolution="10x10",
+            )
 
     @httpretty.activate
     def test_create_session_with_e2ee(self):

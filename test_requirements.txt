@@ -1,4 +1,4 @@
-nose
+pytest
 httpretty
 expects
 wheel

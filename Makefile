@@ -8,7 +8,7 @@ coverage:
 	coverage html
 
 test:
-	nosetests -v
+	pytest -v
 
 dist:
 	python setup.py sdist --formats gztar bdist_wheel
