@@ -124,6 +124,5 @@ class OpenTokSipCallTest(unittest.TestCase):
         )
         expect(sip_call_response).to(have_property(u("streamId"), sip_call.streamId))
         assert (
-            b'"streams": ["stream-id-1", "stream-id-2"]}'
-            in httpretty.last_request().body
+            b'"streams": ["stream-id-1", "stream-id-2"]}' in httpretty.last_request().body
         )

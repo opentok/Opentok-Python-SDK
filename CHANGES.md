@@ -1,3 +1,6 @@
+# Release 3.9.1
+- Fix a bug with SIP options in the `Opentok.dial` method
+
 # Release v3.9.0
 - Add `publisher_only` role that can be specified when generating a token.
 

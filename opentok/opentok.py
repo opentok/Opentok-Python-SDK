@@ -1253,8 +1253,11 @@ class Client(object):
         Note: Your response will have a different: id, connectionId and streamId
         """
 
-        payload = {"sessionId": session_id, "token": token, "sip": {"uri": sip_uri}}
-        payload.update(options)
+        payload = {
+            "sessionId": session_id,
+            "token": token,
+            "sip": {"uri": sip_uri, **options},
+        }
 
         endpoint = self.endpoints.dial_url()
 
