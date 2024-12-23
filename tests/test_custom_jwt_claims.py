@@ -4,7 +4,7 @@ from expects import *
 
 from opentok import Client, __version__
 import time
-from jose import jwt
+from jwt import decode
 
 
 class JwtCustomClaimsTest(unittest.TestCase):
@@ -19,7 +19,7 @@ class JwtCustomClaimsTest(unittest.TestCase):
     def test_livetime_custom_claim(self):
         self.opentok.jwt_livetime = 5  # Token will expire 5 minutes in the future
         jwt_token = self.opentok._create_jwt_auth_header()
-        claims = jwt.decode(jwt_token, self.api_secret, algorithms=[u("HS256")])
+        claims = decode(jwt_token, self.api_secret, algorithms=[u("HS256")])
         expect(claims).to(have_key(u("exp")))
         expect(int(claims[u("exp")])).to(
             be_above(int(time.time()) + (60 * 4))

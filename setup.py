@@ -2,9 +2,9 @@ from setuptools import setup, find_packages
 import codecs
 import os
 import re
-import sys
 
 here = os.path.abspath(os.path.dirname(__file__))
+
 
 # Read the version number from a source file.
 # Why read it, and not import?
@@ -27,7 +27,7 @@ def find_version(*file_paths):
 with codecs.open("README.rst", encoding="utf-8") as f:
     long_description = f.read()
 
-install_requires = ["requests", "six", "pytz", "python-jose", "rsa>=4.7"]
+install_requires = ["requests", "six", "pytz", "pyjwt[crypto]>=1.6.4", "rsa>=4.7"]
 
 setup(
     name="opentok",

@@ -12,7 +12,7 @@ import json  # archiving
 import platform  # user-agent
 from socket import inet_aton  # create_session
 import xml.dom.minidom as xmldom  # create_session
-from jose import jwt  # _create_jwt_auth_header
+from jwt import encode  # _create_jwt_auth_header
 import random  # _create_jwt_auth_header
 import logging  # logging
 import warnings  # Native. Used for notifying deprecations
@@ -2065,7 +2065,7 @@ class Client(object):
             "jti": "{0}".format(0, random.random()),
         }
 
-        return jwt.encode(payload, self.api_secret, algorithm="HS256")
+        return encode(payload, self.api_secret, algorithm="HS256")
 
     def mute_all(
         self, session_id: str, excludedStreamIds: Optional[List[str]]

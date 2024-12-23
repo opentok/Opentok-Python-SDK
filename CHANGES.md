@@ -1,3 +1,6 @@
+# Release 3.9.2
+- Migrate from using `python-jose` with native-python cryptographic backend to the `pyjwt` package
+
 # Release 3.9.1
 - Fix a bug with SIP options in the `Opentok.dial` method
 
