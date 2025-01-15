@@ -12,10 +12,8 @@ if PY3:
 # compat
 from six.moves import map
 
-dthandler = (
-    lambda obj: obj.isoformat()
-    if isinstance(obj, datetime) or isinstance(obj, date)
-    else None
+dthandler = lambda obj: (
+    obj.isoformat() if isinstance(obj, datetime) or isinstance(obj, date) else None
 )
 
 
@@ -28,8 +26,9 @@ class OutputModes(Enum):
     individual = u("individual")
     """Each stream in the archive is recorded to an individual file."""
 
+
 class StreamModes(Enum):
-    """"List of valid settings for the stream_mode parameter of the OpenTok.start_archive()
+    """ "List of valid settings for the stream_mode parameter of the OpenTok.start_archive()
     method."""
 
     auto = u("auto")
@@ -37,6 +36,7 @@ class StreamModes(Enum):
     manual = u("manual")
     """Streams are included in the archive based on calls to the OpenTok.add_archive_stream()
     and OpenTok.remove_archive_stream() methods."""
+
 
 class Archive(object):
     """Represents an archive of an OpenTok session.
@@ -68,8 +68,8 @@ class Archive(object):
 
     :ivar streamMode:
         Whether streams included in the archive are selected automatically
-        ("auto", the default) or manually ("manual"). 
-    
+        ("auto", the default) or manually ("manual").
+
     :ivar streams:
         A list of streams currently being archived. This is only set for an archive with
         the status set to "started" and the stream_Mode set to "manual".
@@ -110,6 +110,8 @@ class Archive(object):
        "available"; for other archives, (including archives with the status "uploaded") this property is
        set to null. The download URL is obfuscated, and the file is only available from the URL for
        10 minutes. To generate a new URL, call the Archive.listArchives() or OpenTok.getArchive() method.
+
+    :ivar max_bitrate: The maximum video bitrate for the archive, in bits per second. The minimum value is 100,000 and the maximum is 6,000,000.
     """
 
     def __init__(self, sdk, values):
@@ -136,6 +138,7 @@ class Archive(object):
         self.streams = values.get("streams")
         self.url = values.get("url")
         self.resolution = values.get("resolution")
+        self.max_bitrate = values.get("maxBitrate")
 
     def stop(self):
         """

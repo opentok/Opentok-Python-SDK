@@ -38,6 +38,7 @@ class OpenTokArchiveTest(unittest.TestCase):
                 u("hasVideo"): True,
                 u("outputMode"): OutputModes.composed.value,
                 u("url"): None,
+                u("maxBitrate"): 2000000,
             },
         )
         httpretty.register_uri(
@@ -61,7 +62,8 @@ class OpenTokArchiveTest(unittest.TestCase):
                             "hasAudio": true,
                             "hasVideo": false,
                             "outputMode": "composed",
-                            "url" : null
+                            "url" : null,
+                            "maxBitrate": 2000000
                         }
                     """
                 )
@@ -98,6 +100,7 @@ class OpenTokArchiveTest(unittest.TestCase):
         expect(archive).to(have_property(u("has_video"), False))
         expect(archive).to(have_property(u("output_mode"), OutputModes.composed))
         expect(archive).to(have_property(u("url"), None))
+        expect(archive).to(have_property(u("max_bitrate"), 2000000))
 
     @httpretty.activate
     def test_add_archive_stream(self):
@@ -144,6 +147,7 @@ class OpenTokArchiveTest(unittest.TestCase):
                 u("hasVideo"): True,
                 u("outputMode"): OutputModes.composed.value,
                 u("url"): None,
+                u("maxBitrate"): 2000000,
             },
         )
         httpretty.register_uri(

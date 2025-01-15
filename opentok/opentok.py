@@ -559,6 +559,7 @@ class Client(object):
         resolution=None,
         layout=None,
         multi_archive_tag=None,
+        max_bitrate=None,
     ):
         """
         Starts archiving an OpenTok session.
@@ -617,6 +618,8 @@ class Client(object):
         at a time for a given session.
         For more information, see simultaneous archives: https://tokbox.com/developer/guides/archiving/#simultaneous-archives.
 
+        :param String max_bitrate (Optional): The maximum video bitrate for the archive, in bits per second. The minimum value is 100,000 and the maximum is 6,000,000.
+
         :rtype: The Archive object, which includes properties defining the archive,
           including the archive ID.
         """
@@ -643,6 +646,7 @@ class Client(object):
             "resolution": resolution,
             "streamMode": stream_mode.value,
             "multiArchiveTag": multi_archive_tag,
+            "maxBitrate": max_bitrate,
         }
 
         if layout is not None:

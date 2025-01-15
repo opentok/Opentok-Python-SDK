@@ -51,7 +51,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                             "hasAudio": true,
                             "hasVideo": true,
                             "outputMode": "composed",
-                            "url" : null
+                            "url" : null,
+                            "maxBitrate": 2000000
                         }
                     """
                 )
@@ -95,6 +96,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(archive).to(have_property(u("has_audio"), True))
         expect(archive).to(have_property(u("has_video"), True))
         expect(archive).to(have_property(u("url"), None))
+        expect(archive).to(have_property(u("max_bitrate"), 2000000))
 
     @httpretty.activate
     def test_start_archive_with_name(self):
@@ -468,7 +470,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
                             "hasAudio": true,
                             "hasVideo": true,
                             "outputMode": "composed",
-                            "url" : null
+                            "url" : null,
+                            "maxBitrate": 2000000
                         }
                     """
                 )
@@ -516,6 +519,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(archive).to(have_property(u("has_video"), True))
         expect(archive).to(have_property(u("output_mode"), OutputModes.composed))
         expect(archive).to(have_property(u("url"), None))
+        expect(archive).to(have_property(u("max_bitrate"), 2000000))
 
     @httpretty.activate
     def test_start_archive_with_layout(self):
@@ -1069,9 +1073,7 @@ class OpenTokArchiveApiTest(unittest.TestCase):
             equal(u("application/json"))
         )
         expect(httpretty.last_request()).to(
-            have_property(
-                u("querystring"), {u("offset"): [u("2")], u("count"): [u("4")]}
-            )
+            have_property(u("querystring"), {u("offset"): [u("2")], u("count"): [u("4")]})
         )
         expect(archive_list).to(be_an(ArchiveList))
         expect(archive_list).to(have_property(u("count"), 6))
