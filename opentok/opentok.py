@@ -325,7 +325,7 @@ class Client(object):
 
             token = encode(payload, self.api_secret, algorithm="HS256", headers=headers)
 
-            return f'Bearer {token}'
+            return token
 
         data_params = dict(
             session_id=session_id,
@@ -349,6 +349,7 @@ class Client(object):
             sentinal=self.TOKEN_SENTINEL,
             base64_data=base64.b64encode(decoded_base64_bytes).decode(),
         )
+
         return token
 
     def create_session(
