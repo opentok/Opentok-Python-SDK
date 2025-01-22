@@ -1,3 +1,7 @@
+# Release 3.10.0
+- Add new `max_bitrate` option for archives
+- Change to create JWTs by default in the `Client.generate_token` method. T1 tokens can still be created.
+
 # Release 3.9.2
 - Migrate from using `python-jose` with native-python cryptographic backend to the `pyjwt` package
 

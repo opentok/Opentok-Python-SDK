@@ -6,7 +6,7 @@ import random  # generate_token
 import time  # generate_token
 import hmac  # _sign_string
 import hashlib
-from typing import List  # use for type hinting
+from typing import List
 import requests  # create_session, archiving
 import json  # archiving
 import platform  # user-agent
@@ -174,6 +174,7 @@ class Client(object):
         expire_time=None,
         data=None,
         initial_layout_class_list=[],
+        use_jwt=True,
     ):
         """
         Generates a token for a given session.
@@ -211,6 +212,9 @@ class Client(object):
           classes are used in customizing the layout of videos in
           `live streaming broadcasts <https://tokbox.com/developer/guides/broadcast/#live-streaming>`_ and
           `composed archives <https://tokbox.com/developer/guides/archiving/layout-control.html>`_
+
+        :param bool use_jwt: Whether to use JWT tokens or not. If set to False, the token will be a
+            plain text token. If set to True (the default), the token will be a JWT.
 
         :rtype:
           The token string.
@@ -287,7 +291,7 @@ class Client(object):
         try:
             decoded_session_id = base64.b64decode(sub_session_id_bytes_padded, b("-_"))
             parts = decoded_session_id.decode("utf-8").split(u("~"))
-        except Exception as e:
+        except Exception:
             raise OpenTokException(
                 u("Cannot generate token, the session_id {0} was not valid").format(
                     session_id
@@ -299,6 +303,29 @@ class Client(object):
                     "Cannot generate token, the session_id {0} does not belong to the api_key {1}"
                 ).format(session_id, self.api_key)
             )
+
+        if use_jwt:
+            payload = {}
+            payload['iss'] = self.api_key
+            payload['ist'] = 'project'
+            payload['iat'] = now
+            payload["exp"] = expire_time
+            payload['nonce'] = random.randint(0, 999999)
+            payload['role'] = role.value
+            payload['scope'] = 'session.connect'
+            payload['session_id'] = session_id
+            if initial_layout_class_list:
+                payload['initial_layout_class_list'] = (
+                    initial_layout_class_list_serialized
+                )
+            if data:
+                payload['connection_data'] = data
+
+            headers = {'alg': 'HS256', 'typ': 'JWT'}
+
+            token = encode(payload, self.api_secret, algorithm="HS256", headers=headers)
+
+            return f'Bearer {token}'
 
         data_params = dict(
             session_id=session_id,
@@ -470,7 +497,7 @@ class Client(object):
         try:
             logger.debug(
                 "POST to %r with params %r, headers %r, proxies %r",
-                self.endpoints.session_url(),
+                self.endpoints.get_session_url(),
                 options,
                 self.get_headers(),
                 self.proxies,
@@ -654,7 +681,7 @@ class Client(object):
 
         logger.debug(
             "POST to %r with params %r, headers %r, proxies %r",
-            self.endpoints.archive_url(),
+            self.endpoints.get_archive_url(),
             json.dumps(payload),
             self.get_json_headers(),
             self.proxies,
@@ -701,7 +728,7 @@ class Client(object):
         """
         logger.debug(
             "POST to %r with headers %r, proxies %r",
-            self.endpoints.archive_url(archive_id) + "/stop",
+            self.endpoints.get_archive_url(archive_id) + "/stop",
             self.get_json_headers(),
             self.proxies,
         )
@@ -736,7 +763,7 @@ class Client(object):
         """
         logger.debug(
             "DELETE to %r with headers %r, proxies %r",
-            self.endpoints.archive_url(archive_id),
+            self.endpoints.get_archive_url(archive_id),
             self.get_json_headers(),
             self.proxies,
         )
@@ -766,7 +793,7 @@ class Client(object):
         """
         logger.debug(
             "GET to %r with headers %r, proxies %r",
-            self.endpoints.archive_url(archive_id),
+            self.endpoints.get_archive_url(archive_id),
             self.get_json_headers(),
             self.proxies,
         )
@@ -959,7 +986,7 @@ class Client(object):
         """
         logger.debug(
             "POST to %r with params %r, headers %r, proxies %r",
-            self.endpoints.signaling_url(session_id, connection_id),
+            self.endpoints.get_signaling_url(session_id, connection_id),
             json.dumps(payload),
             self.get_json_headers(),
             self.proxies,
@@ -1456,7 +1483,7 @@ class Client(object):
 
         payload.update(options)
 
-        endpoint = self.endpoints.broadcast_url()
+        endpoint = self.endpoints.get_broadcast_url()
 
         logger.debug(
             "POST to %r with params %r, headers %r, proxies %r",
@@ -1500,7 +1527,7 @@ class Client(object):
         projectId, createdAt, updatedAt and resolution
         """
 
-        endpoint = self.endpoints.broadcast_url(broadcast_id, stop=True)
+        endpoint = self.endpoints.get_broadcast_url(broadcast_id, stop=True)
 
         logger.debug(
             "POST to %r with headers %r, proxies %r",
@@ -1639,7 +1666,7 @@ class Client(object):
         projectId, createdAt, updatedAt, resolution, broadcastUrls and status
         """
 
-        endpoint = self.endpoints.broadcast_url(broadcast_id)
+        endpoint = self.endpoints.get_broadcast_url(broadcast_id)
 
         logger.debug(
             "GET to %r with headers %r, proxies %r",
@@ -1697,7 +1724,7 @@ class Client(object):
             if stylesheet is not None:
                 payload["stylesheet"] = stylesheet
 
-        endpoint = self.endpoints.broadcast_url(broadcast_id, layout=True)
+        endpoint = self.endpoints.get_broadcast_url(broadcast_id, layout=True)
 
         logger.debug(
             "PUT to %r with params %r, headers %r, proxies %r",

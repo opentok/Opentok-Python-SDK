@@ -1,8 +1,8 @@
 import unittest
-from six import text_type, u, b, PY2, PY3
+from six import text_type, u
 
 from opentok import Client, Session, Roles, MediaModes
-from .helpers import token_decoder, token_signature_validator
+from .helpers import token_decoder
 
 
 class SessionTest(unittest.TestCase):
@@ -20,8 +20,7 @@ class SessionTest(unittest.TestCase):
         )
         token = session.generate_token()
         assert isinstance(token, text_type)
-        assert token_decoder(token)[u("session_id")] == self.session_id
-        assert token_signature_validator(token, self.api_secret)
+        assert token_decoder(token, self.api_secret)[u("session_id")] == self.session_id
 
     def test_generate_role_token(self):
         session = Session(
@@ -29,6 +28,5 @@ class SessionTest(unittest.TestCase):
         )
         token = session.generate_token(role=Roles.moderator)
         assert isinstance(token, text_type)
-        assert token_decoder(token)[u("session_id")] == self.session_id
-        assert token_decoder(token)[u("role")] == u("moderator")
-        assert token_signature_validator(token, self.api_secret)
+        assert token_decoder(token, self.api_secret)[u("session_id")] == self.session_id
+        assert token_decoder(token, self.api_secret)[u("role")] == u("moderator")
