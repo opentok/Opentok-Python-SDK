@@ -17,10 +17,8 @@ session = opentok.create_session()
 def hello():
     key = api_key
     session_id = session.session_id
-    token = opentok.generate_token(session_id)
-    return render_template(
-        "index.html", api_key=key, session_id=session_id, token=token
-    )
+    token = opentok.generate_token(session_id, use_jwt=True)
+    return render_template("index.html", api_key=key, session_id=session_id, token=token)
 
 
 if __name__ == "__main__":

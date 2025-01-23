@@ -27,6 +27,7 @@ class OpenTokSessionCreationTest(unittest.TestCase):
     def tearDown(self):
         httpretty.disable()
 
+    @pytest.mark.filterwarnings("ignore::pytest.PytestUnhandledThreadExceptionWarning")
     def test_timeout(self):
         with pytest.raises(OpenTokException):
             opentok = Client(self.api_key, self.api_secret, timeout=1)

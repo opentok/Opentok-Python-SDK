@@ -20,62 +20,56 @@ class OpenTokTokenGenerationTest(unittest.TestCase):
         )
         self.opentok = Client(self.api_key, self.api_secret)
 
-    def test_generate_plain_token(self):
-        token = self.opentok.generate_token(self.session_id)
+    def test_generate_plain_token_t1(self):
+        token = self.opentok.generate_token(self.session_id, use_jwt=False)
         assert isinstance(token, text_type)
         assert token_decoder(token)[u("session_id")] == self.session_id
         assert token_signature_validator(token, self.api_secret)
 
+    def test_generate_plain_token_jwt(self):
+        token = self.opentok.generate_token(self.session_id)
+        assert isinstance(token, text_type)
+        assert token_decoder(token, self.api_secret)[u("session_id")] == self.session_id
+
     def test_generate_role_token(self):
         token = self.opentok.generate_token(self.session_id, Roles.moderator)
         assert isinstance(token, text_type)
-        assert token_decoder(token)[u("role")] == Roles.moderator.value
-        assert token_signature_validator(token, self.api_secret)
+        assert token_decoder(token, self.api_secret)[u("role")] == Roles.moderator.value
 
         token = self.opentok.generate_token(self.session_id, role=Roles.moderator)
         assert isinstance(token, text_type)
-        assert token_decoder(token)[u("role")] == Roles.moderator.value
-        assert token_signature_validator(token, self.api_secret)
+        assert token_decoder(token, self.api_secret)[u("role")] == Roles.moderator.value
 
         token = self.opentok.generate_token(self.session_id, Roles.publisher_only)
-        assert token_decoder(token)["role"] == Roles.publisher_only.value
-        assert token_signature_validator(token, self.api_secret)
+        assert token_decoder(token, self.api_secret)["role"] == Roles.publisher_only.value
 
     def test_generate_expires_token(self):
         # an integer is a valid argument
         expire_time = int(time.time()) + 100
         token = self.opentok.generate_token(self.session_id, expire_time=expire_time)
         assert isinstance(token, text_type)
-        assert token_decoder(token)[u("expire_time")] == text_type(expire_time)
-        assert token_signature_validator(token, self.api_secret)
+        print(token_decoder(token, self.api_secret))
+        assert token_decoder(token, self.api_secret)[u("exp")] == expire_time
         # anything that can be coerced into an integer is also valid
         expire_time = text_type(int(time.time()) + 100)
         token = self.opentok.generate_token(self.session_id, expire_time=expire_time)
         assert isinstance(token, text_type)
-        assert token_decoder(token)[u("expire_time")] == expire_time
-        assert token_signature_validator(token, self.api_secret)
+        assert token_decoder(token, self.api_secret)[u("exp")] == int(expire_time)
         # a datetime object is also valid
-        if PY2:
-            expire_time = datetime.datetime.fromtimestamp(
-                time.time(), pytz.UTC
-            ) + datetime.timedelta(days=1)
-        if PY3:
-            expire_time = datetime.datetime.fromtimestamp(
-                time.time(), datetime.timezone.utc
-            ) + datetime.timedelta(days=1)
+        expire_time = datetime.datetime.fromtimestamp(
+            time.time(), datetime.timezone.utc
+        ) + datetime.timedelta(days=1)
         token = self.opentok.generate_token(self.session_id, expire_time=expire_time)
         assert isinstance(token, text_type)
-        assert token_decoder(token)[u("expire_time")] == text_type(
-            calendar.timegm(expire_time.utctimetuple())
+        assert token_decoder(token, self.api_secret)[u("exp")] == calendar.timegm(
+            expire_time.utctimetuple()
         )
-        assert token_signature_validator(token, self.api_secret)
 
     def test_generate_data_token(self):
         data = u("name=Johnny")
         token = self.opentok.generate_token(self.session_id, data=data)
         assert isinstance(token, text_type)
-        assert token_decoder(token)[u("connection_data")] == data
-        assert token_signature_validator(token, self.api_secret)
+        assert token_decoder(token, self.api_secret)[u("connection_data")] == data
 
     def test_generate_initial_layout_class_list(self):
         initial_layout_class_list = [u("focus"), u("small")]
@@ -84,15 +78,15 @@ class OpenTokTokenGenerationTest(unittest.TestCase):
         )
         assert isinstance(token, text_type)
         assert sorted(
-            token_decoder(token)[u("initial_layout_class_list")].split(u(" "))
+            token_decoder(token, self.api_secret)[u("initial_layout_class_list")].split(
+                u(" ")
+            )
         ) == sorted(initial_layout_class_list)
-        assert token_signature_validator(token, self.api_secret)
 
     def test_generate_no_data_token(self):
         token = self.opentok.generate_token(self.session_id)
         assert isinstance(token, text_type)
-        assert u("connection_data") not in token_decoder(token)
-        assert token_signature_validator(token, self.api_secret)
+        assert u("connection_data") not in token_decoder(token, self.api_secret)
 
     def test_does_not_generate_token_without_params(self):
         with pytest.raises(TypeError):
