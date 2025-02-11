@@ -33,6 +33,7 @@ pip-delete-this-directory.txt
 .coverage
 .cache
 coverage.xml
+htmlcov/
 
 # Translations
 *.mo
