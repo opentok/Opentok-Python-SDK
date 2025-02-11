@@ -55,3 +55,6 @@ env/
 
 # Pyenv
 .python-version
+
+# Credentials
+credentials/

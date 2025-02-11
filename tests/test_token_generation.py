@@ -1,10 +1,9 @@
 import pytest
 import unittest
-from six import text_type, u, PY2, PY3
+from six import text_type, u
 import time
 import datetime
 import calendar
-import pytz
 
 from opentok import Client, Roles, OpenTokException
 
@@ -30,6 +29,17 @@ class OpenTokTokenGenerationTest(unittest.TestCase):
         token = self.opentok.generate_token(self.session_id)
         assert isinstance(token, text_type)
         assert token_decoder(token, self.api_secret)[u("session_id")] == self.session_id
+
+    def test_generate_plain_token_jwt_vonage_wrapper(self):
+        self.api_secret = './tests/fake_data/dummy_private_key.txt'
+        vonage_wrapper = Client(self.api_key, self.api_secret)
+        public_key = ""
+        with open('./tests/fake_data/dummy_public_key.txt', 'r') as file:
+            public_key = file.read()
+
+        token = vonage_wrapper.generate_token(self.session_id)
+        assert isinstance(token, text_type)
+        assert token_decoder(token, public_key)[u("session_id")] == self.session_id
 
     def test_generate_role_token(self):
         token = self.opentok.generate_token(self.session_id, Roles.moderator)

@@ -1,7 +1,9 @@
+from time import time
+from jwt import decode
 import pytest
 import unittest
 from six import u, b
-from six.moves.urllib.parse import parse_qs
+from urllib.parse import parse_qs
 from expects import *
 import httpretty
 from .validate_jwt import validate_jwt_header
@@ -55,6 +57,78 @@ class OpenTokSessionCreationTest(unittest.TestCase):
                 u("session_id"),
                 u(
                     "1_MX4xMjM0NTZ-fk1vbiBNYXIgMTcgMDA6NDE6MzEgUERUIDIwMTR-MC42ODM3ODk1MzQ0OTQyODA4fg"
+                ),
+            )
+        )
+        expect(session).to(have_property(u("media_mode"), MediaModes.relayed))
+        expect(session).to(have_property(u("location"), None))
+        expect(session).to(have_property(u("e2ee"), False))
+
+    @httpretty.activate
+    def test_create_default_vonage_session(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            u("https://video.api.vonage.com/session/create"),
+            body="""
+                [
+                    {
+                        "session_id": "1_MX4yOWY3NjBmOC03Y2UxLTQ2YzktYWRlMy1mMmRlZGVlNGVkNWZ-fjE3MjY0NjI1ODg2NDd-MTF4TGExYmJoelBlR1FHbVhzbWd4STBrfn5-",
+                        "project_id": "29f760f8-7ce1-46c9-ade3-f2dedee4ed5f",
+                        "partner_id": "29f760f8-7ce1-46c9-ade3-f2dedee4ed5f",
+                        "create_dt": "Sun Sep 15 21:56:28 PDT 2024",
+                        "session_status": null,
+                        "status_invalid": null,
+                        "media_server_hostname": null,
+                        "messaging_server_url": null,
+                        "messaging_url": null,
+                        "symphony_address": null,
+                        "properties": null,
+                        "ice_server": null,
+                        "session_segment_id": "35308566-4012-4c1e-90f7-cc15b5a390fe",
+                        "ice_servers": null,
+                        "ice_credential_expiration": 86100
+                    }
+                ]""",
+            status=200,
+            content_type="application/json",
+        )
+
+        self.api_secret = './tests/fake_data/dummy_private_key.txt'
+        vonage_wrapper = Client(self.api_key, self.api_secret)
+        session = vonage_wrapper.create_session()
+
+        public_key = ""
+        with open('./tests/fake_data/dummy_public_key.txt', 'r') as file:
+            public_key = file.read()
+
+        decoded_jwt = decode(
+            httpretty.last_request().headers[u("Authorization")].split(None, 1)[1],
+            public_key,
+            algorithms=["RS256"],
+        )
+
+        expect(decoded_jwt["application_id"]).to(equal(vonage_wrapper.api_key))
+        expect(decoded_jwt["ist"]).to(equal("project"))
+        expect(decoded_jwt["exp"]).to(be_above(time()))
+
+        expect(httpretty.last_request().headers[u("user-agent")]).to(
+            equal(
+                u("OpenTok-Python-SDK/")
+                + __version__
+                + " python/"
+                + platform.python_version()
+                + " OpenTok-With-Vonage-API-Backend"
+            )
+        )
+        body = parse_qs(httpretty.last_request().body)
+        expect(body).to(have_key(b("p2p.preference"), [b("enabled")]))
+        expect(body).to(have_key(b("archiveMode"), [b("manual")]))
+        expect(session).to(be_a(Session))
+        expect(session).to(
+            have_property(
+                u("session_id"),
+                u(
+                    "1_MX4yOWY3NjBmOC03Y2UxLTQ2YzktYWRlMy1mMmRlZGVlNGVkNWZ-fjE3MjY0NjI1ODg2NDd-MTF4TGExYmJoelBlR1FHbVhzbWd4STBrfn5-"
                 ),
             )
         )

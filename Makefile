@@ -4,7 +4,7 @@ clean:
 	rm -rf dist build
 
 coverage:
-	pytest -v --cov
+	pytest -v --cov=opentok
 	coverage html
 
 test:
