@@ -551,7 +551,6 @@ class Client(object):
                 )
             else:
                 headers = self.get_headers()
-                headers['Accept'] = 'application/json'
                 response = requests.post(
                     self.endpoints.get_session_url(),
                     data=options,
@@ -569,6 +568,7 @@ class Client(object):
 
         try:
             content_type = response.headers["Content-Type"]
+            # Legacy behaviour
             if content_type != "application/json":
                 dom = xmldom.parseString(response.content.decode("utf-8"))
                 error = dom.getElementsByTagName("error")
@@ -606,6 +606,7 @@ class Client(object):
                 + " python/"
                 + platform.python_version(),
                 "X-OPENTOK-AUTH": self._create_jwt_auth_header(),
+                "Accept": "application/json",
             }
         return {
             "User-Agent": self.user_agent + " OpenTok-With-Vonage-API-Backend",
@@ -1918,13 +1919,13 @@ class Client(object):
         logger.debug(
             "DELETE to %r with headers %r, proxies %r",
             self.endpoints.get_render_url(render_id=render_id),
-            self.get_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
         response = requests.delete(
             self.endpoints.get_render_url(render_id=render_id),
-            headers=self.get_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout,
         )
@@ -1955,14 +1956,14 @@ class Client(object):
         logger.debug(
             "GET to %r with headers %r, params %r, proxies %r",
             self.endpoints.get_render_url(),
-            self.get_headers(),
+            self.get_json_headers(),
             query_params,
             self.proxies,
         )
 
         response = requests.get(
             self.endpoints.get_render_url(),
-            headers=self.get_headers(),
+            headers=self.get_json_headers(),
             params=query_params,
             proxies=self.proxies,
             timeout=self.timeout,
@@ -2193,7 +2194,7 @@ class Client(object):
                 options = {"active": True, "excludedStreams": []}
 
             response = requests.post(
-                url, headers=self.get_headers(), data=json.dumps(options)
+                url, headers=self.get_json_headers(), data=json.dumps(options)
             )
 
             if response:
@@ -2230,7 +2231,7 @@ class Client(object):
         url = self.endpoints.get_mute_all_url(session_id)
 
         response = requests.post(
-            url, headers=self.get_headers(), data=json.dumps(options)
+            url, headers=self.get_json_headers(), data=json.dumps(options)
         )
 
         try:
@@ -2264,7 +2265,7 @@ class Client(object):
             if stream_id:
                 url = self.endpoints.get_stream_url(session_id, stream_id) + "/mute"
 
-            response = requests.post(url, headers=self.get_headers())
+            response = requests.post(url, headers=self.get_json_headers())
 
             if response:
                 return response
@@ -2381,7 +2382,7 @@ class OpenTok(Client):
                 options = {"active": True, "excludedStreams": []}
 
             response = requests.post(
-                url, headers=self.get_headers(), data=json.dumps(options)
+                url, headers=self.get_json_headers(), data=json.dumps(options)
             )
 
             if response:
@@ -2416,7 +2417,7 @@ class OpenTok(Client):
         url = self.endpoints.get_mute_all_url(session_id)
 
         response = requests.post(
-            url, headers=self.get_headers(), data=json.dumps(options)
+            url, headers=self.get_json_headers(), data=json.dumps(options)
         )
 
         try:
@@ -2448,7 +2449,7 @@ class OpenTok(Client):
             if stream_id:
                 url = self.endpoints.get_stream_url(session_id, stream_id) + "/mute"
 
-            response = requests.post(url, headers=self.get_headers())
+            response = requests.post(url, headers=self.get_json_headers())
 
             if response:
                 return response
