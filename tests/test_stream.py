@@ -1,8 +1,7 @@
 import unittest
-from six import text_type, u, b, PY2, PY3
+from six import u
 from opentok import Client, Stream, StreamList, __version__, SetStreamClassError
 import httpretty
-import json
 import textwrap
 from expects import *
 
@@ -163,7 +162,7 @@ class OpenTokStreamTest(unittest.TestCase):
 
     @httpretty.activate
     def test_set_stream_class_lists(self):
-        """ Test set stream class functionality """
+        """Test set stream class functionality"""
         payload = [
             {
                 "id": "7b09ec3c-26f9-43d7-8197-f608f13d4fb6",
@@ -197,7 +196,7 @@ class OpenTokStreamTest(unittest.TestCase):
 
     @httpretty.activate
     def test_set_stream_class_lists_throws_exception(self):
-        """ Test invalid request in set stream class list """
+        """Test invalid request in set stream class list"""
 
         # invalid payload
         payload = [{"id": "7b09ec3c-26f9-43d7-8197-f608f13d4fb6"}]

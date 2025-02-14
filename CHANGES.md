@@ -1,3 +1,8 @@
+# Release 3.11.0
+- OpenTok SDK now accepts Vonage credentials so it's possible to use the existing OpenTok SDK with the Vonage Video API
+- Add additional headers to some requests
+- Internal changes to the `Opentok.create_session` method
+
 # Release 3.10.0
 - Add new `max_bitrate` option for archives
 - Change to create JWTs by default in the `Client.generate_token` method. T1 tokens can still be created by setting `use_jwt=False` when generating a token.

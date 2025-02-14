@@ -5,7 +5,7 @@ import time
 
 
 def validate_jwt_header(self, jsonwebtoken):
-    claims = decode(jsonwebtoken, self.api_secret, algorithms=[u("HS256")])
+    claims = decode(jsonwebtoken, self.api_secret, algorithms=["HS256", "RS256"])
     expect(claims).to(have_key(u("iss")))
     expect(claims[u("iss")]).to(equal(self.api_key))
     expect(claims).to(have_key(u("ist")))

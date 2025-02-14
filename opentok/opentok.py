@@ -1,4 +1,5 @@
 from datetime import datetime  # generate_token
+import re
 from typing import List, Optional  # imports List, Optional type hint
 import calendar  # generate_token
 import base64  # generate_token
@@ -7,6 +8,7 @@ import time  # generate_token
 import hmac  # _sign_string
 import hashlib
 from typing import List
+import uuid
 import requests  # create_session, archiving
 import json  # archiving
 import platform  # user-agent
@@ -19,7 +21,7 @@ import warnings  # Native. Used for notifying deprecations
 
 
 # compat
-from six.moves.urllib.parse import urlencode
+from urllib.parse import urlencode
 from six import text_type, u, b, PY3
 from enum import Enum
 
@@ -111,6 +113,11 @@ logger = logging.getLogger("opentok")
 class Client(object):
     """Use this SDK to create tokens and interface with the server-side portion
     of the Opentok API.
+
+    You can also interact with this client object with Vonage credentials. Instead of passing
+    on OpenTok API key and secret, you can pass in a Vonage application ID and private key,
+    e.g. api_key=VONAGE_APPLICATION_ID, api_secret=VONAGE_PRIVATE_KEY. You do not need to set the API
+    URL differently, the SDK will set this for you.
     """
 
     TOKEN_SENTINEL = "T1=="
@@ -124,11 +131,25 @@ class Client(object):
         timeout=None,
         app_version=None,
     ):
+
+        if isinstance(api_secret, (str, bytes)) and re.search(
+            "[.][a-zA-Z0-9_]+$", api_secret
+        ):
+            # We have a private key so we assume we are using Vonage credentials
+            self._using_vonage = True
+            self._api_url = 'https://video.api.vonage.com'
+            with open(api_secret, "rb") as key_file:
+                self.api_secret = key_file.read()
+        else:
+            # We are using OpenTok credentials
+            self._using_vonage = False
+            self.api_secret = api_secret
+            self._api_url = api_url
+
         self.api_key = str(api_key)
-        self.api_secret = api_secret
         self.timeout = timeout
         self._proxies = None
-        self.endpoints = Endpoints(api_url, self.api_key)
+        self.endpoints = Endpoints(self._api_url, self.api_key)
         self._app_version = __version__ if app_version == None else app_version
         self._user_agent = (
             f"OpenTok-Python-SDK/{self.app_version} python/{platform.python_version()}"
@@ -306,14 +327,13 @@ class Client(object):
 
         if use_jwt:
             payload = {}
-            payload['iss'] = self.api_key
-            payload['ist'] = 'project'
+
+            payload['session_id'] = session_id
+            payload['role'] = role.value
             payload['iat'] = now
             payload["exp"] = expire_time
-            payload['nonce'] = random.randint(0, 999999)
-            payload['role'] = role.value
             payload['scope'] = 'session.connect'
-            payload['session_id'] = session_id
+
             if initial_layout_class_list:
                 payload['initial_layout_class_list'] = (
                     initial_layout_class_list_serialized
@@ -321,9 +341,27 @@ class Client(object):
             if data:
                 payload['connection_data'] = data
 
-            headers = {'alg': 'HS256', 'typ': 'JWT'}
+            if not self._using_vonage:
+                payload['iss'] = self.api_key
+                payload['ist'] = 'project'
+                payload['nonce'] = random.randint(0, 999999)
 
-            token = encode(payload, self.api_secret, algorithm="HS256", headers=headers)
+                headers = {'alg': 'HS256', 'typ': 'JWT'}
+
+                token = encode(
+                    payload, self.api_secret, algorithm="HS256", headers=headers
+                )
+            else:
+                payload['application_id'] = self.api_key
+                payload['jti'] = str(uuid.uuid4())
+                payload['subject'] = 'video'
+                payload['acl'] = {'paths': {'/session/**': {}}}
+
+                headers = {'alg': 'RS256', 'typ': 'JWT'}
+
+                token = encode(
+                    payload, self.api_secret, algorithm="RS256", headers=headers
+                )
 
             return token
 
@@ -500,39 +538,54 @@ class Client(object):
                 "POST to %r with params %r, headers %r, proxies %r",
                 self.endpoints.get_session_url(),
                 options,
-                self.get_headers(),
+                self.get_json_headers(),
                 self.proxies,
             )
-            response = requests.post(
-                self.endpoints.get_session_url(),
-                data=options,
-                headers=self.get_headers(),
-                proxies=self.proxies,
-                timeout=self.timeout,
-            )
+            if not self._using_vonage:
+                response = requests.post(
+                    self.endpoints.get_session_url(),
+                    data=options,
+                    headers=self.get_headers(),
+                    proxies=self.proxies,
+                    timeout=self.timeout,
+                )
+            else:
+                headers = self.get_headers()
+                response = requests.post(
+                    self.endpoints.get_session_url(),
+                    data=options,
+                    headers=headers,
+                    proxies=self.proxies,
+                    timeout=self.timeout,
+                )
             response.encoding = "utf-8"
-
             if response.status_code == 403:
                 raise AuthError("Failed to create session, invalid credentials")
             if not response.content:
                 raise RequestError()
-            dom = xmldom.parseString(response.content.decode("utf-8"))
         except Exception as e:
             raise RequestError("Failed to create session: %s" % str(e))
 
         try:
-            error = dom.getElementsByTagName("error")
-            if error:
-                error = error[0]
-                raise AuthError(
-                    "Failed to create session (code=%s): %s"
-                    % (
-                        error.attributes["code"].value,
-                        error.firstChild.attributes["message"].value,
+            content_type = response.headers["Content-Type"]
+            # Legacy behaviour
+            if content_type != "application/json":
+                dom = xmldom.parseString(response.content.decode("utf-8"))
+                error = dom.getElementsByTagName("error")
+                if error:
+                    error = error[0]
+                    raise AuthError(
+                        "Failed to create session (code=%s): %s"
+                        % (
+                            error.attributes["code"].value,
+                            error.firstChild.attributes["message"].value,
+                        )
                     )
+                session_id = (
+                    dom.getElementsByTagName("session_id")[0].childNodes[0].nodeValue
                 )
-
-            session_id = dom.getElementsByTagName("session_id")[0].childNodes[0].nodeValue
+            else:
+                session_id = response.json()[0]["session_id"]
             return Session(
                 self,
                 session_id,
@@ -546,12 +599,19 @@ class Client(object):
 
     def get_headers(self):
         """For internal use."""
+        if not self._using_vonage:
+            return {
+                "User-Agent": "OpenTok-Python-SDK/"
+                + self.app_version
+                + " python/"
+                + platform.python_version(),
+                "X-OPENTOK-AUTH": self._create_jwt_auth_header(),
+                "Accept": "application/json",
+            }
         return {
-            "User-Agent": "OpenTok-Python-SDK/"
-            + self.app_version
-            + " python/"
-            + platform.python_version(),
-            "X-OPENTOK-AUTH": self._create_jwt_auth_header(),
+            "User-Agent": self.user_agent + " OpenTok-With-Vonage-API-Backend",
+            "Authorization": "Bearer " + self._create_jwt_auth_header(),
+            "Accept": "application/json",
         }
 
     def headers(self):
@@ -1859,13 +1919,13 @@ class Client(object):
         logger.debug(
             "DELETE to %r with headers %r, proxies %r",
             self.endpoints.get_render_url(render_id=render_id),
-            self.get_headers(),
+            self.get_json_headers(),
             self.proxies,
         )
 
         response = requests.delete(
             self.endpoints.get_render_url(render_id=render_id),
-            headers=self.get_headers(),
+            headers=self.get_json_headers(),
             proxies=self.proxies,
             timeout=self.timeout,
         )
@@ -1896,14 +1956,14 @@ class Client(object):
         logger.debug(
             "GET to %r with headers %r, params %r, proxies %r",
             self.endpoints.get_render_url(),
-            self.get_headers(),
+            self.get_json_headers(),
             query_params,
             self.proxies,
         )
 
         response = requests.get(
             self.endpoints.get_render_url(),
-            headers=self.get_headers(),
+            headers=self.get_json_headers(),
             params=query_params,
             proxies=self.proxies,
             timeout=self.timeout,
@@ -2090,14 +2150,21 @@ class Client(object):
     def _create_jwt_auth_header(self):
         payload = {
             "ist": "project",
-            "iss": self.api_key,
             "iat": int(time.time()),  # current time in unix time (seconds)
             "exp": int(time.time())
             + (60 * self._jwt_livetime),  # 3 minutes in the future (seconds)
-            "jti": "{0}".format(0, random.random()),
         }
 
-        return encode(payload, self.api_secret, algorithm="HS256")
+        if not self._using_vonage:
+            payload["iss"] = self.api_key
+            payload["jti"] = str(random.random())
+            return encode(payload, self.api_secret, algorithm="HS256")
+
+        payload["application_id"] = self.api_key
+        payload["jti"] = str(uuid.uuid4())
+        headers = {"typ": "JWT", "alg": "RS256"}
+
+        return encode(payload, self.api_secret, algorithm='RS256', headers=headers)
 
     def mute_all(
         self, session_id: str, excludedStreamIds: Optional[List[str]]
@@ -2127,7 +2194,7 @@ class Client(object):
                 options = {"active": True, "excludedStreams": []}
 
             response = requests.post(
-                url, headers=self.get_headers(), data=json.dumps(options)
+                url, headers=self.get_json_headers(), data=json.dumps(options)
             )
 
             if response:
@@ -2164,7 +2231,7 @@ class Client(object):
         url = self.endpoints.get_mute_all_url(session_id)
 
         response = requests.post(
-            url, headers=self.get_headers(), data=json.dumps(options)
+            url, headers=self.get_json_headers(), data=json.dumps(options)
         )
 
         try:
@@ -2198,7 +2265,7 @@ class Client(object):
             if stream_id:
                 url = self.endpoints.get_stream_url(session_id, stream_id) + "/mute"
 
-            response = requests.post(url, headers=self.get_headers())
+            response = requests.post(url, headers=self.get_json_headers())
 
             if response:
                 return response
@@ -2315,7 +2382,7 @@ class OpenTok(Client):
                 options = {"active": True, "excludedStreams": []}
 
             response = requests.post(
-                url, headers=self.get_headers(), data=json.dumps(options)
+                url, headers=self.get_json_headers(), data=json.dumps(options)
             )
 
             if response:
@@ -2350,7 +2417,7 @@ class OpenTok(Client):
         url = self.endpoints.get_mute_all_url(session_id)
 
         response = requests.post(
-            url, headers=self.get_headers(), data=json.dumps(options)
+            url, headers=self.get_json_headers(), data=json.dumps(options)
         )
 
         try:
@@ -2382,7 +2449,7 @@ class OpenTok(Client):
             if stream_id:
                 url = self.endpoints.get_stream_url(session_id, stream_id) + "/mute"
 
-            response = requests.post(url, headers=self.get_headers())
+            response = requests.post(url, headers=self.get_json_headers())
 
             if response:
                 return response

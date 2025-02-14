@@ -26,7 +26,7 @@ def token_decoder(token: str, secret: str = None):
         return token_data
 
     encoded = token.replace('Bearer ', '').strip()
-    return decode(encoded, secret, algorithms='HS256')
+    return decode(encoded, secret, algorithms=['HS256', 'RS256'])
 
 
 def token_signature_validator(token, secret):
