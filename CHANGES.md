@@ -1,5 +1,7 @@
 # Release 3.11.0
-- OpenTok SDK now accepts Vonage credentials so it's possible to use the existing OpenTok SDK with the Vonage Video API.
+- OpenTok SDK now accepts Vonage credentials so it's possible to use the existing OpenTok SDK with the Vonage Video API
+- Add additional headers to some requests
+- Internal changes to the `Opentok.create_session` method
 
 # Release 3.10.0
 - Add new `max_bitrate` option for archives
