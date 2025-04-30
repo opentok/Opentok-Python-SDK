@@ -5,3 +5,4 @@ wheel
 twine
 bump2version
 sure
+pytest-cov
