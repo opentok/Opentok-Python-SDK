@@ -2094,7 +2094,10 @@ class Client(object):
             timeout=self.timeout,
         )
 
+        # Keeping backwards compat just in case
         if response and response.status_code == 200:
+            return Captions(response.json())
+        if response and response.status_code == 202:
             return Captions(response.json())
         elif response.status_code == 400:
             """
