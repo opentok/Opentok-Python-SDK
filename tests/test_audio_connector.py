@@ -12,6 +12,38 @@ from .validate_jwt import validate_jwt_header
 
 
 class OpenTokAudioConnectorLiteTest(unittest.TestCase):
+    @httpretty.activate
+    def test_connect_audio_to_websocket_with_bidirectional(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            u(f"https://api.opentok.com/v2/project/{self.api_key}/connect"),
+            body=self.response_body,
+            status=200,
+            content_type=u("application/json"),
+        )
+
+        websocket_options = {"uri": "wss://service.com/ws-endpoint", "bidirectional": True}
+
+        websocket_audio_connection = self.opentok.connect_audio_to_websocket(
+            self.session_id, self.token, websocket_options
+        )
+
+        validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
+        expect(httpretty.last_request().headers[u("user-agent")]).to(contain(u("OpenTok-Python-SDK/") + __version__))
+        expect(httpretty.last_request().headers[u("content-type")]).to(equal(u("application/json")))
+        if PY2:
+            body = json.loads(httpretty.last_request().body)
+        if PY3:
+            body = json.loads(httpretty.last_request().body.decode("utf-8"))
+
+        expect(body).to(have_key(u("token")))
+        expect(body["websocket"]).to(have_key("bidirectional"))
+        expect(body["websocket"]["bidirectional"]).to(be_true)
+        expect(websocket_audio_connection).to(be_a(WebSocketAudioConnection))
+        expect(websocket_audio_connection).to(have_property(u("id"), u("b0a5a8c7-dc38-459f-a48d-a7f2008da853")))
+        expect(websocket_audio_connection).to(have_property(u("connectionId"), u("e9f8c166-6c67-440d-994a-04fb6dfed007")))
+        # The bidirectional property should be present (None if not in response, True if in response)
+        expect(hasattr(websocket_audio_connection, "bidirectional")).to(be_true)
     def setUp(self):
         self.api_key = u("123456")
         self.api_secret = u("1234567890abcdef1234567890abcdef1234567890")

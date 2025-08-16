@@ -7,6 +7,7 @@ class WebSocketAudioConnection:
     def __init__(self, kwargs):
         self.id = kwargs.get("id")
         self.connectionId = kwargs.get("connectionId")
+        self.bidirectional = kwargs.get("bidirectional")
 
     def json(self):
         """Returns a JSON representation of the WebSocket audio connection information."""

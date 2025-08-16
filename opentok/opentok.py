@@ -1993,6 +1993,7 @@ class Client(object):
             String 'uri': A publicly reachable WebSocket URI to be used for the destination of the audio stream (such as "wss://example.com/ws-endpoint").
             List 'streams' Optional: A list of stream IDs for the OpenTok streams you want to include in the WebSocket audio. If you omit this property, all streams in the session will be included.
             Dictionary 'headers' Optional: An object of key-value pairs of headers to be sent to your WebSocket server with each message, with a maximum length of 512 bytes.
+            Boolean 'bidirectional' Optional: If true, enables bidirectional audio streaming over the WebSocket connection.
         """
         self.validate_websocket_options(websocket_options)
 
@@ -2043,6 +2044,10 @@ class Client(object):
             )
         if "uri" not in options:
             raise InvalidWebSocketOptionsError("Provide a WebSocket URI.")
+
+        if "bidirectional" in options:
+            if not isinstance(options["bidirectional"], bool):
+                raise InvalidWebSocketOptionsError("'bidirectional' must be a boolean if provided.")
 
     def start_captions(
         self,
