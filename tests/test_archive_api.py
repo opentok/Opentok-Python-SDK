@@ -1553,6 +1553,243 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         response.headers["Content-Type"].should.equal("application/json")
 
     @httpretty.activate
+    def test_start_archive_with_quantization_parameter(self):
+        """Test start archive with quantization parameter"""
+        httpretty.register_uri(
+            httpretty.POST,
+            u("https://api.opentok.com/v2/project/{0}/archive").format(self.api_key),
+            body=textwrap.dedent(
+                u(
+                    """\
+                        {
+                            "createdAt" : 1395183243556,
+                            "duration" : 0,
+                            "id" : "30b3ebf1-ba36-4f5b-8def-6f70d9986fe9",
+                            "name" : "ARCHIVE NAME",
+                            "partnerId" : 123456,
+                            "reason" : "",
+                            "sessionId" : "SESSIONID",
+                            "size" : 0,
+                            "status" : "started",
+                            "hasAudio": true,
+                            "hasVideo": true,
+                            "outputMode": "composed",
+                            "url" : null,
+                            "quantizationParameter": 25
+                        }
+                    """
+                )
+            ),
+            status=200,
+            content_type=u("application/json"),
+        )
+
+        archive = self.opentok.start_archive(
+            self.session_id, name=u("ARCHIVE NAME"), quantization_parameter=25
+        )
+
+        validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
+        expect(httpretty.last_request().headers[u("user-agent")]).to(
+            contain(u("OpenTok-Python-SDK/") + __version__)
+        )
+        expect(httpretty.last_request().headers[u("content-type")]).to(
+            equal(u("application/json"))
+        )
+        # non-deterministic json encoding. have to decode to test it properly
+        if PY2:
+            body = json.loads(httpretty.last_request().body)
+        if PY3:
+            body = json.loads(httpretty.last_request().body.decode("utf-8"))
+        expect(body).to(have_key(u("sessionId"), u("SESSIONID")))
+        expect(body).to(have_key(u("name"), u("ARCHIVE NAME")))
+        expect(body).to(have_key(u("quantizationParameter"), 25))
+        expect(archive).to(be_an(Archive))
+        expect(archive).to(
+            have_property(u("id"), u("30b3ebf1-ba36-4f5b-8def-6f70d9986fe9"))
+        )
+        expect(archive).to(have_property(u("name"), ("ARCHIVE NAME")))
+        expect(archive).to(have_property(u("quantization_parameter"), 25))
+
+    def test_start_archive_with_invalid_quantization_parameter_type(self):
+        """Test start archive with invalid quantization parameter type"""
+        with pytest.raises(OpenTokException) as excinfo:
+            self.opentok.start_archive(
+                self.session_id, quantization_parameter="invalid"
+            )
+        expect(str(excinfo.value)).to(contain("quantization_parameter must be a number"))
+
+    def test_start_archive_with_quantization_parameter_too_low(self):
+        """Test start archive with quantization parameter below minimum"""
+        with pytest.raises(OpenTokException) as excinfo:
+            self.opentok.start_archive(
+                self.session_id, quantization_parameter=14
+            )
+        expect(str(excinfo.value)).to(contain("quantization_parameter must be between 15 and 40"))
+
+    def test_start_archive_with_quantization_parameter_too_high(self):
+        """Test start archive with quantization parameter above maximum"""
+        with pytest.raises(OpenTokException) as excinfo:
+            self.opentok.start_archive(
+                self.session_id, quantization_parameter=41
+            )
+        expect(str(excinfo.value)).to(contain("quantization_parameter must be between 15 and 40"))
+
+    @httpretty.activate
+    def test_start_archive_with_quantization_parameter_boundary_values(self):
+        """Test start archive with quantization parameter boundary values"""
+        httpretty.register_uri(
+            httpretty.POST,
+            u("https://api.opentok.com/v2/project/{0}/archive").format(self.api_key),
+            body=textwrap.dedent(
+                u(
+                    """\
+                        {
+                            "createdAt" : 1395183243556,
+                            "duration" : 0,
+                            "id" : "30b3ebf1-ba36-4f5b-8def-6f70d9986fe9",
+                            "name" : "",
+                            "partnerId" : 123456,
+                            "reason" : "",
+                            "sessionId" : "SESSIONID",
+                            "size" : 0,
+                            "status" : "started",
+                            "hasAudio": true,
+                            "hasVideo": true,
+                            "outputMode": "composed",
+                            "url" : null,
+                            "quantizationParameter": 15
+                        }
+                    """
+                )
+            ),
+            status=200,
+            content_type=u("application/json"),
+        )
+
+        # Test minimum value (15)
+        archive = self.opentok.start_archive(self.session_id, quantization_parameter=15)
+        expect(archive).to(be_an(Archive))
+        expect(archive).to(have_property(u("quantization_parameter"), 15))
+
+        # Test maximum value (40)
+        httpretty.reset()
+        httpretty.register_uri(
+            httpretty.POST,
+            u("https://api.opentok.com/v2/project/{0}/archive").format(self.api_key),
+            body=textwrap.dedent(
+                u(
+                    """\
+                        {
+                            "createdAt" : 1395183243556,
+                            "duration" : 0,
+                            "id" : "30b3ebf1-ba36-4f5b-8def-6f70d9986fe9",
+                            "name" : "",
+                            "partnerId" : 123456,
+                            "reason" : "",
+                            "sessionId" : "SESSIONID",
+                            "size" : 0,
+                            "status" : "started",
+                            "hasAudio": true,
+                            "hasVideo": true,
+                            "outputMode": "composed",
+                            "url" : null,
+                            "quantizationParameter": 40
+                        }
+                    """
+                )
+            ),
+            status=200,
+            content_type=u("application/json"),
+        )
+
+        archive = self.opentok.start_archive(self.session_id, quantization_parameter=40)
+        expect(archive).to(be_an(Archive))
+        expect(archive).to(have_property(u("quantization_parameter"), 40))
+
+    @httpretty.activate
+    def test_start_archive_with_float_quantization_parameter(self):
+        """Test start archive with float quantization parameter"""
+        httpretty.register_uri(
+            httpretty.POST,
+            u("https://api.opentok.com/v2/project/{0}/archive").format(self.api_key),
+            body=textwrap.dedent(
+                u(
+                    """\
+                        {
+                            "createdAt" : 1395183243556,
+                            "duration" : 0,
+                            "id" : "30b3ebf1-ba36-4f5b-8def-6f70d9986fe9",
+                            "name" : "",
+                            "partnerId" : 123456,
+                            "reason" : "",
+                            "sessionId" : "SESSIONID",
+                            "size" : 0,
+                            "status" : "started",
+                            "hasAudio": true,
+                            "hasVideo": true,
+                            "outputMode": "composed",
+                            "url" : null,
+                            "quantizationParameter": 25.5
+                        }
+                    """
+                )
+            ),
+            status=200,
+            content_type=u("application/json"),
+        )
+
+        archive = self.opentok.start_archive(self.session_id, quantization_parameter=25.5)
+        
+        if PY2:
+            body = json.loads(httpretty.last_request().body)
+        if PY3:
+            body = json.loads(httpretty.last_request().body.decode("utf-8"))
+        expect(body).to(have_key(u("quantizationParameter"), 25.5))
+        expect(archive).to(be_an(Archive))
+        expect(archive).to(have_property(u("quantization_parameter"), 25.5))
+
+    @httpretty.activate
+    def test_start_archive_without_quantization_parameter(self):
+        """Test start archive without quantization parameter (should not include in payload)"""
+        httpretty.register_uri(
+            httpretty.POST,
+            u("https://api.opentok.com/v2/project/{0}/archive").format(self.api_key),
+            body=textwrap.dedent(
+                u(
+                    """\
+                        {
+                            "createdAt" : 1395183243556,
+                            "duration" : 0,
+                            "id" : "30b3ebf1-ba36-4f5b-8def-6f70d9986fe9",
+                            "name" : "",
+                            "partnerId" : 123456,
+                            "reason" : "",
+                            "sessionId" : "SESSIONID",
+                            "size" : 0,
+                            "status" : "started",
+                            "hasAudio": true,
+                            "hasVideo": true,
+                            "outputMode": "composed",
+                            "url" : null
+                        }
+                    """
+                )
+            ),
+            status=200,
+            content_type=u("application/json"),
+        )
+
+        archive = self.opentok.start_archive(self.session_id)
+        
+        if PY2:
+            body = json.loads(httpretty.last_request().body)
+        if PY3:
+            body = json.loads(httpretty.last_request().body.decode("utf-8"))
+        expect(body).to_not(have_key(u("quantizationParameter")))
+        expect(archive).to(be_an(Archive))
+        expect(archive).to(have_property(u("quantization_parameter"), None))
+
+    @httpretty.activate
     def test_set_archive_layout_throws_exception(self):
         """Test invalid request in set archive layout"""
         archive_id = u("f6e7ee58-d6cf-4a59-896b-6d56b158ec71")
