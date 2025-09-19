@@ -648,6 +648,7 @@ class Client(object):
         layout=None,
         multi_archive_tag=None,
         max_bitrate=None,
+        quantization_parameter=None,
     ):
         """
         Starts archiving an OpenTok session.
@@ -708,6 +709,8 @@ class Client(object):
 
         :param String max_bitrate (Optional): The maximum video bitrate for the archive, in bits per second. The minimum value is 100,000 and the maximum is 6,000,000.
 
+        :param Number quantization_parameter (Optional): The quantization parameter (QP) for video encoding quality. Values between 15-40, where smaller values generate higher quality and larger archives, larger values generate lower quality and smaller archives. QP uses variable bitrate (VBR).
+
         :rtype: The Archive object, which includes properties defining the archive,
           including the archive ID.
         """
@@ -725,6 +728,16 @@ class Client(object):
                 )
             )
 
+        if quantization_parameter is not None:
+            if not isinstance(quantization_parameter, (int, float)):
+                raise OpenTokException(
+                    u("quantization_parameter must be a number")
+                )
+            if quantization_parameter < 15 or quantization_parameter > 40:
+                raise OpenTokException(
+                    u("quantization_parameter must be between 15 and 40")
+                )
+
         payload = {
             "name": name,
             "sessionId": session_id,
@@ -736,6 +749,9 @@ class Client(object):
             "multiArchiveTag": multi_archive_tag,
             "maxBitrate": max_bitrate,
         }
+
+        if quantization_parameter is not None:
+            payload["quantizationParameter"] = quantization_parameter
 
         if layout is not None:
             payload["layout"] = layout

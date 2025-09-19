@@ -112,6 +112,8 @@ class Archive(object):
        10 minutes. To generate a new URL, call the Archive.listArchives() or OpenTok.getArchive() method.
 
     :ivar max_bitrate: The maximum video bitrate for the archive, in bits per second. The minimum value is 100,000 and the maximum is 6,000,000.
+    
+    :ivar quantization_parameter: The quantization parameter (QP) for video encoding quality. Values between 15-40, where smaller values generate higher quality and larger archives.
     """
 
     def __init__(self, sdk, values):
@@ -139,6 +141,7 @@ class Archive(object):
         self.url = values.get("url")
         self.resolution = values.get("resolution")
         self.max_bitrate = values.get("maxBitrate")
+        self.quantization_parameter = values.get("quantizationParameter")
 
     def stop(self):
         """
