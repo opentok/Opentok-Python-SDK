@@ -2010,13 +2010,25 @@ class Client(object):
             List 'streams' Optional: A list of stream IDs for the OpenTok streams you want to include in the WebSocket audio. If you omit this property, all streams in the session will be included.
             Dictionary 'headers' Optional: An object of key-value pairs of headers to be sent to your WebSocket server with each message, with a maximum length of 512 bytes.
             Boolean 'bidirectional' Optional: If true, enables bidirectional audio streaming over the WebSocket connection.
+            Dictionary 'audio_transport' Optional: Configuration for audio transport format.
+                String 'transport': The transport type ('binary' or 'json').
+                String 'encoding' Optional: The encoding type (required for 'json' transport, e.g. 'base64').
+                String 'audio_field' Optional: The JSON field name for outbound audio data.
+                String 'receive_audio_field' Optional: The JSON field name for inbound audio data.
+                Dictionary 'static_fields' Optional: Static fields included in every outbound JSON message.
         """
         self.validate_websocket_options(websocket_options)
+
+        ws_opts = dict(websocket_options)
+        if "audio_transport" in ws_opts:
+            audio_transport = ws_opts.pop("audio_transport")
+            filtered = {k: v for k, v in audio_transport.items() if v is not None}
+            ws_opts["audioTransport"] = json.dumps(filtered, separators=(',', ':'))
 
         payload = {
             "sessionId": session_id,
             "token": opentok_token,
-            "websocket": websocket_options,
+            "websocket": ws_opts,
         }
 
         logger.debug(
@@ -2064,6 +2076,18 @@ class Client(object):
         if "bidirectional" in options:
             if not isinstance(options["bidirectional"], bool):
                 raise InvalidWebSocketOptionsError("'bidirectional' must be a boolean if provided.")
+
+        if "audio_transport" in options:
+            audio_transport = options["audio_transport"]
+            if not isinstance(audio_transport, dict):
+                raise InvalidWebSocketOptionsError("'audio_transport' must be a dictionary if provided.")
+            if "transport" not in audio_transport:
+                raise InvalidWebSocketOptionsError("'audio_transport' must include a 'transport' field.")
+            valid_transports = ("binary", "json")
+            if audio_transport["transport"] not in valid_transports:
+                raise InvalidWebSocketOptionsError(
+                    f"'transport' must be one of {valid_transports}."
+                )
 
     def start_captions(
         self,

@@ -165,3 +165,145 @@ class OpenTokAudioConnectorLiteTest(unittest.TestCase):
         with self.assertRaises(InvalidWebSocketOptionsError) as context:
             self.opentok.connect_audio_to_websocket(self.session_id, self.token, websocket_options)
         self.assertTrue("Provide a WebSocket URI." in str(context.exception))
+
+    @httpretty.activate
+    def test_connect_audio_to_websocket_with_audio_transport_json(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            u(f"https://api.opentok.com/v2/project/{self.api_key}/connect"),
+            body=self.response_body,
+            status=200,
+            content_type=u("application/json"),
+        )
+
+        websocket_options = {
+            "uri": "wss://service.com/ws-endpoint",
+            "audio_transport": {
+                "transport": "json",
+                "encoding": "base64",
+            },
+        }
+
+        websocket_audio_connection = self.opentok.connect_audio_to_websocket(
+            self.session_id, self.token, websocket_options
+        )
+
+        if PY3:
+            body = json.loads(httpretty.last_request().body.decode("utf-8"))
+
+        expect(body["websocket"]).to(have_key("audioTransport"))
+        expect(body["websocket"]).not_to(have_key("audio_transport"))
+        parsed = json.loads(body["websocket"]["audioTransport"])
+        expect(parsed["transport"]).to(equal("json"))
+        expect(parsed["encoding"]).to(equal("base64"))
+        expect(websocket_audio_connection).to(be_a(WebSocketAudioConnection))
+
+    @httpretty.activate
+    def test_connect_audio_to_websocket_with_audio_transport_full(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            u(f"https://api.opentok.com/v2/project/{self.api_key}/connect"),
+            body=self.response_body,
+            status=200,
+            content_type=u("application/json"),
+        )
+
+        websocket_options = {
+            "uri": "wss://service.com/ws-endpoint",
+            "audio_transport": {
+                "transport": "json",
+                "encoding": "base64",
+                "audio_field": "data",
+                "static_fields": {"event": "media"},
+            },
+        }
+
+        websocket_audio_connection = self.opentok.connect_audio_to_websocket(
+            self.session_id, self.token, websocket_options
+        )
+
+        if PY3:
+            body = json.loads(httpretty.last_request().body.decode("utf-8"))
+
+        parsed = json.loads(body["websocket"]["audioTransport"])
+        expect(parsed["transport"]).to(equal("json"))
+        expect(parsed["encoding"]).to(equal("base64"))
+        expect(parsed["audio_field"]).to(equal("data"))
+        expect(parsed["static_fields"]).to(equal({"event": "media"}))
+        expect(websocket_audio_connection).to(be_a(WebSocketAudioConnection))
+
+    @httpretty.activate
+    def test_connect_audio_to_websocket_with_binary_transport(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            u(f"https://api.opentok.com/v2/project/{self.api_key}/connect"),
+            body=self.response_body,
+            status=200,
+            content_type=u("application/json"),
+        )
+
+        websocket_options = {
+            "uri": "wss://service.com/ws-endpoint",
+            "audio_transport": {
+                "transport": "binary",
+            },
+        }
+
+        websocket_audio_connection = self.opentok.connect_audio_to_websocket(
+            self.session_id, self.token, websocket_options
+        )
+
+        if PY3:
+            body = json.loads(httpretty.last_request().body.decode("utf-8"))
+
+        expect(body["websocket"]["audioTransport"]).to(equal('{"transport":"binary"}'))
+        expect(websocket_audio_connection).to(be_a(WebSocketAudioConnection))
+
+    @httpretty.activate
+    def test_connect_audio_to_websocket_without_audio_transport(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            u(f"https://api.opentok.com/v2/project/{self.api_key}/connect"),
+            body=self.response_body,
+            status=200,
+            content_type=u("application/json"),
+        )
+
+        websocket_options = {"uri": "wss://service.com/ws-endpoint"}
+
+        self.opentok.connect_audio_to_websocket(
+            self.session_id, self.token, websocket_options
+        )
+
+        if PY3:
+            body = json.loads(httpretty.last_request().body.decode("utf-8"))
+
+        expect(body["websocket"]).not_to(have_key("audioTransport"))
+        expect(body["websocket"]).not_to(have_key("audio_transport"))
+
+    def test_connect_audio_to_websocket_invalid_audio_transport_type(self):
+        websocket_options = {
+            "uri": "wss://service.com/ws-endpoint",
+            "audio_transport": "invalid",
+        }
+        with self.assertRaises(InvalidWebSocketOptionsError) as context:
+            self.opentok.connect_audio_to_websocket(self.session_id, self.token, websocket_options)
+        self.assertTrue("'audio_transport' must be a dictionary if provided." in str(context.exception))
+
+    def test_connect_audio_to_websocket_audio_transport_missing_transport(self):
+        websocket_options = {
+            "uri": "wss://service.com/ws-endpoint",
+            "audio_transport": {"encoding": "base64"},
+        }
+        with self.assertRaises(InvalidWebSocketOptionsError) as context:
+            self.opentok.connect_audio_to_websocket(self.session_id, self.token, websocket_options)
+        self.assertTrue("'audio_transport' must include a 'transport' field." in str(context.exception))
+
+    def test_connect_audio_to_websocket_audio_transport_invalid_transport(self):
+        websocket_options = {
+            "uri": "wss://service.com/ws-endpoint",
+            "audio_transport": {"transport": "invalid"},
+        }
+        with self.assertRaises(InvalidWebSocketOptionsError) as context:
+            self.opentok.connect_audio_to_websocket(self.session_id, self.token, websocket_options)
+        self.assertTrue("'transport' must be one of" in str(context.exception))
