@@ -1,5 +1,11 @@
-# Release 3.12.0
+# Release 3.14.0
+- Add new `audio_transport` options object, which enables the setting of specific options for audio transport when streaming audio over a WebSocket connection.
+
+# Release 3.13.0
 - Add new `quantization_parameter` option for archives to control video encoding quality. Values between 15-40, where smaller values generate higher quality and larger archives, larger values generate lower quality and smaller archives. QP uses variable bitrate (VBR).
+
+# Release 3.12.0
+- Add new `bidirectional` option, which enables bidirectional audio streaming over the WebSocket connection.
 
 # Release 3.11.0
 - OpenTok SDK now accepts Vonage credentials so it's possible to use the existing OpenTok SDK with the Vonage Video API
