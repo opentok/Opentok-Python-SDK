@@ -649,6 +649,8 @@ class Client(object):
         multi_archive_tag=None,
         max_bitrate=None,
         quantization_parameter=None,
+        has_transcription=False,
+        transcription_properties=None,
     ):
         """
         Starts archiving an OpenTok session.
@@ -711,6 +713,14 @@ class Client(object):
 
         :param Number quantization_parameter (Optional): The quantization parameter (QP) for video encoding quality. Values between 15-40, where smaller values generate higher quality and larger archives, larger values generate lower quality and smaller archives. QP uses variable bitrate (VBR).
 
+        :param Boolean has_transcription (Optional): Whether the archive will have a transcription of the audio of the session (true) or not (false, the default).
+
+        :param Dictionary transcription_properties (Optional): Properties for the transcription. If has_transcription is set to True, you can specify the following properties for the transcription:
+
+            String 'primaryLanguageCode' (Optional): The primary language spoken in the archive to be transcribed, in BCP-47 format, e.g. en-US, es-ES or pt-BR.
+
+            Boolean 'hasSummary' (Optional): Whether the transcription should include a summary of the session (true) or not (false, the default).
+
         :rtype: The Archive object, which includes properties defining the archive,
           including the archive ID.
         """
@@ -749,6 +759,11 @@ class Client(object):
             "multiArchiveTag": multi_archive_tag,
             "maxBitrate": max_bitrate,
         }
+
+        if has_transcription:
+            payload["hasTranscription"] = has_transcription
+            if transcription_properties is not None:
+                payload["transcriptionProperties"] = transcription_properties
 
         if quantization_parameter is not None:
             payload["quantizationParameter"] = quantization_parameter
