@@ -626,7 +626,11 @@ class OpenTokArchiveApiTest(unittest.TestCase):
             content_type=u("application/json"),
         )
 
-        archive = self.opentok.start_archive(self.session_id, has_transcription=True)
+        archive = self.opentok.start_archive(
+            self.session_id,
+            has_transcription=True,
+            transcription_properties={"primaryLanguageCode": "ja-JP", "hasSummary": False}
+        )
 
         validate_jwt_header(self, httpretty.last_request().headers[u("x-opentok-auth")])
         expect(httpretty.last_request().headers[u("user-agent")]).to(
@@ -642,6 +646,10 @@ class OpenTokArchiveApiTest(unittest.TestCase):
             body = json.loads(httpretty.last_request().body.decode("utf-8"))
         expect(body).to(have_key(u("name"), None))
         expect(body).to(have_key(u("sessionId"), u("SESSIONID")))
+        expect(body).to(have_key(u("hasTranscription"), True))
+        expect(body).to(
+            have_key(u("transcriptionProperties"), {"primaryLanguageCode": "ja-JP", "hasSummary": False})
+        )
         expect(archive).to(be_an(Archive))
         expect(archive).to(
             have_property(u("id"), u("30b3ebf1-ba36-4f5b-8def-6f70d9986fe9"))
@@ -650,7 +658,6 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(archive).to(have_property(u("status"), u("started")))
         expect(archive).to(have_property(u("session_id"), u("SESSIONID")))
         expect(archive).to(have_property(u("partner_id"), 123456))
-        expect(archive).to(have_property(u("has_transcription"), True))
         if PY2:
             created_at = datetime.datetime.fromtimestamp(1395183243, pytz.UTC)
         if PY3:
@@ -662,6 +669,8 @@ class OpenTokArchiveApiTest(unittest.TestCase):
         expect(archive).to(have_property(u("has_audio"), True))
         expect(archive).to(have_property(u("has_video"), True))
         expect(archive).to(have_property(u("url"), None))
+        expect(archive).to(have_property(u("has_transcription"), True))
+        expect(archive).to(have_property(u("transcription_properties"), {"primaryLanguageCode": "ja-JP", "hasSummary": False}))
 
     @httpretty.activate
     def test_stop_archive(self):

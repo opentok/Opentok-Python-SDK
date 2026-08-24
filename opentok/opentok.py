@@ -649,6 +649,8 @@ class Client(object):
         multi_archive_tag=None,
         max_bitrate=None,
         quantization_parameter=None,
+        has_transcription=False,
+        transcription_properties=None,
     ):
         """
         Starts archiving an OpenTok session.
@@ -748,6 +750,8 @@ class Client(object):
             "streamMode": stream_mode.value,
             "multiArchiveTag": multi_archive_tag,
             "maxBitrate": max_bitrate,
+            "hasTranscription": has_transcription,
+            "transcriptionProperties": transcription_properties,
         }
 
         if quantization_parameter is not None:
