@@ -142,6 +142,8 @@ class Archive(object):
         self.resolution = values.get("resolution")
         self.max_bitrate = values.get("maxBitrate")
         self.quantization_parameter = values.get("quantizationParameter")
+        self.has_transcription = values.get("hasTranscription")
+        self.transcription_properties = values.get("transcriptionProperties")
 
     def stop(self):
         """
