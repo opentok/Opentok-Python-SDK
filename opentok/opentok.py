@@ -758,9 +758,12 @@ class Client(object):
             "streamMode": stream_mode.value,
             "multiArchiveTag": multi_archive_tag,
             "maxBitrate": max_bitrate,
-            "hasTranscription": has_transcription,
-            "transcriptionProperties": transcription_properties,
         }
+
+        if has_transcription:
+            payload["hasTranscription"] = has_transcription
+            if transcription_properties is not None:
+                payload["transcriptionProperties"] = transcription_properties
 
         if quantization_parameter is not None:
             payload["quantizationParameter"] = quantization_parameter
