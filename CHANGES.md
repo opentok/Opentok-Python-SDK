@@ -1,3 +1,6 @@
+# Release 3.15.0
+- Updates the implementation for the Archives feature in order to add support for post-call transcription.
+
 # Release 3.14.0
 - Add new `audio_transport` options object, which enables the setting of specific options for audio transport when streaming audio over a WebSocket connection.
 
